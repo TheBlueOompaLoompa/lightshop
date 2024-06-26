@@ -5,7 +5,6 @@
 
     export let projectName: string;
     const prn = `${projectName}`;
-    export let versions: number;
 
     let showDeleteConfirm = false;
 
@@ -19,10 +18,9 @@
         window.location.reload();
     }
 
-    let selectedVersion = `${versions}`;
 
     function openProject() {
-        location.href = `/project?name=${encodeURIComponent(prn)}&version=${selectedVersion}`;
+        location.href = `/project?name=${encodeURIComponent(prn)}`;
     }
 </script>
 
@@ -34,16 +32,6 @@
 
 <row class="subpanel">
     <span id="projectName">{projectName}</span>
-    <span style="margin-right: var(--spacing);">Versions</span>
-    <select onchange={(ev) => selectedVersion = ev.target.value}>
-        {#each new Array(versions + 1) as _, version}
-        {#if version == versions}
-        <option value={version} selected>{version}</option>
-        {:else}
-        <option value={version}>{version}</option>
-        {/if}
-        {/each}
-    </select>
     <button onclick={openProject}>Open</button>
     <button onclick={confirmDelete}><Trash class="icon-space"/>Delete</button>
 </row>

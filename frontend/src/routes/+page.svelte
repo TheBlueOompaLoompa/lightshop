@@ -4,27 +4,26 @@
 	import ProjectModal from '$components/ProjectModal.svelte';
 	
 	import { Client } from '$lib/stores';
-	import type { ProjectInfo } from '@backend/types';
+	import type { Project } from '@backend/types';
 	import SettingsModal from '$components/SettingsModal.svelte';
 
     let showSettings = false;
     let showNewProject = false;
-    let projects: ProjectInfo[] = [];
-    let newProject: ProjectInfo;
+    let projects: Project[] = [];
+    let newProject: Project;
 
     Client.subscribe(async client => {
         if(client) {
             const list = await client.projects.list.query();
+            console.log(list);
             if(list) projects = list;
         }
     });
 
     async function createProject() {
-        await $Client.projects.new.mutate({
-            info: newProject
-        });
+        await $Client.projects.save.mutate(newProject);
 
-        location.href = `/project?name=${encodeURIComponent(newProject.name)}&version=0`;
+        location.href = `/project?name=${encodeURIComponent(newProject.name)}`;
     }
 </script>
 
@@ -33,7 +32,7 @@
 {/if}
 
 {#if showNewProject}
-<ProjectModal isNewProject={true} bind:info={newProject} onpositive={() => { createProject(); showNewProject = false; }} onnegative={() => showNewProject = false}/>
+<ProjectModal isNewProject={true} bind:project={newProject} onpositive={() => { createProject(); showNewProject = false; }} onnegative={() => showNewProject = false}/>
 {/if}
 
 <main>
@@ -48,7 +47,7 @@
             </hrow>
             <projects>
                 {#each projects as project}
-                <ProjectRow projectName={`${project.name}`} versions={project.version} />
+                <ProjectRow projectName={`${project.name}`} />
                 {/each}
             </projects>
         </div>

@@ -34,6 +34,8 @@
   "dependencies": {
     "@sveltejs/adapter-static": "next",
     "@trpc/client": "next",
-    "backend": "../backend"
+    "@types/lodash": "^4.17.5",
+    "backend": "../backend",
+    "lodash": "^4.17.21"
   }
 }

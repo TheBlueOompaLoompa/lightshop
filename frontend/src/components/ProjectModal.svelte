@@ -1,13 +1,12 @@
 <script lang='ts'>
     import ConfirmModal from "$components/ConfirmModal.svelte";
-	import { ProjectInfo } from "@backend/schema/project";
-    import type { ProjectInfo as IProjectInfo } from '@backend/types';
+    import type { Project } from '@backend/types';
 
     export let isNewProject = false;
 
-    export let info: IProjectInfo = ProjectInfo.parse(undefined);
-    export let minutes = (info.time - info.time % 60) / 60;
-    export let seconds = info.time % 60;
+    export let project: Project = { name: '', tempo: 120, time: 0, version: 0, music: '', offset: 0 };
+    export let minutes = (project.time - project.time % 60) / 60;
+    export let seconds = project.time % 60;
 
     export let onpositive = () => {};
     export let onnegative = () => {};
@@ -20,7 +19,7 @@
             const reader = new FileReader();
 
             reader.onload = (_e: any) => {
-                if(typeof reader.result == 'string') info.musicFile = reader.result;
+                if(typeof reader.result == 'string') project.music = reader.result;
             };
 
             reader.readAsDataURL(file);
@@ -31,7 +30,7 @@
         onpositive();
     }
 
-    $: info.time = minutes * 60 + seconds;
+    $: project.time = minutes * 60 + seconds;
 </script>
 
 <ConfirmModal
@@ -44,15 +43,17 @@
 >
     <div class="area">
         <span>Name</span>
-        <input type="text" placeholder="Name" bind:value={info.name}/>
+        <input type="text" placeholder="Name" bind:value={project.name}/>
         <span>Tempo</span>
-        <input type="number" bind:value={info.tempo}/>
+        <input type="number" bind:value={project.tempo}/>
         <span>Length</span>
         <div>
             <input type="number" size="4" bind:value={minutes}/>
             <span>:</span>
             <input type="number" size="4" bind:value={seconds}/>
         </div>
+        <span>Offset (ms)</span>
+        <input type="number" bind:value={project.offset}>
         <span>Music File</span>
         <input type="file" onchange={onMusicUpload}/>
     </div>
