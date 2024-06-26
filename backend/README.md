@@ -1,15 +1,13 @@
-# backend
+# Lightshop backend
 
-To install dependencies:
+## Setup
+`bun i`
 
-```bash
-bun install
-```
+## Run
+`bun run .`
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.0.30. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## DB
+Reset DB
+`bun run db:reset`
+Migrations
+`bun run db:migrations`
