@@ -1,43 +1,68 @@
 import { z } from 'zod';
-import { deleteProject, listProjects, loadProject, saveProject, updateConfig } from '../projects';
-import { Project, ProjectInfo } from '$schema/project';
+import { insertProject, projects } from '$schema/project';
 import { publicProcedure, router } from '../trpc';
 import Cache from '../cache';
+import { diskDB } from 'db';
+import { eq } from 'drizzle-orm';
+import { caller } from '../index';
+import _ from 'lodash';
 
 const cache = new Cache();
 
 export default router({
     list: publicProcedure
         .query(async () => {
-            return await cache.useCache('project-list', listProjects);
-        }),
-    new: publicProcedure
-        .input(Project)
-        .mutation(async (opts) => {
-            await saveProject(opts.input, true);
-            cache.invalidate('project-list');
+            return await cache.useCache('project-list', async () => 
+                await diskDB.select({ name: projects.name })
+                    .from(projects)
+            );
         }),
     save: publicProcedure
-        .input(Project)
+        .input(insertProject)
         .mutation(async (opts) => {
-            await saveProject(opts.input);
+            await diskDB.insert(projects)
+                .values(opts.input)
+                .onConflictDoUpdate({
+                    target: projects.name,
+                    set: opts.input
+                });
             cache.invalidate('project-list');
         }),
     delete: publicProcedure
         .input(z.string({ description: 'Project name' }))
         .mutation(async (opts) => {
-            await deleteProject(opts.input);
+            await diskDB.delete(projects).where(eq(projects.name, opts.input));
             cache.invalidate('project-list');
         }),
     open: publicProcedure
-        .input(z.object({ name: z.string(), version: z.number() }))
+        .input(z.string())
         .query(async opts => {
-            const project = await loadProject(opts.input.name, opts.input.version);
-            return project;
+            const project = (await diskDB.select().from(projects).where(eq(projects.name, opts.input)))[0];
+
+            const pools = await caller.pools.list(project.name);
+            const POOL_NAME = 'Roots';
+
+            if(!_.some(pools, ['name', POOL_NAME])) {
+                await caller.pools.new({ name: POOL_NAME, project: project.name });
+            }
+
+            const settings = await caller.settings.load();
+            const rootClips = await caller.clips.list({ pool: POOL_NAME, project: project.name });
+            settings.targets.forEach(async target => {
+                if(!_.some(rootClips, ['name', target.name])) {
+                    await caller.clips.new({
+                        name: target.name,
+                        type: 'root',
+                        pool: POOL_NAME,
+                        params: [],
+                        project: project.name,
+                        targetType: target.type
+                    });
+                }
+            });
+
+            return {
+                project
+            };
         }),
-    updateConfig: publicProcedure
-        .input(ProjectInfo)
-        .mutation(async opts => {
-            await updateConfig(opts.input.name, opts.input.version, opts.input);
-        })
-})
+});

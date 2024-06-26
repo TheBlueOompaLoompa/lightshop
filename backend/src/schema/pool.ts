@@ -1,7 +1,11 @@
-import { z } from "zod";
-import { Clip, CompositeClip } from './clip';
+import { sqliteTable, text  } from "drizzle-orm/sqlite-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { projects } from "./project";
 
-export const Pool = z.object({
-    name: z.string(),
-    clips: z.union([Clip, CompositeClip])
+export const pools = sqliteTable('pools', {
+    project: text('project').references(() => projects.name, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    name: text('name').notNull(),
 });
+
+export const insertPool = createInsertSchema(pools);
+export const selectPool = createSelectSchema(pools);

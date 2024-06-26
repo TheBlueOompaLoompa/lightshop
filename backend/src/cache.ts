@@ -13,6 +13,14 @@ export default class Cache {
         }
     }
 
+    groupInvalidate(tagStart: string) {
+        Object.keys(this._cache).forEach(tag => {
+            if(tag.startsWith(tagStart)) {
+                this.invalidate(tag);
+            }
+        });
+    }
+
     invalidate(tag: string) {
         this._cache[tag] = undefined
     }

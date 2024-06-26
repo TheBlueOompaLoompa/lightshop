@@ -27,7 +27,8 @@
     "baseUrl": "./src",
     "paths": {
         "$schema/*": ["schema/*"],
-        "$api/*": ["api/*"]
+        "$api/*": ["api/*"],
+        "$lib/*": ["lib/*"]
     }
   }
 }

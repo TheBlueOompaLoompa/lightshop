@@ -1,23 +1,67 @@
 import { router, createCallerFactory } from './trpc';
 import { createBunWSHandler, type CreateBunContextOptions } from 'trpc-bun-adapter';
 import projects from '$api/projects';
+import pools from '$api/pool';
+import player from '$api/player';
 import settings from '$api/settings';
-import type { Project } from 'types';
 import { resolve } from 'node:path';
+import bpm from '$api/bpm';
+import _ from 'lodash';
+import animations from 'animations/animations';
+import clips from '$api/clips';
 
 const appRouter = router({
     projects,
-    settings
+    pools,
+    player,
+    clips,
+    bpm,
+    settings,
 });
 
 const createCaller = createCallerFactory(appRouter);
-const caller = createCaller({});
+export const caller = createCaller({});
+
+async function setupBuiltin() {
+    // Default pools
+    const poolList = await caller.pools.list('');
+    const linear = { name: 'Linear', project: null };
+    const spatial = { name: 'Spatial', project: null };
+    if(!_.some(poolList, linear)) await caller.pools.new(linear);
+    if(!_.some(poolList, spatial)) await caller.pools.new(spatial);
+
+    // Default clips
+    const linearClips = await caller.clips.list({ pool: linear.name });
+    const spatialClips = await caller.clips.list({ pool: spatial.name });
+    Object.keys(animations).forEach(async anim => {
+        if(animations[anim].targets.includes('linear') && !_.some(linearClips, ['name', anim])) {
+            await caller.clips.new({
+                name: anim,
+                type: 'builtin',
+                pool: linear.name,
+                params: animations[anim].params,
+                targetType: 'linear'
+            });
+        }
+
+        if(animations[anim].targets.includes('spatial') && !_.some(spatialClips, ['name', anim])) {
+            await caller.clips.new({
+                name: anim,
+                type: 'builtin',
+                pool: spatial.name,
+                params: animations[anim].params,
+                targetType: 'spatial'
+            });
+        }
+    });
+}
 
 export const createContext = (opts: CreateBunContextOptions) => ({
 });
 
 const FRONTEND_PATH = resolve('../frontend/build/');
 
+await setupBuiltin();
 Bun.serve({
     fetch(req, server) {
         const url = new URL(req.url);
