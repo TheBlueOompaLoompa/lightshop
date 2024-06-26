@@ -7,7 +7,7 @@
 `bun run .`
 
 ## DB
-Reset DB
+- Reset DB
 `bun run db:reset`
-Migrations
+- Migrations
 `bun run db:migrations`
