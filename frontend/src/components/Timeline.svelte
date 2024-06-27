@@ -4,6 +4,7 @@
     import { px2beats, beats2px, snap } from '$lib/util';
     import type { Clip as TClip } from '@backend/types';
     import _ from 'lodash';
+	import Playhead from '../routes/project/Playhead.svelte';
 
     export let clip: TClip;
     export let scale = 2;
@@ -30,8 +31,7 @@
         if(!($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip)) return;
         if($OnCursor.clip.targetType != clip.targetType) return;
 
-        const rect = main.getBoundingClientRect()
-        hoverBeat = snap(px2beats(event.pageX - rect.x + beats2px(beats, scale), scale), $Snapping);
+        const rect = main.getBoundingClientRect();
         $TimelineHover = { x: rect.x, y: rect.y };
         clips.forEach(clip => {
             if(
@@ -66,6 +66,31 @@
             clips = [...clips, ...(await $Client.clips.new.mutate(newClip))];
         }
     }
+
+    let resizingClip: TClip | undefined;
+    let resizeSide: 'left' | 'right';
+
+    function onresizeClip(side: 'left' | 'right', clip: TClip) {
+        resizeSide = side;
+        resizingClip = clip;
+    }
+
+    function resizeMouseMove(event: MouseEvent) {
+        const rect = main.getBoundingClientRect();
+        hoverBeat = snap(px2beats(event.pageX - rect.x + beats2px(beats, scale), scale), $Snapping);
+        if(resizingClip) {
+            if(resizeSide == 'left' && resizingClip.end != hoverBeat) resizingClip.start = hoverBeat;
+            else if(resizingClip.start != hoverBeat) resizingClip.end = hoverBeat;
+            resizingClip = resizingClip;
+            clips = clips;
+        }
+    }
+
+    $: if(main) window.addEventListener('mousemove', resizeMouseMove);
+
+    window.addEventListener('mouseup', () => {
+        resizingClip = null;
+    });
 </script>
 
 <timeline class="timeline">
@@ -78,11 +103,11 @@
         <span style="font-size: small; color: gray;">{clip.targetType}</span>
     </div>
     <div class="main" role="feed" {onmousemove} {onmouseout} onblur={onmouseout} {onclick} bind:this={main}>
-    {#each clips as clip}
-    {#if clip.end >= beats}
-    <Clip {clip} {scale} beat={clip.start - beats}/>
-    {/if}
-    {/each}
+        {#each clips as clip}
+        {#if clip.end >= beats}
+        <Clip {clip} {scale} beat={clip.start - beats} onresize={(side) => {onresizeClip(side, clip)}}/>
+        {/if}
+        {/each}
     </div>
 </timeline>
 
@@ -95,12 +120,9 @@
     timeline {
         display: flex;
         width: 100%;
-        height: 100%;
+        height: 100px;
         border: var(--white-border);
         border-radius: calc(var(--rounding)/2);
-    }
-
-    span {
         user-select: none;
     }
 

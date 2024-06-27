@@ -5,6 +5,7 @@
     import { Client, FPS, Snapping } from '$lib/stores';
     import { beats2time } from '$lib/util';
     import { time2beats } from '@backend/util';
+	import Playhead from "./Playhead.svelte";
 
     let { project, scale = $bindable(2), beats = $bindable(0) }:
         { project: Project, scale: number, beats: number } = $props();
@@ -126,15 +127,17 @@
         <input type="range" min="1" max="8" step="1" bind:value={$Snapping}>1/{$Snapping}
     </bar>
     
-    <Ticks {scale} {beats} snapping={$Snapping}/>
-
-    <timelines>
-        {#each clips as _clip, i}
-        <div>
-            <Timeline bind:clip={clips[i]} {beats} {scale} />
-        </div>
-        {/each}
-    </timelines>
+    <div>
+        <Playhead/>
+        <Ticks {scale} {beats} snapping={$Snapping}/>
+        <timelines>
+            {#each clips as _clip, i}
+            <div>
+                <Timeline bind:clip={clips[i]} {beats} {scale} />
+            </div>
+            {/each}
+        </timelines>
+    </div>
 </main>
 
 <style>
@@ -150,14 +153,9 @@
     }
 
     main div {
-        display: flex;
-        --height: 100px;
-        min-height: var(--height);
-        height: var(--height);
-        max-height: var(--height);
-        width: 100%;
-        margin-bottom: var(--spacing);
         position: relative;
+        width: 100%;
+        height: fit-content;
     }
 
     bar {

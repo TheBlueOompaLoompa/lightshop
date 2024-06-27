@@ -2,7 +2,7 @@
     import { time2beats, beats2time, snap } from "$lib/util";
     import { timelineSpacing } from "$lib/constants";
 
-    let { scale, beats, snapping }: { scale: number, beats: number, snapping: number } = $props();
+    let { scale, beats, snapping, onretime }: { scale: number, beats: number, snapping: number, onretime: () => any } = $props();
 
     const spacing = timelineSpacing;
 
@@ -14,10 +14,10 @@
     let moving = false;
 
     function moveTime(event: any) {
-        /*if(moving) {
+        if(moving) {
             $Playing = false;
             $Time = snap(event.offsetX / 10 / $TimelineScale, $Snapping, $Bpm) - ($Offset / 1000);
-        }*/
+        }
     }
 
     function startMove() {

@@ -2,7 +2,7 @@ import type { AppRouter } from '@backend/index';
 import { TRPCUntypedClient, createTRPCClientProxy, createWSClient, wsLink } from '@trpc/client';
 
 export default function createClient() {
-    const ws = createWSClient({ url: import.meta.env.VITE_TRPC });
+    const ws = createWSClient({ url: import.meta.env.VITE_TRPC ?? 'ws://localhost:3000/trpc' });
     return createTRPCClientProxy<AppRouter>(new TRPCUntypedClient({
         links: [
             wsLink({

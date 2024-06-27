@@ -17,7 +17,11 @@ const config = {
             '$components/*': 'src/components/*',
             '@backend/*': '../backend/src/*',
         }
-	}
+	},
+    onwarn: (warning, handler) => {
+        if (warning.code.includes("a11y") || warning.code.includes('ARIA')) return;
+        handler(warning);
+    },
 };
 
 export default config;

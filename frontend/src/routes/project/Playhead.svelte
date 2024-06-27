@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { Bpm, Time, TimelineScale, Playing, Offset } from '$lib/stores';
     import { snap } from '$lib/util';
     import Head from '../../assets/head.svg?raw';
 
-    export let tracks: any[];
+    export let trackCount: number = 1;
+    export let beat = 1;
 
     let playheadElement: HTMLElement;
     let svgContainerElement: HTMLDivElement;
@@ -14,19 +14,16 @@
     }
 
     $: if(svgElement) {
-        svgElement.style.left = `${-svgElement.clientWidth/2}px`;
-    }
-
-    $: if(playheadElement) {
-        playheadElement.style.left = `${($Time + ($Offset/1000)) * 10 * $TimelineScale}px`;
+        svgElement.style.height = '1rem';
+        svgElement.style.width = '1rem';
     }
 </script>
 
-<playhead class="retiming" bind:this={playheadElement}>
-    <div bind:this={svgContainerElement}>
+<playhead class="retiming" bind:this={playheadElement} style="left: calc({beat * 20 * 2 + 200}px + var(--spacing) * 2);">
+    <div bind:this={svgContainerElement} style="left: calc(-1rem/4);">
         {@html Head}
     </div>
-    <headline style="height: calc(var(--min-track-height) * {tracks.length} + 1rem + (var(--spacing) * {tracks.length} * 2 + var(--spacing) * 3))"/>
+    <headline style="height: calc(100px * {trackCount} + 1rem + 1px)"></headline>
 </playhead>
 
 <style>
@@ -37,12 +34,15 @@
         width: 0;
         height: 0;
         z-index: 1;
+        pointer-events: none;
     }
 
     headline {
+        position: absolute;
         display: inline-block;
         background-color: red;
         width: 1px;
+        left: .2rem;
     }
 
     div {
