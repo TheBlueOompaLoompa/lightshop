@@ -15,6 +15,7 @@
 
     let hoverBeat = 0;
 
+    // Remove clips when deleted on server
     Client.subscribe(async client => {
         if(client) {
             clips = await client.clips.listChildren.query(clip.id);
@@ -50,6 +51,7 @@
     }
 
     async function onclick() {
+        // When user clicks with clip on cursor
         if($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip.targetType == clip.targetType && $TimelineHover) {
             let newClip: Clip = {} as Clip;
             Object.assign(newClip, $OnCursor.clip);
@@ -78,22 +80,37 @@
     function resizeMouseMove(event: MouseEvent) {
         const rect = main.getBoundingClientRect();
         hoverBeat = snap(px2beats(event.pageX - rect.x + beats2px(beats, scale), scale), $Snapping);
+
         if(resizingClip) {
-            if(resizeSide == 'left' && resizingClip.end != hoverBeat) resizingClip.start = hoverBeat;
-            else if(resizingClip.start != hoverBeat) resizingClip.end = hoverBeat;
+            // Verify not overlapping other clips
+            for(let i = 0; i < clips.length; i++) {
+                if(
+                    clips[i] != resizingClip &&
+                    (
+                    (clips[i].start < hoverBeat && clips[i].end > hoverBeat) ||
+                    (clips[i].start < hoverBeat && clips[i].end <= hoverBeat && resizingClip.start < clips[i].start) ||
+                    (clips[i].start >= hoverBeat && clips[i].end > hoverBeat && resizingClip.end > clips[i].end)
+                    )
+                ) {
+                    return;
+                }
+            }
+
+            if(resizeSide == 'left' && resizingClip.end > hoverBeat) resizingClip.start = hoverBeat;
+            else if(resizingClip.start < hoverBeat) resizingClip.end = hoverBeat;
             resizingClip = resizingClip;
             clips = clips;
         }
     }
-
-    $: if(main) window.addEventListener('mousemove', resizeMouseMove);
 
     window.addEventListener('mouseup', () => {
         resizingClip = null;
     });
 </script>
 
-<timeline class="timeline">
+<svelte:window onmousemove={resizeMouseMove} />
+
+<timeline class="timeline" {onmousemove}>
     <div class="side">
         {#if clip.type == 'composite'}
         <span contenteditable="true" bind:textContent={clip.name}></span>
