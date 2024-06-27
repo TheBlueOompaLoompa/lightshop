@@ -15,7 +15,8 @@
         }
     }
 
-    function resize(event: Event, side: 'left' | 'right') {
+    function resize(event: MouseEvent, side: 'left' | 'right') {
+        if(event.button != 0) return;
         onresize(side);
     }
 </script>
@@ -26,8 +27,8 @@
     style="{style}; background: {clip.params[0].value}; left: {scale * timelineSpacing * beat}px; width: {scale * timelineSpacing * (clip.end - clip.start)}px;">
 
     <span style="background-color: #333;">{clip.name}</span>
-    <grab id="left" on:mousedown={(e: Event) => resize(e, 'left')}></grab>
-    <grab id="right" on:mousedown={(e: Event) => resize(e, 'right')}></grab>
+    <grab id="left" on:mousedown={(e: MouseEvent) => resize(e, 'left')}></grab>
+    <grab id="right" on:mousedown={(e: MouseEvent) => resize(e, 'right')}></grab>
 </clip>
 
 <style>
@@ -48,7 +49,7 @@
         position: absolute;
         top: 0px;
         bottom: 0px;
-        width: 20px;
+        width: 10px;
         z-index: 2;
     }
 
