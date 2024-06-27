@@ -2,7 +2,7 @@ import { publicProcedure, router } from '../trpc';
 import Cache from '../cache';
 import { z } from 'zod';
 import { diskDB } from 'db';
-import { apiClip, apiInsertClip, betterApiInsertClip, clips } from '$schema/clip';
+import { apiClip, apiInsertClip, betterApiClip, betterApiInsertClip, clips } from '$schema/clip';
 import { and, eq, isNull, or } from 'drizzle-orm';
 import { EventEmitter } from 'events';
 import { observable } from '@trpc/server/observable';
@@ -30,17 +30,36 @@ export default router({
                     .where(eq(clips.parent, opts.input))
             )
         ),
-    new: publicProcedure
-        .input(betterApiInsertClip)
-        .mutation(async opts => {
-            cache.groupInvalidate('clips')
-            return await diskDB.insert(clips)
-                .values(opts.input)
-                .returning();
-        }),
     getById: publicProcedure
         .input(z.number())
         .query(async opts => (await diskDB.select().from(clips).where(eq(clips.id, opts.input)))[0]),
+    new: publicProcedure
+        .input(betterApiInsertClip)
+        .mutation(async opts => {
+            cache.groupInvalidate('clips');
+
+            const newClip = await diskDB.insert(clips)
+                .values(opts.input)
+                .returning();
+            
+            ee.emit('new', newClip[0], opts.ctx.id);
+
+            return newClip;
+        }),
+    onNew: publicProcedure
+        .subscription(() => {
+            return observable<{ id: number, clip: z.infer<typeof betterApiInsertClip>}>(emit => {
+                function onNew(clip: any, id: number) {
+                    emit.next({ id, clip });
+                }
+
+                ee.on('new', onNew);
+
+                return () => {
+                    ee.off('new', onNew);
+                };
+            });
+        }),
     delete: publicProcedure
         .input(z.number({ description: 'Clip id' }))
         .mutation(async opts => {
@@ -67,10 +86,28 @@ export default router({
     update: publicProcedure
         .input(apiClip)
         .mutation(async opts => {
+            if(!opts.input.id) return;
+
             cache.groupInvalidate('clips');
+            ee.emit('update', opts.input, opts.ctx.id);
+
             return await diskDB.update(clips)
                 .set(opts.input)
                 .where(eq(clips.id, opts.input.id))
-        })
+        }),
+    onUpdate: publicProcedure
+        .subscription(() => {
+            return observable<{ id: number, clip: z.infer<typeof betterApiInsertClip>}>(emit => {
+                function onUpdate(clip: any, id: number) {
+                    emit.next({ id, clip });
+                }
+
+                ee.on('update', onUpdate);
+
+                return () => {
+                    ee.off('update', onUpdate);
+                };
+            });
+        }),
 });
 

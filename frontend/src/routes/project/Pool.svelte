@@ -16,7 +16,9 @@
     });
 
     function applyClip(clip: Clip) {
-        $OnCursor = { type: 'clip', clip };
+        let newClip: Clip | any = {};
+        Object.assign(newClip, clip);
+        $OnCursor = { type: 'clip', clip: newClip };
     }
 </script>
 

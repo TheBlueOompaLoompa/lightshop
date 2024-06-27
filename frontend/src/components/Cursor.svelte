@@ -1,6 +1,6 @@
 <script lang="ts">
     import Clip from "$components/Clip.svelte";
-    import { OnCursor, Snapping, TimelineHover, Selected, Client } from "$lib/stores";
+    import { OnCursor, Snapping, TimelineHover, Selected, Client, NextStart, HoverBeat } from "$lib/stores";
     import { beats2px, px2beats, snap } from "$lib/util";
     import type { CursorBasket } from "$lib/types";
 
@@ -8,6 +8,21 @@
 
     let x = $state(0);
     let y = $state(0);
+
+    let saveEnd = -1;
+
+    function endPlaceBound(depth = 0) {
+        if($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip.end != undefined) {
+            if($NextStart > 0 && $OnCursor.clip.end + $HoverBeat > $NextStart) {
+                if(saveEnd == -1) saveEnd = $OnCursor.clip.end;
+                $OnCursor.clip.end = $NextStart - $HoverBeat;
+            }else {
+                if(saveEnd > -1) $OnCursor.clip.end = saveEnd;
+                saveEnd = -1;
+                if(depth < 4) endPlaceBound(depth + 1);
+            }
+        }
+    }
 
     window.addEventListener('mousemove', event => {
         x = event.pageX;
@@ -18,15 +33,17 @@
                 x = beats2px(beatsLeft, timelineScale) + $TimelineHover.x - beats2px(beats, timelineScale);
             }
 
+            endPlaceBound();
+
             y = $TimelineHover.y + 10;
+        }else {
+            if($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip.end != undefined && saveEnd > -1) $OnCursor.clip.end = saveEnd;
         }
     });
 
     window.addEventListener('keydown', async event => {
         if(event.key == 'Escape') {
-            $OnCursor = {};
             $OnCursor = undefined;
-            $Selected = {};
             $Selected = undefined;
         }
 
@@ -50,7 +67,7 @@
     <cursor style="inset: 0px; left: {x}px; top: {y}px;">
         {#if $OnCursor}
             {#if $OnCursor.type == 'clip'}
-            <Clip clip={$OnCursor.clip} scale={timelineScale}/>
+            <Clip clip={$OnCursor.clip} scale={timelineScale} style=""/>
             {/if}
         {/if}
     </cursor>

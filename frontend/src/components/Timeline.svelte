@@ -1,10 +1,10 @@
 <script lang="ts">
     import Clip from '$components/Clip.svelte';
-    import { TimelineHover, OnCursor, Snapping, Client, Project } from '$lib/stores';
+    import { TimelineHover, OnCursor, Snapping, Client, Project, NextStart, HoverBeat } from '$lib/stores';
     import { px2beats, beats2px, snap } from '$lib/util';
     import type { Clip as TClip } from '@backend/types';
+    import { clientId } from '$lib/trpc';
     import _ from 'lodash';
-	import Playhead from '../routes/project/Playhead.svelte';
 
     export let clip: TClip;
     export let scale = 2;
@@ -13,20 +13,36 @@
     let main: HTMLElement;
     let clips: TClip[] = [];
 
-    let hoverBeat = 0;
-
-    // Remove clips when deleted on server
     Client.subscribe(async client => {
         if(client) {
+            // Initial load
             clips = await client.clips.listChildren.query(clip.id);
 
+            // Remove clips when deleted on server
             client.clips.onDelete.subscribe(undefined, {
                 onData(clip: TClip) {
                     clips = clips.toSpliced(clips.findIndex(c => c.id == clip.id), 1);
                 }
             });
+
+            client.clips.onUpdate.subscribe(undefined, {
+                onData(data: any) {
+                    const { id, clip: nclip } = data;
+                    if(id == clientId) return;
+                    const idx = clips.findIndex(c => c.id == nclip.id);
+                    if(idx > -1) clips = clips.toSpliced(idx, 1, nclip);
+                }
+            });
+
+            client.clips.onNew.subscribe(undefined, {
+                onData(data: any) {
+                    const { id, clip: nclip } = data;
+                    if(id == clientId) return;
+                    clips = [...clips, nclip];
+                }
+            });
         }
-    })
+    });
 
     function onmousemove(event: MouseEvent) {
         if(!($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip)) return;
@@ -34,11 +50,14 @@
 
         const rect = main.getBoundingClientRect();
         $TimelineHover = { x: rect.x, y: rect.y };
+        $NextStart = 0;
         clips.forEach(clip => {
+            if(clip.start >= $HoverBeat && ($NextStart == 0 || clip.start < $NextStart)) $NextStart = clip.start;
+            if(!($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip && $OnCursor.clip.start != undefined && $OnCursor.clip.end != undefined)) return;
             if(
-                clip.start < ($OnCursor.clip.start + hoverBeat) && (clip.end > $OnCursor.clip.start + hoverBeat) ||
-                clip.start < ($OnCursor.clip.end + hoverBeat) && (clip.end > $OnCursor.clip.end + hoverBeat) ||
-                clip.start == ($OnCursor.clip.start + hoverBeat) && (clip.end == $OnCursor.clip.end + hoverBeat)
+                clip.start < ($OnCursor.clip.start + $HoverBeat) && (clip.end > $OnCursor.clip.start + $HoverBeat) ||
+                clip.start == ($OnCursor.clip.start + $HoverBeat) && (clip.end == $OnCursor.clip.end + $HoverBeat) ||
+                clip.start == $HoverBeat
             ) {
                 $TimelineHover = undefined;
                 return;
@@ -55,14 +74,13 @@
         if($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip.targetType == clip.targetType && $TimelineHover) {
             let newClip: Clip = {} as Clip;
             Object.assign(newClip, $OnCursor.clip);
-            newClip.start += hoverBeat;
-            newClip.end += hoverBeat;
+            newClip.start += $HoverBeat;
+            newClip.end += $HoverBeat;
             newClip.parent = clip.id;
             newClip.pool = '';
             newClip.id = undefined;
             newClip.project = $Project.name;
 
-            $OnCursor = { type: undefined, clip: undefined };
             $OnCursor = undefined;
             
             clips = [...clips, ...(await $Client.clips.new.mutate(newClip))];
@@ -79,7 +97,7 @@
 
     function resizeMouseMove(event: MouseEvent) {
         const rect = main.getBoundingClientRect();
-        hoverBeat = snap(px2beats(event.pageX - rect.x + beats2px(beats, scale), scale), $Snapping);
+        $HoverBeat = snap(px2beats(event.pageX - rect.x + beats2px(beats, scale), scale), $Snapping);
 
         if(resizingClip) {
             // Verify not overlapping other clips
@@ -87,19 +105,20 @@
                 if(
                     clips[i] != resizingClip &&
                     (
-                    (clips[i].start < hoverBeat && clips[i].end > hoverBeat) ||
-                    (clips[i].start < hoverBeat && clips[i].end <= hoverBeat && resizingClip.start < clips[i].start) ||
-                    (clips[i].start >= hoverBeat && clips[i].end > hoverBeat && resizingClip.end > clips[i].end)
+                    (clips[i].start < $HoverBeat && clips[i].end > $HoverBeat) ||
+                    (clips[i].start < $HoverBeat && clips[i].end <= $HoverBeat && resizingClip.start < clips[i].start) ||
+                    (clips[i].start >= $HoverBeat && clips[i].end > $HoverBeat && resizingClip.end > clips[i].end)
                     )
                 ) {
                     return;
                 }
             }
 
-            if(resizeSide == 'left' && resizingClip.end > hoverBeat) resizingClip.start = hoverBeat;
-            else if(resizingClip.start < hoverBeat) resizingClip.end = hoverBeat;
+            if(resizeSide == 'left' && resizingClip.end > $HoverBeat) resizingClip.start = $HoverBeat;
+            else if(resizingClip.start < $HoverBeat) resizingClip.end = $HoverBeat;
             resizingClip = resizingClip;
             clips = clips;
+            $Client.clips.update.mutate(resizingClip);
         }
     }
 
@@ -122,7 +141,7 @@
     <div class="main" role="feed" {onmousemove} {onmouseout} onblur={onmouseout} {onclick} bind:this={main}>
         {#each clips as clip}
         {#if clip.end >= beats}
-        <Clip {clip} {scale} beat={clip.start - beats} onresize={(side) => {onresizeClip(side, clip)}}/>
+        <Clip style="" {clip} {scale} beat={clip.start - beats} onresize={(side) => {onresizeClip(side, clip)}}/>
         {/if}
         {/each}
     </div>

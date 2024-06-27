@@ -12,7 +12,7 @@ let targets: ZodWorker<RenderMessage>[] = [];
 let targetClips: TargetClips = {};
 
 function clipsMsg(msg: ClipsMessage) {
-
+    targetClips
 }
 
 // TODO: Make permsg: ClipsMessagecent work

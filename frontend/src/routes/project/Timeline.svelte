@@ -62,8 +62,9 @@
         if(player.paused) {
             player.play();
             lastTime = Date.now();
-            time = player.currentTime*1000 + project.offset - latency;
+            time = player.currentTime*1000;
             startTime = time;
+            time += project.offset - latency;
             
             timing();
         }else {

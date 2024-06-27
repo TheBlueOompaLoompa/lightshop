@@ -14,10 +14,10 @@
     let moving = false;
 
     function moveTime(event: any) {
-        if(moving) {
+/*        if(moving) {
             $Playing = false;
             $Time = snap(event.offsetX / 10 / $TimelineScale, $Snapping, $Bpm) - ($Offset / 1000);
-        }
+        }*/
     }
 
     function startMove() {

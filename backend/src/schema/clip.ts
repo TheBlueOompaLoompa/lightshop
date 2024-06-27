@@ -30,8 +30,10 @@ export const clips = sqliteTable('clips', {
 
 export const apiClip = createInsertSchema(clips, {
     type: ClipType,
-    targetType: TargetType
+    targetType: TargetType,
+    params: z.array(Parameter)
 });
+export const betterApiClip = createInsertSchema(clips);
 
 export const apiInsertClip = apiClip.omit({ id: true });
 export const betterApiInsertClip = createInsertSchema(clips).omit({ id: true });

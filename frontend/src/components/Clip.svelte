@@ -1,13 +1,15 @@
 <script lang="ts">
     import type { Clip } from '@backend/types';
     import { timelineSpacing } from "$lib/constants";
-    import { OnCursor, Selected } from "$lib/stores";
+    import { OnCursor, Selected, Client } from "$lib/stores";
 
-    export let clip: Clip;
-    export let style: string = '';
-    export let scale: number;
-    export let beat: number = 0;
-    export let onresize: (side: 'left' | 'right') => any = () => {};
+    let {
+        clip,
+        style = '',
+        scale,
+        beat = 0,
+        onresize = () => {},
+    }: { clip: Clip, style: string, scale: number, beat: number, onresize: (side: 'left' | 'right') => any } = $props();
 
     function onclick(e: Event) {
         if(!$OnCursor) {
@@ -22,13 +24,13 @@
 </script>
 
 <clip 
-    on:click={onclick}
+    onclick={onclick}
     class={$Selected && $Selected.type == 'clip' && $Selected.clip.id == clip.id ? 'selected': ''}
     style="{style}; background: {clip.params[0].value}; left: {scale * timelineSpacing * beat}px; width: {scale * timelineSpacing * (clip.end - clip.start)}px;">
 
     <span style="background-color: #333;">{clip.name}</span>
-    <grab id="left" on:mousedown={(e: MouseEvent) => resize(e, 'left')}></grab>
-    <grab id="right" on:mousedown={(e: MouseEvent) => resize(e, 'right')}></grab>
+    <grab id="left" onmousedown={(e: MouseEvent) => resize(e, 'left')}></grab>
+    <grab id="right" onmousedown={(e: MouseEvent) => resize(e, 'right')}></grab>
 </clip>
 
 <style>

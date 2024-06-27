@@ -20,7 +20,7 @@ const appRouter = router({
 });
 
 const createCaller = createCallerFactory(appRouter);
-export const caller = createCaller({});
+export const caller = createCaller({ id: 0 });
 
 async function setupBuiltin() {
     // Default pools
@@ -56,8 +56,16 @@ async function setupBuiltin() {
     });
 }
 
-export const createContext = (opts: CreateBunContextOptions) => ({
-});
+export function createContext(opts: CreateBunContextOptions) {
+    const url = new URL(opts.req.url);
+    const id = url.searchParams.get('id');
+
+    if(id) {
+        return {
+            id: parseInt(id)
+        };
+    }
+};
 
 const FRONTEND_PATH = resolve('../frontend/build/');
 
