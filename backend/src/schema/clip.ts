@@ -36,3 +36,7 @@ export const apiClip = createInsertSchema(clips, {
 export const apiInsertClip = apiClip.omit({ id: true });
 export const betterApiInsertClip = createInsertSchema(clips).omit({ id: true });
 
+export interface TreeClip {
+    id: number,
+    children: TreeClip[]
+}

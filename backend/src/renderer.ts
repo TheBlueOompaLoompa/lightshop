@@ -56,11 +56,11 @@ const SRenderMessage = z.object({ type: z.literal('render'), percent: z.number()
 const SConnectMessage = z.object({ type: z.literal('connect'), uri: z.string(), ledCount: z.number(), spatialData: z.optional(Vec3.array()) });
 const SClipMessage = z.object({ type: z.literal('clip'), clip: apiClip });
 
-export const SMessage = z.discriminatedUnion('type',
+const SMessage = z.discriminatedUnion('type',
     [SRenderMessage, SConnectMessage, SClipMessage]
 );
 
-type Message = z.infer<typeof SMessage>;
+export type Message = z.infer<typeof SMessage>;
 type ClipMessage = z.infer<typeof SClipMessage>;
 type RenderMessage = z.infer<typeof SRenderMessage>;
 type ConnectMessage = z.infer<typeof SConnectMessage>;
