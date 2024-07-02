@@ -177,5 +177,4 @@ dist
 # Custom
 
 drizzle/
-*.db*
 settings.json
