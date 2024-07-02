@@ -29,24 +29,47 @@ self.onmessage = (event: MessageEvent) => {
     }
 };
 
-function onConnect(msg: ConnectMessage) {
-    ws = new WebSocket(`ws://${msg.uri}:8080`);
-    ws.onopen = () => {
-        if(!ws) return;
-        out = new Uint32Array(msg.ledCount);
-        ledCount = msg.ledCount;
-        spatialData = msg.spatialData;
-    
+const onOpen = (msg: ConnectMessage) => {
+    if(!ws) return;
+    out = new Uint32Array(msg.ledCount);
+    ledCount = msg.ledCount;
+    spatialData = msg.spatialData;
+
+    let on = true;
+    const delay = 200;
+    const amount = 2.5;
+    const int = setInterval(() => {
+        if(!out || !ws) return;
+        on = !on;
+        out.fill(on ? 0xFFFFFFFF : 0);
+        ws.send(out);
+    }, delay);
+
+    setTimeout(() => {
+        clearInterval(int);
+        if(!out || !ws) return;
         out.fill(0);
         ws.send(out);
-    };
+    }, delay*amount*3);
+
+    console.log('open');
+
+    ws.onclose = () => {
+        ws = new WebSocket(`ws://${msg.uri}:8080`);
+        ws.onopen = () => onOpen(msg);
+    }
+};
+
+function onConnect(msg: ConnectMessage) {
+    ws = new WebSocket(`ws://${msg.uri}:8080`);
+    ws.onopen = () => onOpen(msg);
 }
 
 function onRender(msg: RenderMessage) {
     if(ws && out && ws.readyState == ws.OPEN) {
         out.fill(0);
         if(anim && msg.percent <= 1 && msg.percent >= 0)
-            anim.render({ time: msg.percent, out, ledCount, spatialData })
+            anim.render({ time: msg.percent, out, ledCount, spatialData, extra: undefined })
         ws.send(out);
     }
 }
