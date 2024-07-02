@@ -24,10 +24,11 @@
     let time = $state(0);
     let beats = $derived(Math.max(time2beats(time, bpms, project.tempo), 0));
     let viewBeats = $state(0);
+    let playing = $state(false);
 
     $effect(() => {
         viewBeats = Math.max(viewBeats, 0)
-        if(!player.paused) {
+        if(playing) {
             if(viewBeats < beats - (20/scale)) {
                 viewBeats = beats - (20/scale)
             }
@@ -91,6 +92,8 @@
         }else {
             player.pause();
         }
+
+        playing = !player.paused;
     }
 
     async function stop() {
@@ -105,6 +108,7 @@
             viewBeats = 0;
         }
 
+        playing = !player.paused;
         updateTimes();
     }
 
@@ -159,7 +163,7 @@
     </bar>
     
     <div>
-        <Playhead {scale} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
+        <Playhead {scale} beats={beats - viewBeats}/>
         <Ticks {scale} beats={viewBeats} snapping={$Snapping} {onretime} />
         <timelines>
             {#each clips as _clip, i}
