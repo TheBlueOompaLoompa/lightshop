@@ -1,64 +1,62 @@
-import Animation, { ParameterType, type RenderInput } from "$lib/animation";
+import { ParameterType } from "$schema/clip";
+import Animation, { type RenderInput } from "$lib/animation";
 import Color from "$lib/color";
-import { AnimationType } from "$lib/types";
+import { TargetType } from "$schema/settings";
 
-export function clonerTree(){
-    return new Animation(
-        'Swipe',
-        [AnimationType.Tree],
-        [
-            {
-                name: 'Color',
-                type: ParameterType.color,
-                value: Color.fromHsv(0, 0, 0)
-            },
-            {
-                name: 'Direction',
-                type: ParameterType.number,
-                value: 0
-            },
-            {
-                name: 'InvertDirection',
-                type: ParameterType.boolean,
-                value: false
+
+const anim = new Animation(
+    'Swipe',
+    [TargetType.enum.linear, TargetType.enum.spatial],
+    [
+        {
+            name: 'Color',
+            type: ParameterType.enum.color,
+            value: Color.fromHsv(0, 0, 0).hex
+        },
+        {
+            name: 'Direction',
+            type: ParameterType.enum.number,
+            value: 0
+        },
+        {
+            name: 'InvertDirection',
+            type: ParameterType.enum.bool,
+            value: false
+        },
+        {
+            name: 'InvertFill',
+            type: ParameterType.enum.bool,
+            value: false
+        }
+    ],
+    render
+);
+
+export default anim;
+
+function render(this: Animation, input: RenderInput) {
+    const color = this.getParameter('Color') as Color;
+    const direction = this.getParameter('Direction') as number;
+    const invertFill = this.getParameter('InvertFill') as boolean;
+
+    let percent = input.time;
+
+    percent = invertFill ? 1 - percent : percent;
+
+    for(let i = 0; i < input.out.length; i++) {
+        if(direction == 1) {
+            if(input.ledCount - i <= Math.floor(percent*input.out.length)) {
+                input.out[i] = color.raw();
             }
-            ,
-            {
-                name: 'InvertFill',
-                type: ParameterType.boolean,
-                value: false
-            }
-        ],
-        treeRender, clonerTree
-    );
+        }else if(i <= Math.floor(percent*input.out.length)){
+            input.out[i] = color.raw();
+        }
+    }
+
+    return input.out;
 }
 
-export function clonerLinear(){
-    return new Animation(
-        'Swipe',
-        [AnimationType.Linear],
-        [
-            {
-                name: 'Color',
-                type: ParameterType.color,
-                value: Color.fromHsv(0, 0, 0)
-            },
-            {
-                name: 'Direction',
-                type: ParameterType.boolean,
-                value: 0
-            },
-            {
-                name: 'InvertFill',
-                type: ParameterType.boolean,
-                value: false
-            }
-        ],
-        linearRender, clonerLinear
-    );
-}
-
-function treeRender(this: Animation, time: number, input: RenderInput) {
+/*function treeRender(this: Animation, time: number, input: RenderInput) {
     const relTime = time - this.start;
     let percent = relTime / (this.end - this.start);
     const direction = this.getParameter('Direction');
@@ -90,27 +88,4 @@ function treeRender(this: Animation, time: number, input: RenderInput) {
     }
 
     return input.out;
-}
-
-function linearRender(this: Animation, time: number, input: RenderInput) {
-    const color = this.getParameter('Color') as Color;
-    const direction = this.getParameter('Direction') as boolean;
-    const invertFill = this.getParameter('InvertFill');
-
-    const relTime = time - this.start;
-    let percent = relTime / (this.end - this.start);
-
-    percent = invertFill ? 1 - percent : percent;
-
-    for(let i = 0; i < input.out.length; i++) {
-        if(direction) {
-            if(input.ledCount - i <= Math.floor(percent*input.out.length)) {
-                input.out[i] = color.raw();
-            }
-        }else if(i <= Math.floor(percent*input.out.length)){
-            input.out[i] = color.raw();
-        }
-    }
-
-    return input.out;
-}
+}*/
