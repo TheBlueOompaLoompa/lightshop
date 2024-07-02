@@ -163,7 +163,7 @@
     </bar>
     
     <div>
-        <Playhead {scale} beats={beats - viewBeats}/>
+        <Playhead {scale} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
         <Ticks {scale} beats={viewBeats} snapping={$Snapping} {onretime} />
         <timelines>
             {#each clips as _clip, i}
