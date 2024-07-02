@@ -60,11 +60,9 @@ export function createContext(opts: CreateBunContextOptions) {
     const url = new URL(opts.req.url);
     const id = url.searchParams.get('id');
 
-    if(id) {
-        return {
-            id: parseInt(id)
-        };
-    }
+    return {
+        id: parseInt(id ?? Date.now().toString())
+    };
 };
 
 const FRONTEND_PATH = resolve('../frontend/build/');

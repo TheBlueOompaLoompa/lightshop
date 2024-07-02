@@ -38,7 +38,19 @@ export const betterApiClip = createInsertSchema(clips);
 export const apiInsertClip = apiClip.omit({ id: true });
 export const betterApiInsertClip = createInsertSchema(clips).omit({ id: true });
 
-export interface TreeClip {
-    id: number,
-    children: TreeClip[]
-}
+const SBaseTreeClip = z.object({
+    id: z.number(),
+    name: z.string(),
+    params: z.array(Parameter),
+    start: z.number(),
+    end: z.number(),
+    type: ClipType,
+});
+
+export type TreeClip = z.infer<typeof SBaseTreeClip> & {
+    children: TreeClip[];
+};
+
+export const STreeClip: z.ZodType<TreeClip> = SBaseTreeClip.extend({
+    children: z.lazy(() => STreeClip.array())
+});

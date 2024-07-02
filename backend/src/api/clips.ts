@@ -41,6 +41,8 @@ export default router({
             const newClip = await diskDB.insert(clips)
                 .values(opts.input)
                 .returning();
+
+            caller.player.sendMsg({ type: 'clips', clips: newClip });
             
             ee.emit('new', newClip[0], opts.ctx.id);
 
@@ -66,6 +68,9 @@ export default router({
             const clip = await caller.clips.getById(opts.input);
             ee.emit('delete', clip);
             cache.groupInvalidate('clips');
+            
+            caller.player.sendMsg({ type: 'clips', clips: [{...clip, parent: -1}] });
+            
             await diskDB.delete(clips)
                 .where(eq(clips.id, opts.input));
         }),
@@ -90,6 +95,7 @@ export default router({
 
             cache.groupInvalidate('clips');
             ee.emit('update', opts.input, opts.ctx.id);
+            caller.player.sendMsg({ type: 'clips', clips: [opts.input] });
 
             return await diskDB.update(clips)
                 .set(opts.input)

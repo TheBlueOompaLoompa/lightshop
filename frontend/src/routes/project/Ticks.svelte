@@ -1,26 +1,30 @@
 <script lang="ts">
     import { time2beats, beats2time, snap } from "$lib/util";
+    import { Snapping } from "$lib/stores";
     import { timelineSpacing } from "$lib/constants";
 
-    let { scale, beats, snapping, onretime }: { scale: number, beats: number, snapping: number, onretime: () => any } = $props();
+    let { scale, beats, snapping, onretime }: { scale: number, beats: number, snapping: number, onretime: (beat: number) => any } = $props();
+
+    let realSnap = $derived(snapping <= 0 ? 2 : snapping);
 
     const spacing = timelineSpacing;
 
     let ticksWidth = $state(0);
-    let tickCount = $derived(Math.ceil(ticksWidth / spacing * snapping / scale) + snapping);
-    let numberCount = $derived(Math.ceil(tickCount / snapping));
-    //$: numberCount = Math.floor(seconds2beats($Length, $Bpm));
+    let tickCount = $derived(Math.ceil(ticksWidth / spacing * realSnap / scale) + realSnap);
+    let numberCount = $derived(Math.ceil(tickCount / realSnap));
 
     let moving = false;
 
-    function moveTime(event: any) {
-/*        if(moving) {
-            $Playing = false;
-            $Time = snap(event.offsetX / 10 / $TimelineScale, $Snapping, $Bpm) - ($Offset / 1000);
-        }*/
+    let numbersElement: HTMLElement;
+
+    function onmousemove(event: MouseEvent) {
+        const rect = numbersElement.getBoundingClientRect();
+        if(moving) {
+            onretime(snap((event.pageX - rect.left) / timelineSpacing / scale, $Snapping) + beats);
+        }
     }
 
-    function startMove() {
+    function onmousedown() {
         moving = true;
     }
 
@@ -29,18 +33,20 @@
     });
 </script>
 
+<svelte:window {onmousemove} />
+
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<numbers onmousedown={startMove} onmousemove={moveTime}>
+<numbers {onmousedown} bind:this={numbersElement}>
     {#each {length: numberCount } as _, i}
         <span class="retiming" style="left: {spacing * scale * i - beats % 1 * spacing * scale}px"
         >{i + Math.floor(beats)}</span>
     {/each}
 </numbers>
-<ticks bind:clientWidth={ticksWidth}>
+<ticks {onmousedown} bind:clientWidth={ticksWidth}>
     {#each {length: tickCount } as _, i}
-        <tick style="left: {spacing * scale * i / snapping - beats % 1 * spacing * scale}px">
-            <tli class={i % snapping == 0 ? 'long' : ''}></tli>
+        <tick style="left: {spacing * scale * i / realSnap - beats % 1 * spacing * scale}px">
+            <tli class={`${i % realSnap == 0 ? 'long' : ''} ${snapping == 0 ? 'dot': ''}`}></tli>
         </tick>
     {/each}
 </ticks>
@@ -75,7 +81,11 @@
     tli {
         width: 1px;
         height: 20%;
-        background-color: white;
+        border-left: 2px white solid;
+    }
+
+    tli.dot {
+        border-left: 2px gray solid;
     }
 
     .long {

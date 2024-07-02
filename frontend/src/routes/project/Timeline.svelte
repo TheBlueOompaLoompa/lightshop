@@ -3,13 +3,13 @@
     import Ticks from "./Ticks.svelte";
     import type { Clip, Project, Bpm } from "@backend/types";
     import { Client, FPS, Snapping } from '$lib/stores';
-    import { beats2time } from '$lib/util';
-    import { time2beats } from '@backend/util';
+    import { time2beats, beats2time } from '@backend/util';
 	import Playhead from "./Playhead.svelte";
 
-    let { project, scale = $bindable(2), beats = $bindable(0) }:
+    let { project, scale = $bindable(2), beats: bindBeats = $bindable(0) }:
         { project: Project, scale: number, beats: number } = $props();
-    let bpms: Bpm[] = [];
+    let bpms: Bpm[] = $state([]);
+    let clips: Clip[] = $state([]);
 
     Client.subscribe(async client => {
         if(client) {
@@ -22,48 +22,69 @@
     let latency = $derived(audioCtx.outputLatency * 1000);
 
     let time = $state(0);
+    let beats = $derived(Math.max(time2beats(time, bpms, project.tempo), 0));
+    let viewBeats = $state(0);
+
+    $effect(() => {
+        viewBeats = Math.max(viewBeats, 0)
+        if(!player.paused) {
+            if(viewBeats < beats - (20/scale)) {
+                viewBeats = beats - (20/scale)
+            }
+        }
+    });
+
+    
     let minutes = $state(0);
     let seconds = $state(0);
+    
+    function setTime(newTime: number) {
+        player.currentTime = newTime / 1000;
+        time = player.currentTime * 1000 + project.offset - latency;
+        updateTimes();
+    }
 
     function onChangeTime() {
         player.currentTime = minutes * 60 + seconds;
-        time = player.currentTime * 1000 + project.offset - latency;
+        setTime(player.currentTime * 1000);
     }
 
-    let startTime = 0;
+    let startTime = $state(0);
     let player: HTMLAudioElement = new Audio(project.music);
 
     $effect(() => {
-        let timeLeft = time;
-        beats = Math.max(time2beats(timeLeft, bpms, project.tempo), 0);
-
-        $Client.player.setTime.mutate(beats);
+        time;
+        sendTime();
     });
 
 
     const updateTimes = () => { minutes = Math.floor(player.currentTime / 60); seconds = player.currentTime % 60; }
 
-    let lastTime = 0;
-    async function timing() {
+    function sendTime(beforeCall: () => any = () => {}) {
         const timeDiff = Date.now() - lastTime;
 
         if(timeDiff > 1000/$FPS) {
-            time = player.currentTime*1000 + project.offset - latency;
+            beforeCall();
             lastTime = Date.now();
+            $Client.player.setBeat.mutate(beats);
 
             updateTimes();
         }
+    }
 
+    let lastTime = 0;
+    async function timing() {
+        sendTime(() => time = player.currentTime*1000 + project.offset - latency);
         if(time >= project.time * 1000) player.pause();
         if(!player.paused) window.requestAnimationFrame(timing);
     }
 
-    function playPause() {
+    async function playPause() {
         if(player.paused) {
-            player.play();
+            await player.play();
             lastTime = Date.now();
             time = player.currentTime*1000;
-            startTime = time;
+            startTime = parseInt(time.toString());
             time += project.offset - latency;
             
             timing();
@@ -72,14 +93,16 @@
         }
     }
 
-    function stop() {
+    async function stop() {
         if(!player.paused) {
             player.pause();
+            viewBeats = Math.min(time2beats(startTime, bpms, project.tempo), viewBeats);
             player.currentTime = startTime/1000;
             time = player.currentTime*1000 - project.offset - latency;
         }else {
             player.currentTime = 0;
             time = 0;
+            viewBeats = 0;
         }
 
         updateTimes();
@@ -100,9 +123,7 @@
             scale -= e.deltaY * zoomSpeed * wheelMultiplier;
             scale = Math.max(scale, 0.5);
         }else {
-            time = Math.max(time - (e.deltaX != 0 ? -e.deltaX : e.deltaY), 0);
-            updateTimes();
-            player.currentTime = time / 1000;
+            viewBeats -= (e.deltaX != 0 ? -e.deltaX : e.deltaY) / 80;
         }
     }
 
@@ -111,13 +132,21 @@
     function onmousemove(e: MouseEvent) {
         mouseDrag = e.buttons == 4;
         if(mouseDrag) {
-            time -= e.movementX / scale * 10;
-            updateTimes();
-            player.currentTime = time / 1000;
+            viewBeats -= e.movementX / scale / 20;
         }
     }
 
-    let clips: Clip[] = $state([]);
+    function onretime(newBeats: number) {
+        setTime(beats2time(newBeats, bpms, project.tempo));
+    }
+
+    window.addEventListener('keyup', (e: KeyboardEvent) => {
+        if(e.key == ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            playPause();
+        }
+    });
 </script>
 
 <main bind:this={timelineBody} {onmousemove} style={mouseDrag ? 'cursor: move;' : ''}>
@@ -125,16 +154,17 @@
         <button onclick={playPause} class="ibutton">⏯</button>
         <button onclick={stop} class="ibutton">⏹</button>
         <input type="number" bind:value={minutes} onchange={onChangeTime}>:<input type="number" bind:value={seconds} onchange={onChangeTime}>
+        <input type="checkbox" bind:checked={$Snapping}/>
         <input type="range" min="1" max="8" step="1" bind:value={$Snapping}>1/{$Snapping}
     </bar>
     
     <div>
-        <Playhead/>
-        <Ticks {scale} {beats} snapping={$Snapping}/>
+        <Playhead {scale} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
+        <Ticks {scale} beats={viewBeats} snapping={$Snapping} {onretime} />
         <timelines>
             {#each clips as _clip, i}
             <div>
-                <Timeline bind:clip={clips[i]} {beats} {scale} />
+                <Timeline bind:clip={clips[i]} beats={viewBeats} {scale} />
             </div>
             {/each}
         </timelines>

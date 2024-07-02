@@ -43,7 +43,7 @@
         padding: calc(var(--spacing)/4);
 
         background: #333;
-        border-radius: var(--rounding);
+        border-radius: calc(var(--rounding)/2);
         border: var(--border);
     }
 

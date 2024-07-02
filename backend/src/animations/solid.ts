@@ -19,7 +19,7 @@ const anim = new Animation(
 export default anim;
 
 function render(this: Animation, input: RenderInput) {
-    input.out.fill((this.getParameter('Color') as Color).raw());
+    input.out.fill(this.getParameter('Color').raw());
 
     return input.out;
 }

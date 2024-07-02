@@ -64,9 +64,10 @@
         </div>
     </ResizePanel>
 </main>
-{/if}
 
 <Cursor timelineScale={scale} {beats} />
+
+{/if}
 
 <svelte:head>
     <title>Lightshop {projectName}</title>

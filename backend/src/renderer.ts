@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { Parameter, apiClip } from "$schema/clip";
+import { Parameter, STreeClip, apiClip } from "$schema/clip";
 import animations from "animations/animations";
 import type Animation from "$lib/animation";
 import { Vec3 } from "$schema/settings";
+import Color from "$lib/color";
 
 declare var self: Worker;
 
@@ -29,17 +30,24 @@ self.onmessage = (event: MessageEvent) => {
 };
 
 function onConnect(msg: ConnectMessage) {
-    ws = new WebSocket(msg.uri);
+    ws = new WebSocket(`ws://${msg.uri}:8080`);
     ws.onopen = () => {
+        if(!ws) return;
         out = new Uint32Array(msg.ledCount);
         ledCount = msg.ledCount;
         spatialData = msg.spatialData;
+    
+        out.fill(0);
+        ws.send(out);
     };
 }
 
 function onRender(msg: RenderMessage) {
-    if(anim && ws && out && ws.readyState == ws.OPEN && spatialData) {
-        anim.render({ time: msg.percent, out, ledCount, spatialData })
+    if(ws && out && ws.readyState == ws.OPEN) {
+        out.fill(0);
+        if(anim && msg.percent <= 1 && msg.percent >= 0)
+            anim.render({ time: msg.percent, out, ledCount, spatialData })
+        ws.send(out);
     }
 }
 
@@ -47,6 +55,7 @@ function onClip(msg: ClipMessage) {
     const { clip } = msg;
     if(!clip.name) return;
     anim = animations[clip.name];
+
     if(anim) {
         anim.params = clip.params as z.infer<typeof Parameter>[];
     }
@@ -54,7 +63,7 @@ function onClip(msg: ClipMessage) {
 
 const SRenderMessage = z.object({ type: z.literal('render'), percent: z.number() });
 const SConnectMessage = z.object({ type: z.literal('connect'), uri: z.string(), ledCount: z.number(), spatialData: z.optional(Vec3.array()) });
-const SClipMessage = z.object({ type: z.literal('clip'), clip: apiClip });
+const SClipMessage = z.object({ type: z.literal('clip'), clip: STreeClip });
 
 const SMessage = z.discriminatedUnion('type',
     [SRenderMessage, SConnectMessage, SClipMessage]

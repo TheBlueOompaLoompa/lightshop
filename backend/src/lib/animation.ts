@@ -1,6 +1,7 @@
 import { TargetType, Vec3 } from '$schema/settings';
 import { Parameter } from '$schema/clip';
 import type { z } from 'zod';
+import Color from './color';
 
 export default class Animation {
     name;
@@ -17,7 +18,7 @@ export default class Animation {
 
     public getParameter(name: string): any | undefined {
         const param = this.params.find(param => param.name === name);
-        return param ? param.value : undefined;
+        return param ? (param.type == 'color' ? Color.fromHex(param.value as string) : param.value) : undefined;
     }
 
     public setParameter(name: string, value: any): boolean {
@@ -33,8 +34,9 @@ export default class Animation {
 
 export interface RenderInput {
     ledCount: number,
-    spatialData: z.infer<typeof Vec3>[],
+    spatialData: z.infer<typeof Vec3>[] | undefined,
     time: number
-    out: Uint32Array
+    out: Uint32Array,
+    extra: any,
 }
 

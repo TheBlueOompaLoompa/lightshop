@@ -1,9 +1,11 @@
 <script lang="ts">
     import { snap } from '$lib/util';
     import Head from '../../assets/head.svg?raw';
+    import { timelineSpacing } from '$lib/constants';
 
     export let trackCount: number = 1;
-    export let beat = 1;
+    export let beats = 1;
+    export let scale = 2;
 
     let playheadElement: HTMLElement;
     let svgContainerElement: HTMLDivElement;
@@ -19,7 +21,7 @@
     }
 </script>
 
-<playhead class="retiming" bind:this={playheadElement} style="left: calc({beat * 20 * 2 + 200}px + var(--spacing) * 2);">
+<playhead class="retiming" bind:this={playheadElement} style="left: calc({beats * timelineSpacing * scale + 200}px + var(--spacing) * 2);">
     <div bind:this={svgContainerElement} style="left: calc(-1rem/4);">
         {@html Head}
     </div>

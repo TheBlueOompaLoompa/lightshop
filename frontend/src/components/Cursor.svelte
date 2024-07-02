@@ -2,7 +2,7 @@
     import Clip from "$components/Clip.svelte";
     import { OnCursor, Snapping, TimelineHover, Selected, Client, NextStart, HoverBeat } from "$lib/stores";
     import { beats2px, px2beats, snap } from "$lib/util";
-    import type { CursorBasket } from "$lib/types";
+    import { type CursorBasket, SCursorBasket } from "$lib/types";
 
     let { timelineScale, beats }: { timelineScale: number, beats: number } = $props();
 
@@ -50,6 +50,21 @@
         if(event.key == 'Delete') {
             if($Selected) await deleteThing($Selected);
             else if($OnCursor) await deleteThing($OnCursor);
+        }
+
+        if(event.ctrlKey) {
+            switch(event.key) {
+            case 'c':
+                await navigator.clipboard.writeText(JSON.stringify($Selected));
+                break;
+            case 'v':
+                $OnCursor = SCursorBasket.parse(JSON.parse(await navigator.clipboard.readText()));
+                if($OnCursor && $OnCursor.type == "clip" && $OnCursor.clip) {
+                    $OnCursor.clip.end -= $OnCursor.clip.start;
+                    $OnCursor.clip.start = 0;
+                }
+                break;
+            }
         }
     });
 

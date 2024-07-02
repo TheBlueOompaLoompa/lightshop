@@ -23,7 +23,7 @@
     }
 </script>
 
-<ConfirmModal message="Create New Render Target" positive="Create" negative="Cancel" onpositive={onPositive} {onnegative}>
+<ConfirmModal message="Create/Modify Render Target" positive="Create" negative="Cancel" onpositive={onPositive} {onnegative}>
     <div>
         <span>Name</span>
         <input type="text" placeholder="Bar" bind:value={name}>
@@ -39,6 +39,11 @@
             <option value="linear">Linear</option>
             <option value="spatial">Spatial</option>
         </select>
+
+        {#if type == 'spatial'}
+        <span>Spatial Data (; seperated, \n per led)</span>
+        <input type="file"/>
+        {/if}
     </div>
 </ConfirmModal>
 
