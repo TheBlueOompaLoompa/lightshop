@@ -1,48 +1,54 @@
-import Animation, { ParameterType, type RenderInput } from "$lib/animation";
+import { ParameterType } from "$schema/clip";
+import Animation, { type RenderInput } from "$lib/animation";
 import Color from "$lib/color";
-import { AnimationType } from "$lib/types";
+import { TargetType } from "$schema/settings";
 
-export default cloner
+const anim = new Animation(
+    'Gunshot',
+    [TargetType.enum.linear, TargetType.enum.spatial],
+    [
+        {
+            name: 'Color',
+            type: ParameterType.enum.color,
+            value: Color.fromHsv(0, 0, 0).hex
+        },
+        {
+            name: 'Direction',
+            type: ParameterType.enum.bool,
+            value: false
+        },
+        {
+            name: 'Length',
+            type: ParameterType.enum.number,
+            value: 6
+        },
+        {
+            name: 'Fade Length',
+            type: ParameterType.enum.number,
+            value: 0
+        }
+    ],
+    render
+);
 
-function cloner(){
-    return new Animation(
-        'Gunshot',
-        [AnimationType.Tree, AnimationType.Linear],
-        [
-            {
-                name: 'Color',
-                type: ParameterType.color,
-                value: Color.fromHsv(0, 0, 0)
-            },
-            {
-                name: 'Direction',
-                type: ParameterType.boolean,
-                value: false
-            },
-            {
-                name: 'Length',
-                type: ParameterType.number,
-                value: 6
-            }
-        ],
-        render, cloner
-    );
-}
+export default anim;
 
-function render(this: Animation, time: number, input: RenderInput) {
+function render(this: Animation, input: RenderInput) {
     const color = this.getParameter('Color') as Color;
     const direction = this.getParameter('Direction') as boolean;
     const length = this.getParameter('Length') as number;
+    const fade = this.getParameter('Fade Length') as number;
 
-    const relTime = time - this.start;
-    let percent = relTime / (this.end - this.start);
+    let percent = input.time;
 
     percent = direction ? 1 - percent : percent;
+    const start = Math.floor(input.out.length * percent);
 
-    for(let i = 0; i < input.out.length; i++) {
-        if(i >= Math.floor(percent*input.out.length) && i < Math.floor(percent*input.out.length) + length) {
-            input.out[i] = color.raw();
-        }
+    for(let i = Math.max(start - fade); i < input.out.length && i < start + length + fade*2; i++) {
+        let newCol = Color.fromHex(color.hex);
+        newCol.v -= (i < start ? (start-i) / fade : 0) * 100;
+        newCol.v -= ((i - start > length + fade) ? ((i - start - length - fade) - fade) / fade : 0) * 100;
+        input.out[i] = newCol.raw();
     }
 
     return input.out;
