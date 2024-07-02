@@ -12,6 +12,10 @@ player.onerror = (e: ErrorEvent) => {
     console.error(e);
 };
 
+player.onmessage = (e: MessageEvent) => {
+    console.log(e);
+}
+
 export default router({
     sendMsg: publicProcedure
         .input(SMessage)

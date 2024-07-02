@@ -19,18 +19,22 @@ let beat = 0;
 function clipsMsg(msg: ClipsMessage) {
     // TODO: Support tree
     msg.clips.forEach((clip: any) => {
-        let targetRef = (Object.entries(targetClips).find(item => item[1].id == clip.parent) as any)[1] as unknown as TreeClip;
-        const existingIdx = targetRef.children.findIndex(child => child.id == clip.id);
-        if(existingIdx > -1) {
-            // Delete
-            if(clip.parent < 0) targetRef.children.splice(existingIdx, 1);
-            // Update
-            else targetRef.children[existingIdx] = makeClip(clip);
-        }else {
-            // New
-            targetRef.children.push(makeClip(clip));
+        try {
+            let targetRef = (Object.entries(targetClips).find(item => item[1].id == clip.parent) as any)[1] as unknown as TreeClip;
+            const existingIdx = targetRef.children.findIndex(child => child.id == clip.id);
+            if(existingIdx > -1) {
+                // Delete
+                if(clip.parent < 0) targetRef.children.splice(existingIdx, 1);
+                // Update
+                else targetRef.children[existingIdx] = makeClip(clip);
+            }else {
+                // New
+                targetRef.children.push(makeClip(clip));
+            }
+            beatMsg({ type: 'beat', beat })
+        }catch(e) {
+            self.postMessage(e);
         }
-        beatMsg({ type: 'beat', beat })
     });
 }
 
