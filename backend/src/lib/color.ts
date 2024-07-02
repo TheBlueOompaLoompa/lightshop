@@ -117,6 +117,10 @@ export default class Color {
         this._v = val;
         this.updateRGB();
     }
+
+    toString() {
+        return this.hex;
+    }
 }
 
 // RGB to HSV
