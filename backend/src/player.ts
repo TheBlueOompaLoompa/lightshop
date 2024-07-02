@@ -22,7 +22,7 @@ function clipsMsg(msg: ClipsMessage) {
         try {
             let targetRef = (Object.entries(targetClips).find(item => item[1].id == clip.parent) as any)[1] as unknown as TreeClip;
             const existingIdx = targetRef.children.findIndex(child => child.id == clip.id);
-            if(existingIdx > -1) {
+            if(clip.name == "delete") {
                 // Delete
                 if(clip.parent < 0) targetRef.children.splice(existingIdx, 1);
                 // Update

@@ -69,7 +69,7 @@ export default router({
             ee.emit('delete', clip);
             cache.groupInvalidate('clips');
             
-            caller.player.sendMsg({ type: 'clips', clips: [{...clip, parent: -1}] });
+            caller.player.sendMsg({ type: 'clips', clips: [{...clip, name: "delete"}] });
             
             await diskDB.delete(clips)
                 .where(eq(clips.id, opts.input));
