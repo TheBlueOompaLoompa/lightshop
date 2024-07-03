@@ -79,6 +79,14 @@ export default class Color {
         return color;
     }
 
+    public static fromRaw(raw: number) {
+        const color = new Color();
+        color.r = raw >> 24 & 0xff;
+        color.g = (raw >> 16) & 0xff;
+        color.b = (raw >> 8) & 0xff;
+        return color;
+    }
+
     raw() {
         return (this.r << 24) | (this.g << 16) | (this.b << 8);
     }

@@ -1,5 +1,5 @@
-import { TargetType, Vec3 } from '$schema/settings';
-import { Parameter } from '$schema/clip';
+import { TargetType, Vec3 } from '../schema/settings';
+import { Parameter } from '../schema/clip';
 import type { z } from 'zod';
 import Color from './color';
 import type { Effect } from 'types';

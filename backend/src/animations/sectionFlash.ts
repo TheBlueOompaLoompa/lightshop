@@ -1,12 +1,12 @@
 //import { normalize, sub } from "$lib/vec";
 
-import { ParameterType } from "$schema/clip";
-import Animation, { type RenderInput } from "$lib/animation";
-import { TargetType } from "$schema/settings";
+import { ParameterType } from "../schema/clip";
+import Animation, { type RenderInput } from "../lib/animation";
+import { TargetType } from "../schema/settings";
 
 
 const anim = new Animation(
-    'Section Flash',
+    'Section',
     [TargetType.enum.linear, TargetType.enum.spatial],
     [
         {

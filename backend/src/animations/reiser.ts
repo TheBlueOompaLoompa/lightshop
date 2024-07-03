@@ -1,17 +1,12 @@
-import { ParameterType } from "$schema/clip";
-import Animation, { type RenderInput } from "$lib/animation";
-import Color from "$lib/color";
-import { TargetType } from "$schema/settings";
+import { ParameterType } from "../schema/clip";
+import Animation, { type RenderInput } from "../lib/animation";
+import Color from "../lib/color";
+import { TargetType } from "../schema/settings";
 
 const anim =  new Animation(
     'Reiser',
     [TargetType.enum.linear, TargetType.enum.spatial],
     [
-        {
-            name: 'Color',
-            type: ParameterType.enum.color,
-            value: Color.fromHsv(0, 0, 0).hex
-        },
         {
             name: 'Direction',
             type: ParameterType.enum.bool,
@@ -35,12 +30,11 @@ function render(this: Animation, input: RenderInput) {
     let brightness = Math.log10(-(percent ** hold - 1)) + 1;
     if(direction) brightness = -(brightness - 1)
     brightness = Math.min(Math.max(brightness, 0), 1);
-
-    const oldColor = this.getParameter('Color') as Color;
-    const newColor = Color.fromRgb(oldColor.r * brightness, oldColor.g * brightness, oldColor.b * brightness);
-    
-    input.out.fill(newColor.raw());
-
+    for(let i = 0; i < input.out.length; i++) {
+        const oldColor = Color.fromRaw(input.out[i]);
+        const newColor = Color.fromRgb(Math.round(oldColor.r * brightness), Math.round(oldColor.g * brightness), Math.round(oldColor.b * brightness));
+        input.out[i] = newColor.raw();
+    }
 
     return input.out;
 }

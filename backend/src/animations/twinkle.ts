@@ -1,7 +1,7 @@
-import { ParameterType } from "$schema/clip";
-import Animation, { type RenderInput } from "$lib/animation";
-import Color from "$lib/color";
-import { TargetType } from "$schema/settings";
+import { ParameterType } from "../schema/clip";
+import Animation, { type RenderInput } from "../lib/animation";
+import Color from "../lib/color";
+import { TargetType } from "../schema/settings";
 import { createNoise2D } from 'simplex-noise';
 
 const anim = new Animation(

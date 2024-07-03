@@ -18,6 +18,21 @@ export default [
             effects.Solid.effect,
             effects.Section.effect,
         ]
+    },
+    {
+        name: 'Reiser',
+        targets: [TargetType.enum.linear, TargetType.enum.spatial],
+        effects: [
+            effects.Solid.effect,
+            effects.Reiser.effect
+        ]
+    },
+    {
+        name: 'Twinkle',
+        targets: [TargetType.enum.linear, TargetType.enum.spatial],
+        effects: [
+            effects.Twinkle.effect
+        ]
     }
 ] as Preset[];
 

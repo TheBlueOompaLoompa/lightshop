@@ -52,7 +52,7 @@ const onOpen = (msg: ConnectMessage) => {
         ws.send(out);
     }, delay*amount*3);
 
-    console.log('open');
+    console.log(`Connected to ws://${msg.uri}:8080`);
 
     ws.onclose = () => {
         ws = new WebSocket(`ws://${msg.uri}:8080`);

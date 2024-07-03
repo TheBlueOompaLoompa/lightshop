@@ -2,6 +2,7 @@
     import { Selected, Client } from "$lib/stores";
     import { z } from "zod";
     import { type Parameter, Effect, ParameterType } from "@backend/schema/clip";
+    import effects from "@backend/animations/effects";
 
     function updateParam(ei: number, pi: number, val: any) {
         if($Selected && $Selected.type == 'clip' && $Selected.clip && $Selected.clip.effects) {
@@ -9,6 +10,22 @@
             $Client.clips.update.mutate($Selected.clip);
         }
     }
+
+    function addEffect() {
+        if($Selected && $Selected.type == 'clip' && $Selected.clip && $Selected.clip.effects) {
+            $Selected.clip.effects = [...$Selected.clip.effects, { name: newEffect, params: Object.assign(effects[newEffect].params) }]
+            $Client.clips.update.mutate($Selected.clip);
+        }
+    }
+
+    function deleteEffect(idx: number) {
+        if($Selected && $Selected.type == 'clip' && $Selected.clip && $Selected.clip.effects) {
+            $Selected.clip.effects = $Selected.clip.effects.toSpliced(idx, 1);
+            $Client.clips.update.mutate($Selected.clip);
+        }
+    }
+
+    let newEffect = 'Solid';
 </script>
 
 {#if $Selected && $Selected.type == 'clip' && $Selected.clip}
@@ -19,6 +36,7 @@
             {#if ei > 0}
             <button>↑</button>
             <button>↓</button>
+            <button onclick={() => deleteEffect(ei)}>Delete</button>
             {/if}
         </div>
 
@@ -35,6 +53,14 @@
         {/each}
         </div>
     {/each}
+    <select onchange={e => newEffect = e.target.value}>
+        {#each Object.keys(effects) as effect}
+        {#if effects[effect].targets.includes($Selected.clip.targetType)}
+        <option value={effect}>{effect}</option>
+        {/if}
+        {/each}
+    </select>
+    <button onclick={addEffect}>+</button>
     </div>
 {/if}
 
