@@ -20,18 +20,21 @@ function clipsMsg(msg: ClipsMessage) {
     // TODO: Support tree
     msg.clips.forEach((clip: any) => {
         try {
-            let targetRef = (Object.entries(targetClips).find(item => item[1].id == clip.parent) as any)[1] as unknown as TreeClip;
-            const existingIdx = targetRef.children.findIndex(child => child.id == clip.id);
-            if(clip.name == "delete") {
-                // Delete
-                if(clip.parent < 0) targetRef.children.splice(existingIdx, 1);
-                // Update
-                else targetRef.children[existingIdx] = makeClip(clip);
-            }else {
-                // New
-                targetRef.children.push(makeClip(clip));
+            const data = Object.entries(targetClips).find(item => item[1].id == clip.parent) as any
+            if(data) {
+                let targetRef = data[1] as unknown as TreeClip;
+                const existingIdx = targetRef.children.findIndex(child => child.id == clip.id);
+                if(clip.name == "delete") {
+                    // Delete
+                    targetRef.children.splice(existingIdx, 1);
+                }else {
+                    // Update
+                    if(existingIdx > -1) targetRef.children[existingIdx] = makeClip(clip);
+                    // New
+                    else targetRef.children.push(makeClip(clip));
+                }
+                beatMsg({ type: 'beat', beat });
             }
-            beatMsg({ type: 'beat', beat })
         }catch(e) {
             self.postMessage(e);
         }
@@ -43,7 +46,7 @@ function makeClip(clip: any) {
         id: clip.id,
         name: clip.name,
         type: clip.type,
-        params: clip.params,
+        effects: clip.effects,
         start: clip.start,
         end: clip.end,
         children: [],
@@ -85,7 +88,7 @@ function openMsg(msg: OpenMessage) {
             id,
             type: 'root',
             name: target.name,
-            params: [],
+            effects: [],
             children: [],
             start: 0,
             end: 0

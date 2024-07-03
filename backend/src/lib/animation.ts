@@ -2,6 +2,7 @@ import { TargetType, Vec3 } from '$schema/settings';
 import { Parameter } from '$schema/clip';
 import type { z } from 'zod';
 import Color from './color';
+import type { Effect } from 'types';
 
 export default class Animation {
     name;
@@ -29,6 +30,10 @@ export default class Animation {
             }
         })
         return false;
+    }
+
+    get effect(): Effect {
+        return { name: this.name, params: this.params }
     }
 }
 

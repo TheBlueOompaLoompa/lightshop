@@ -7,8 +7,9 @@ import settings from '$api/settings';
 import { resolve } from 'node:path';
 import bpm from '$api/bpm';
 import _ from 'lodash';
-import animations from 'animations/animations';
+import presets from 'animations/presets';
 import clips from '$api/clips';
+import { TargetType } from '$schema/settings';
 
 const appRouter = router({
     projects,
@@ -30,27 +31,29 @@ async function setupBuiltin() {
     if(!_.some(poolList, linear)) await caller.pools.new(linear);
     if(!_.some(poolList, spatial)) await caller.pools.new(spatial);
 
-    // Default clips
+    // Clip Presets
     const linearClips = await caller.clips.list({ pool: linear.name });
     const spatialClips = await caller.clips.list({ pool: spatial.name });
-    Object.keys(animations).forEach(async anim => {
-        if(animations[anim].targets.includes('linear') && !_.some(linearClips, ['name', anim])) {
-            await caller.clips.new({
-                name: anim,
+    presets.forEach(async preset => {
+        if(preset.targets.includes(TargetType.enum.linear) && !_.some(linearClips, ['name', preset.name])) {
+            const clip = {
+                name: preset.name,
                 type: 'builtin',
                 pool: linear.name,
-                params: animations[anim].params,
+                effects: preset.effects.map(e => ({ name: e.name, params: e.params })),
                 targetType: 'linear'
-            });
+            };
+            console.log(JSON.stringify(clip));
+            await caller.clips.new(clip);
         }
 
-        if(animations[anim].targets.includes('spatial') && !_.some(spatialClips, ['name', anim])) {
+        if(preset.targets.includes(TargetType.enum.spatial) && !_.some(spatialClips, ['name', preset.name])) {
             await caller.clips.new({
-                name: anim,
+                name: preset.name,
                 type: 'builtin',
                 pool: spatial.name,
-                params: animations[anim].params,
-                targetType: 'spatial'
+                effects: preset.effects,
+                targetType: 'linear'
             });
         }
     });

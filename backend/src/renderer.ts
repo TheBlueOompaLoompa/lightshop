@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Parameter, STreeClip, apiClip } from "$schema/clip";
-import animations from "animations/animations";
+import effects from "animations/effects";
 import type Animation from "$lib/animation";
 import { Vec3 } from "$schema/settings";
 import Color from "$lib/color";
@@ -8,7 +8,7 @@ import Color from "$lib/color";
 declare var self: Worker;
 
 let ws: WebSocket | undefined;
-let anim: Animation | undefined;
+let layers: Animation[] = [];
 let out: Uint32Array | undefined;
 let ledCount: number = 1;
 let spatialData: z.infer<typeof Vec3>[] | undefined;
@@ -68,8 +68,11 @@ function onConnect(msg: ConnectMessage) {
 function onRender(msg: RenderMessage) {
     if(ws && out && ws.readyState == ws.OPEN) {
         out.fill(0);
-        if(anim && msg.percent <= 1 && msg.percent >= 0)
-            anim.render({ time: msg.percent, out, ledCount, spatialData, extra: undefined })
+        if(msg.percent <= 1 && msg.percent >= 0) {
+            for(let i = 0; i < layers.length; i++) {
+                layers[i].render({ time: msg.percent, out, ledCount, spatialData, extra: undefined });
+            }
+        }
         ws.send(out);
     }
 }
@@ -77,11 +80,13 @@ function onRender(msg: RenderMessage) {
 function onClip(msg: ClipMessage) {
     const { clip } = msg;
     if(!clip.name) return;
-    anim = animations[clip.name];
-
-    if(anim) {
-        anim.params = clip.params as z.infer<typeof Parameter>[];
+    
+    layers = [];
+    for(let i = 0; i < clip.effects.length; i++) {
+        layers.push(effects[clip.effects[i].name]);
+        layers[i].params = clip.effects[i].params as z.infer<typeof Parameter>[];
     }
+
 }
 
 const SRenderMessage = z.object({ type: z.literal('render'), percent: z.number() });

@@ -13,6 +13,13 @@
     let main: HTMLElement;
     let clips: TClip[] = [];
 
+
+    $: {
+        if($Client) {
+            $Client.clips.update.mutate(clip);
+        }
+    }
+
     Client.subscribe(async client => {
         if(client) {
             // Initial load
@@ -131,11 +138,7 @@
 
 <timeline class="timeline" {onmousemove}>
     <div class="side">
-        {#if clip.type == 'composite'}
         <span contenteditable="true" bind:textContent={clip.name}></span>
-        {:else}
-        <span>{clip.name}</span>
-        {/if}
         <span style="font-size: small; color: gray;">{clip.targetType}</span>
     </div>
     <div class="main" role="feed" {onmousemove} {onmouseout} onblur={onmouseout} {onclick} bind:this={main}>

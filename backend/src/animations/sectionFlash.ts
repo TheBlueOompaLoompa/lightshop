@@ -2,7 +2,6 @@
 
 import { ParameterType } from "$schema/clip";
 import Animation, { type RenderInput } from "$lib/animation";
-import Color from "$lib/color";
 import { TargetType } from "$schema/settings";
 
 
@@ -10,11 +9,6 @@ const anim = new Animation(
     'Section Flash',
     [TargetType.enum.linear, TargetType.enum.spatial],
     [
-        {
-            name: 'Color',
-            type: ParameterType.enum.color,
-            value: Color.fromHsv(0, 0, 0).hex
-        },
         {
             name: 'Sections',
             type: ParameterType.enum.number,
@@ -49,8 +43,8 @@ function render(this: Animation, input: RenderInput) {
     const ledsPerSection = ledCount / sections;
     
     for(let i = 0; i < ledCount; i++) {
-        if(i >= section * ledsPerSection && i < (section * ledsPerSection) + ledsPerSection) {
-            out[i] = (this.getParameter('Color') as Color).raw();
+        if(!(i >= section * ledsPerSection && i < (section * ledsPerSection) + ledsPerSection)) {
+            out[i] = 0;
         }
     }
 

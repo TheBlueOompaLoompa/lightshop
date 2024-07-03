@@ -26,7 +26,7 @@
 <clip 
     onclick={onclick}
     class={$Selected && $Selected.type == 'clip' && $Selected.clip.id == clip.id ? 'selected': ''}
-    style="{style}; background: {clip.params[0].value}; left: {scale * timelineSpacing * beat}px; width: {scale * timelineSpacing * (clip.end - clip.start)}px;">
+    style="{style}; background: {clip.effects[0].params[0].value}; left: {scale * timelineSpacing * beat}px; width: {scale * timelineSpacing * (clip.end - clip.start)}px;">
 
     <span style="background-color: #333;">{clip.name}</span>
     <grab id="left" onmousedown={(e: MouseEvent) => resize(e, 'left')}></grab>

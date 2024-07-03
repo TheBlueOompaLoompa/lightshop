@@ -12,6 +12,11 @@ export const Parameter = z.object({
     value: z.union([z.string(), z.number(), z.boolean()]),
 });
 
+export const Effect = z.object({
+    name: z.string(),
+    params: z.array(Parameter),
+});
+
 export const ClipType = z.enum(['builtin', 'root', 'composite'])
 
 export const clips = sqliteTable('clips', {
@@ -19,7 +24,7 @@ export const clips = sqliteTable('clips', {
     name: text('name').notNull(),
     type: text('type', { enum: ClipType.options }).notNull(),
     targetType: text('target-type', { enum: TargetType.options }).notNull(),
-    params: text('parameters', { mode: 'json' }).notNull().$type<(z.infer<typeof Parameter>)[]>(),
+    effects: text('effects', { mode: 'json' }).notNull().default([]).$type<(z.infer<typeof Effect>)[]>(),
     project: text('project'),
 
     parent: integer('parent').references((): AnySQLiteColumn => clips.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
@@ -31,7 +36,7 @@ export const clips = sqliteTable('clips', {
 export const apiClip = createInsertSchema(clips, {
     type: ClipType,
     targetType: TargetType,
-    params: z.array(Parameter)
+    effects: z.array(Effect)
 });
 export const betterApiClip = createInsertSchema(clips);
 
@@ -41,7 +46,7 @@ export const betterApiInsertClip = createInsertSchema(clips).omit({ id: true });
 const SBaseTreeClip = z.object({
     id: z.number(),
     name: z.string(),
-    params: z.array(Parameter),
+    effects: z.array(Effect),
     start: z.number(),
     end: z.number(),
     type: ClipType,
