@@ -4,13 +4,29 @@ import { blob, integer, sqliteTable, text, type AnySQLiteColumn } from 'drizzle-
 import { pools } from './pool';
 import { createInsertSchema } from 'drizzle-zod';
 
-export const ParameterType = z.enum(['color', 'number', 'bool']);
-
-export const Parameter = z.object({
-    name: z.string(),
-    type: ParameterType,
-    value: z.union([z.string(), z.number(), z.boolean()]),
-});
+export const Parameter = z.discriminatedUnion('type', [
+    z.object({
+        name: z.string(),
+        type: z.literal('color'),
+        value: z.string(),
+    }),
+    z.object({
+        name: z.string(),
+        type: z.literal('number'),
+        value: z.number(),
+    }),
+    z.object({
+        name: z.string(),
+        type: z.literal('bool'),
+        value: z.boolean(),
+    }),
+    z.object({
+        name: z.string(),
+        type: z.literal('select'),
+        value: z.string(),
+        options: z.array(z.string())
+    }),
+]);
 
 export const Effect = z.object({
     name: z.string(),

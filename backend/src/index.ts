@@ -10,6 +10,8 @@ import _ from 'lodash';
 import presets from 'animations/presets';
 import clips from '$api/clips';
 import { TargetType } from '$schema/settings';
+import { ClipType } from '$schema/clip';
+import type { Clip } from 'types';
 
 const appRouter = router({
     projects,
@@ -31,6 +33,31 @@ async function setupBuiltin() {
     if(!_.some(poolList, linear)) await caller.pools.new(linear);
     if(!_.some(poolList, spatial)) await caller.pools.new(spatial);
 
+    // Repair if numbers somehow become strings
+    /*const fixClips = await caller.clips.list({ pool: '', project:  'Rock You' });
+    await fixClips.forEach(async (clip: Clip) => {
+        if(clip.effects) {
+            for(let ei = 0; ei < clip.effects.length; ei++) {
+                for(let pi = 0; pi < clip.effects[ei].params.length; pi++) {
+                    const param = clip.effects[ei].params[pi];
+
+                    switch(param.type) {
+                        case 'color':
+                            param.value = `${param.value}`;
+                            break;
+                        case 'number':
+                            if(typeof param.value == 'string') param.value = parseFloat(param.value);
+                            break;
+                    }
+                    
+                    clip.effects[ei].params[pi] = param;
+                }
+            }
+
+            await caller.clips.update(clip);
+        }
+    });*/
+
     // Clip Presets
     const linearClips = await caller.clips.list({ pool: linear.name });
     const spatialClips = await caller.clips.list({ pool: spatial.name });
@@ -38,22 +65,21 @@ async function setupBuiltin() {
         if(preset.targets.includes(TargetType.enum.linear) && !_.some(linearClips, ['name', preset.name])) {
             const clip = {
                 name: preset.name,
-                type: 'builtin',
+                type: ClipType.enum.builtin,
                 pool: linear.name,
                 effects: preset.effects.map(e => ({ name: e.name, params: e.params })),
-                targetType: 'linear'
+                targetType: TargetType.enum.linear 
             };
-            console.log(JSON.stringify(clip));
             await caller.clips.new(clip);
         }
 
         if(preset.targets.includes(TargetType.enum.spatial) && !_.some(spatialClips, ['name', preset.name])) {
             await caller.clips.new({
                 name: preset.name,
-                type: 'builtin',
+                type: ClipType.enum.builtin,
                 pool: spatial.name,
                 effects: preset.effects,
-                targetType: 'linear'
+                targetType: TargetType.enum.spatial 
             });
         }
     });

@@ -1,4 +1,3 @@
-import { ParameterType } from "../schema/clip";
 import Animation, { type RenderInput } from "../lib/animation";
 import Color from "../lib/color";
 import { TargetType } from "../schema/settings";
@@ -10,22 +9,22 @@ const anim = new Animation(
     [
         {
             name: 'Color',
-            type: ParameterType.enum.color,
+            type: 'color',
             value: Color.fromHsv(0, 0, 0).hex
         },
         {
             name: 'Rate',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 1
         },
         {
             name: 'Hold',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 1
         },
         {
             name: 'Swap',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 1
         }
     ],
@@ -46,6 +45,4 @@ function render(this: Animation, input: RenderInput) {
         const b = (noise(i*20, percent*this.getParameter('Rate')*10) + 1) / 2;
         out[i] = b > .8 ? newColor : 0;
     }
-
-    return out;
 }

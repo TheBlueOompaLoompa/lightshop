@@ -1,4 +1,4 @@
-import Animation, { ParameterType, type RenderInput } from "$lib/animation";
+import Animation, { type RenderInput } from "$lib/animation";
 import Color from "$lib/color";
 import { AnimationType } from "$lib/types";
 import { normalize, sub } from "$lib/vec";
@@ -12,18 +12,18 @@ function cloner(){
         [
             {
                 name: 'Color',
-                type: ParameterType.color,
+                type: 'color',
                 value: Color.fromHsv(0, 0, 0)
             },
             {
                 name: 'Direction',
-                type: ParameterType.boolean,
+                type: 'bool',
                 value: false
             }
             ,
             {
                 name: 'InvertFill',
-                type: ParameterType.boolean,
+                type: 'bool',
                 value: false
             }
         ],

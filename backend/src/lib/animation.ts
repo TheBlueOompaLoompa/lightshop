@@ -10,7 +10,7 @@ export default class Animation {
     render;
     params;
 
-    constructor(name: string, targets: z.infer<typeof TargetType>[], params: z.infer<typeof Parameter>[], render: (input: RenderInput) => Uint32Array) {
+    constructor(name: string, targets: z.infer<typeof TargetType>[], params: z.infer<typeof Parameter>[], render: (input: RenderInput) => any) {
         this.name = name;
         this.targets = targets;
         this.params = params;
@@ -19,7 +19,16 @@ export default class Animation {
 
     public getParameter(name: string): any | undefined {
         const param = this.params.find(param => param.name === name);
-        return param ? (param.type == 'color' ? Color.fromHex(param.value as string) : param.value) : undefined;
+        if(param) {
+            switch(param.type) {
+                case 'color':
+                    return Color.fromHex(param.value as string);
+                case 'number':
+                    return parseFloat(param.value as string);
+                default:
+                    return param.value;
+            }
+        }else return undefined;
     }
 
     public setParameter(name: string, value: any): boolean {

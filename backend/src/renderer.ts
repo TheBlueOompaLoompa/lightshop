@@ -16,6 +16,7 @@ let spatialData: z.infer<typeof Vec3>[] | undefined;
 self.onmessage = (event: MessageEvent) => {
     const msg = SMessage.parse(event.data);
 
+    try {
     switch(msg.type) {
         case 'clip':
             onClip(msg);
@@ -27,14 +28,20 @@ self.onmessage = (event: MessageEvent) => {
             onConnect(msg);
             break;
     }
+    }catch(e) {
+        console.log(`--Renderer Error Dump--\nDevice: ${ws?.url}\n${e}`);
+    }
 };
+
+function setupWs(msg: ConnectMessage) {
+    ws = new WebSocket(`ws://${msg.uri}:8080`);
+    ws.onopen = () => onOpen(msg);
+    ws.onclose = () => setupWs(msg);
+    ws.onerror = (er) => console.error(`Failed to connect ${er}`);
+}
 
 const onOpen = (msg: ConnectMessage) => {
     if(!ws) return;
-    out = new Uint32Array(msg.ledCount);
-    ledCount = msg.ledCount;
-    spatialData = msg.spatialData;
-
     let on = true;
     const delay = 200;
     const amount = 2.5;
@@ -54,26 +61,33 @@ const onOpen = (msg: ConnectMessage) => {
 
     console.log(`Connected to ws://${msg.uri}:8080`);
 
-    ws.onclose = () => {
-        ws = new WebSocket(`ws://${msg.uri}:8080`);
-        ws.onopen = () => onOpen(msg);
-    }
 };
 
 function onConnect(msg: ConnectMessage) {
-    ws = new WebSocket(`ws://${msg.uri}:8080`);
-    ws.onopen = () => onOpen(msg);
+    out = new Uint32Array(msg.ledCount);
+    ledCount = msg.ledCount;
+    spatialData = msg.spatialData;
+
+    setupWs(msg);
 }
 
 function onRender(msg: RenderMessage) {
-    if(ws && out && ws.readyState == ws.OPEN) {
+    if(out) {
         out.fill(0);
         if(msg.percent <= 1 && msg.percent >= 0) {
+            let time = msg.percent;
             for(let i = 0; i < layers.length; i++) {
-                layers[i].render({ time: msg.percent, out, ledCount, spatialData, extra: undefined });
+                let obj = { time, out, ledCount, spatialData, extra: { realTime: msg.percent } };
+                const extra = layers[i].render(obj);
+
+                if(extra) {
+                    if(typeof extra.time != 'undefined') {
+                        time = extra.time;
+                    }
+                }
             }
         }
-        ws.send(out);
+        if(ws && ws.readyState == ws.OPEN) ws.send(out);
     }
 }
 

@@ -58,26 +58,35 @@
         sendTime();
     });
 
-
     const updateTimes = () => { minutes = Math.floor(player.currentTime / 60); seconds = player.currentTime % 60; }
 
-    function sendTime(beforeCall: () => any = () => {}) {
+    async function sendTime(beforeCall: () => any = () => {}) {
         const timeDiff = Date.now() - lastTime;
 
         if(timeDiff > 1000/$FPS) {
             beforeCall();
             lastTime = Date.now();
-            $Client.player.setBeat.mutate(beats);
+            await $Client.player.setBeat.mutate(beats);
 
             updateTimes();
         }
     }
 
+    const clickAudio = new Audio('click.wav');
+    clickAudio.play();
+
     let lastTime = 0;
+    let lastClick = 0;
     async function timing() {
-        sendTime(() => time = player.currentTime*1000 + project.offset - latency);
+        await sendTime(() => time = player.currentTime*1000 + project.offset - latency);
         if(time >= project.time * 1000) player.pause();
-        if(!player.paused) window.requestAnimationFrame(timing);
+        if(!player.paused) {
+            if(lastClick + 1/$Snapping < beats) {
+                //clickAudio.play();
+                lastClick = beats;
+            }
+            window.requestAnimationFrame(timing);
+        }
     }
 
     async function playPause() {
@@ -85,8 +94,9 @@
             await player.play();
             lastTime = Date.now();
             time = player.currentTime*1000;
-            startTime = parseInt(time.toString());
-            time += project.offset - latency;
+            startTime = player.currentTime*1000;
+            lastClick = beats;
+            //time += project.offset - latency;
             
             timing();
         }else {

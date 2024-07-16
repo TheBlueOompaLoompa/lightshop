@@ -1,4 +1,3 @@
-import { ParameterType } from "../schema/clip";
 import Animation, { type RenderInput } from "../lib/animation";
 import Color from "../lib/color";
 import { TargetType } from "../schema/settings";
@@ -9,7 +8,7 @@ const anim = new Animation(
     [
         {
             name: 'Color',
-            type: ParameterType.enum.color,
+            type: 'color',
             value: Color.fromHsv(0, 0, 0).hex
         }
     ],
@@ -20,6 +19,4 @@ export default anim;
 
 function render(this: Animation, input: RenderInput) {
     input.out.fill(this.getParameter('Color').raw());
-
-    return input.out;
 }
