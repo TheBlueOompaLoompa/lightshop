@@ -5,6 +5,7 @@ import Section from './sectionFlash';
 import Twinkle from './twinkle';
 import Swipe from './swipe';
 import Gunshot from './shot';
+import TimeScale from './timescale';
 
 export default {
     Solid,
@@ -12,7 +13,8 @@ export default {
     Section,
     Twinkle,
     Swipe,
-    Gunshot
+    Gunshot,
+    TimeScale
 } as A;
 
 interface A {

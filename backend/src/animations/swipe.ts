@@ -1,6 +1,4 @@
-import { ParameterType } from "../schema/clip";
 import Animation, { type RenderInput } from "../lib/animation";
-import Color from "../lib/color";
 import { TargetType } from "../schema/settings";
 
 
@@ -9,23 +7,18 @@ const anim = new Animation(
     [TargetType.enum.linear, TargetType.enum.spatial],
     [
         {
-            name: 'Color',
-            type: ParameterType.enum.color,
-            value: Color.fromHsv(0, 0, 0).hex
-        },
-        {
             name: 'Direction',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 0
         },
         {
             name: 'InvertDirection',
-            type: ParameterType.enum.bool,
+            type: 'bool',
             value: false
         },
         {
             name: 'InvertFill',
-            type: ParameterType.enum.bool,
+            type: 'bool',
             value: false
         }
     ],
@@ -34,8 +27,11 @@ const anim = new Animation(
 
 export default anim;
 
+function mult(v: number, x: number): number {
+    return ((((v >> 24) & 0xff) * x) << 24) | ((((v >> 16) & 0xff) * x) << 16) | ((((v >> 8) & 0xff) * x) << 8)
+}
+
 function render(this: Animation, input: RenderInput) {
-    const color = this.getParameter('Color') as Color;
     const direction = this.getParameter('Direction') as number;
     const invertFill = this.getParameter('InvertFill') as boolean;
 
@@ -45,15 +41,11 @@ function render(this: Animation, input: RenderInput) {
 
     for(let i = 0; i < input.out.length; i++) {
         if(direction == 1) {
-            if(input.ledCount - i <= Math.floor(percent*input.out.length)) {
-                input.out[i] = color.raw();
-            }
-        }else if(i <= Math.floor(percent*input.out.length)){
-            input.out[i] = color.raw();
+            input.out[i] = mult(input.out[i], input.ledCount - i <= Math.floor(percent*input.out.length) ? 1 : 0);
+        }else {
+            input.out[i] = mult(input.out[i], i <= Math.floor(percent*input.out.length) ? 1 : 0);
         }
     }
-
-    return input.out;
 }
 
 /*function treeRender(this: Animation, time: number, input: RenderInput) {

@@ -1,4 +1,3 @@
-import { ParameterType } from "../schema/clip";
 import Animation, { type RenderInput } from "../lib/animation";
 import Color from "../lib/color";
 import { TargetType } from "../schema/settings";
@@ -9,12 +8,12 @@ const anim =  new Animation(
     [
         {
             name: 'Direction',
-            type: ParameterType.enum.bool,
+            type: 'bool',
             value: false
         },
         {
             name: 'Hold',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 1
         }
     ],
@@ -35,6 +34,4 @@ function render(this: Animation, input: RenderInput) {
         const newColor = Color.fromRgb(Math.round(oldColor.r * brightness), Math.round(oldColor.g * brightness), Math.round(oldColor.b * brightness));
         input.out[i] = newColor.raw();
     }
-
-    return input.out;
 }

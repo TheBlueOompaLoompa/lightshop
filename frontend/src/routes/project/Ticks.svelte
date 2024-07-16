@@ -20,7 +20,7 @@
     function onmousemove(event: MouseEvent) {
         const rect = numbersElement.getBoundingClientRect();
         if(moving) {
-            onretime(snap((event.pageX - rect.left) / timelineSpacing / scale, $Snapping) + beats);
+            onretime(snap((event.pageX - rect.left) / timelineSpacing / scale, $Snapping) - (snapping > 0 ? beats % (1/$Snapping) : 0) + beats);
         }
     }
 

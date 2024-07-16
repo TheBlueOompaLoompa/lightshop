@@ -1,6 +1,4 @@
 //import { normalize, sub } from "$lib/vec";
-
-import { ParameterType } from "../schema/clip";
 import Animation, { type RenderInput } from "../lib/animation";
 import { TargetType } from "../schema/settings";
 
@@ -11,17 +9,17 @@ const anim = new Animation(
     [
         {
             name: 'Sections',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 2
         },
         {
             name: 'Direction',
-            type: ParameterType.enum.bool,
+            type: 'bool',
             value: false
         },
         {
             name: 'Only One',
-            type: ParameterType.enum.number,
+            type: 'number',
             value: 0
         }
     ],
@@ -47,8 +45,6 @@ function render(this: Animation, input: RenderInput) {
             out[i] = 0;
         }
     }
-
-    return out;
 }
 /*
 function treeRender(this: Animation, time: number, input: RenderInput) {
