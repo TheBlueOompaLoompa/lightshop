@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package lightshop.project;
+
+message Project {
+     string name = 1;
+     uint32 tempo = 2;
+     float length = 3;
+     float offset = 4; // milliseconds
+     optional string music = 5;
+}
