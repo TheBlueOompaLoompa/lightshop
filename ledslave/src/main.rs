@@ -1,75 +1,42 @@
-extern crate websocket;
-
-use std::thread;
-use websocket::sync::Server;
-use websocket::OwnedMessage;
+use std::net::UdpSocket;
 
 use rs_ws281x::ControllerBuilder;
 use rs_ws281x::ChannelBuilder;
 use rs_ws281x::StripType;
 
-fn main() {
-	let server = Server::bind("0.0.0.0:8080").unwrap();
+fn main() -> std::io::Result<()> {
+    let socket = UdpSocket::bind("0.0.0.0:8080")?;
 
-	for request in server.filter_map(Result::ok) {
-		// Spawn a new thread for each connection.
-		thread::spawn(|| {
-			let mut client = request.accept().unwrap();
-            let mut controller = ControllerBuilder::new()
-                .freq(800_000)
-                .dma(10)
-                .channel(
-                    0, // Channel Index
-                    ChannelBuilder::new()
-                        .pin(18) // GPIO 10 = SPI0 MOSI
-                        .count(300) // Number of LEDs
-                        .strip_type(StripType::Ws2811Bgr)
-                        .brightness(255) // default: 255
-                        .build(),
-                )
-                .build()
-                .unwrap();
+    let mut controller = ControllerBuilder::new()
+        .freq(800_000)
+        .dma(10)
+        .channel(
+            0, // Channel Index
+            ChannelBuilder::new()
+                .pin(18) // GPIO 10 = SPI0 MOSI
+                .count(300) // Number of LEDs
+                .strip_type(StripType::Ws2811Bgr)
+                .brightness(255) // default: 255
+                .build(),
+        )
+        .build()
+        .unwrap();
+    
+    loop {
+        let mut buf = [0; 300*3];
+        let _ = socket.recv(&mut buf);
 
-            let ip = client.peer_addr().unwrap();
+        {
+            let leds = controller.leds_mut(0);
+            
+            let mut i = 0;
+            for led in &mut *leds {
+                *led = [buf[i+2], buf[i+3], buf[i+1], buf[i]];
+                i+=4;
+            }
+        }
 
-			println!("Connection from {}", ip);
-
-			let message = OwnedMessage::Text("Hello".to_string());
-			client.send_message(&message).unwrap();
-
-			let (mut receiver, mut sender) = client.split().unwrap();
-
-			for message in receiver.incoming_messages() {
-				let message = message.unwrap();
-
-				match message {
-					OwnedMessage::Close(_) => {
-						let message = OwnedMessage::Close(None);
-						sender.send_message(&message).unwrap();
-						println!("Client {} disconnected", ip);
-						return;
-					}
-					OwnedMessage::Ping(ping) => {
-						let message = OwnedMessage::Pong(ping);
-						sender.send_message(&message).unwrap();
-					}
-                    OwnedMessage::Binary(bin) => {
-                        {
-                            let leds = controller.leds_mut(0);
-                            
-                            let mut i = 0;
-                            for led in &mut *leds {
-                                *led = [bin[i+2], bin[i+3], bin[i+1], bin[i]];
-                                i+=4;
-                            }
-                        }
-
-                        controller.render().unwrap();
-                    }
-					_ => sender.send_message(&message).unwrap(),
-				}
-			}
-		});
-	}
+        controller.render().unwrap();
+    }
 }
 

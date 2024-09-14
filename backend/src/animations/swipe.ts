@@ -22,7 +22,10 @@ const anim = new Animation(
             value: false
         }
     ],
-    render
+    render,
+    function clone(this: Animation) {
+        return new Animation(this.name, this.targets, this.params, render, this.clone)
+    }
 );
 
 export default anim;

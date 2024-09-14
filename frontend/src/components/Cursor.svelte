@@ -57,6 +57,10 @@
             case 'c':
                 await navigator.clipboard.writeText(JSON.stringify($Selected));
                 break;
+            case 'x':
+                await navigator.clipboard.writeText(JSON.stringify($Selected));
+                await deleteThing($Selected)
+                break;
             case 'v':
                 $OnCursor = SCursorBasket.parse(JSON.parse(await navigator.clipboard.readText()));
                 if($OnCursor && $OnCursor.type == "clip" && $OnCursor.clip) {

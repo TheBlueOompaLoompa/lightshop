@@ -12,7 +12,10 @@ const anim = new Animation(
             value: Color.fromHsv(0, 0, 0).hex
         }
     ],
-    render
+    render,
+    function clone(this: Animation) {
+        return new Animation(this.name, this.targets, this.params, render, this.clone)
+    }
 );
 
 export default anim;

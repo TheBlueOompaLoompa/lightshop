@@ -4,18 +4,18 @@ import effects from "animations/effects";
 import type Animation from "$lib/animation";
 import { Vec3 } from "$schema/settings";
 import Color from "$lib/color";
+import _ from 'lodash';
 
 declare var self: Worker;
 
-let ws: WebSocket | undefined;
+let ws: any;
 let layers: Animation[] = [];
 let out: Uint32Array | undefined;
 let ledCount: number = 1;
 let spatialData: z.infer<typeof Vec3>[] | undefined;
 
-self.onmessage = (event: MessageEvent) => {
+self.onmessage = async (event: MessageEvent) => {
     const msg = SMessage.parse(event.data);
-
     try {
     switch(msg.type) {
         case 'clip':
@@ -25,7 +25,7 @@ self.onmessage = (event: MessageEvent) => {
             onRender(msg);
             break;
         case 'connect':
-            onConnect(msg);
+            await onConnect(msg);
             break;
     }
     }catch(e) {
@@ -33,62 +33,82 @@ self.onmessage = (event: MessageEvent) => {
     }
 };
 
-function setupWs(msg: ConnectMessage) {
-    ws = new WebSocket(`ws://${msg.uri}:8080`);
-    ws.onopen = () => onOpen(msg);
-    ws.onclose = () => setupWs(msg);
-    ws.onerror = (er) => console.error(`Failed to connect ${er}`);
-}
+async function setupWs(msg: ConnectMessage) {
+    console.log(msg.uri);
+    ws = await Bun.udpSocket({
+        connect: {
+            hostname: msg.uri,
+            port: 8080
+        }
+    });
 
-const onOpen = (msg: ConnectMessage) => {
     if(!ws) return;
     let on = true;
     const delay = 200;
-    const amount = 2.5;
+    const amount = 1.5;
+
     const int = setInterval(() => {
         if(!out || !ws) return;
         on = !on;
         out.fill(on ? 0xFFFFFFFF : 0);
-        ws.send(out);
+        ws.send(new Uint8Array(out.buffer));
     }, delay);
 
     setTimeout(() => {
         clearInterval(int);
         if(!out || !ws) return;
         out.fill(0);
-        ws.send(out);
+        ws.send(new Uint8Array(out.buffer));
     }, delay*amount*3);
-
+    
     console.log(`Connected to ws://${msg.uri}:8080`);
+}
 
-};
-
-function onConnect(msg: ConnectMessage) {
+async function onConnect(msg: ConnectMessage) {
     out = new Uint32Array(msg.ledCount);
     ledCount = msg.ledCount;
     spatialData = msg.spatialData;
 
-    setupWs(msg);
+    await setupWs(msg)
+}
+
+function addComponentRgb(a: number, b: number): number {
+    return ((((a >> 24) & 0xff) + ((b >> 24) & 0xff)) << 24) | ((((a >> 16) & 0xff) + ((b >> 16) & 0xff)) << 16) | ((((a >> 8) & 0xff) + ((b >> 8) & 0xff)) << 8)
 }
 
 function onRender(msg: RenderMessage) {
-    if(out) {
-        out.fill(0);
-        if(msg.percent <= 1 && msg.percent >= 0) {
-            let time = msg.percent;
-            for(let i = 0; i < layers.length; i++) {
-                let obj = { time, out, ledCount, spatialData, extra: { realTime: msg.percent } };
-                const extra = layers[i].render(obj);
+    if(!out) return;
 
-                if(extra) {
-                    if(typeof extra.time != 'undefined') {
-                        time = extra.time;
-                    }
+    out.fill(0);
+    if(msg.percent <= 1 && msg.percent >= 0) {
+        let time = msg.percent;
+
+        let renderedLayers: Uint32Array[] = [];
+
+        for(let i = 0; i < layers.length; i++) {
+            let obj = { time, out, ledCount, spatialData, extra: { realTime: msg.percent } };
+            const extra = layers[i].render(obj);
+
+            if(extra) {
+                if(typeof extra.layer != 'undefined') {
+                    renderedLayers = [...renderedLayers, extra.layer];
+                }
+                
+                if(typeof extra.time != 'undefined') {
+                    time = extra.time;
                 }
             }
         }
-        if(ws && ws.readyState == ws.OPEN) ws.send(out);
+
+        for(let i = 0; i < renderedLayers.length; i++) {
+            for(let j = 0; j < out.length; j++) {
+                out[j] = addComponentRgb(out[j], renderedLayers[i][j]);
+            }
+        }
+        
     }
+
+    if(ws) ws.send(new Uint8Array(out.buffer));
 }
 
 function onClip(msg: ClipMessage) {
@@ -97,7 +117,7 @@ function onClip(msg: ClipMessage) {
     
     layers = [];
     for(let i = 0; i < clip.effects.length; i++) {
-        layers.push(effects[clip.effects[i].name]);
+        layers.push(effects[clip.effects[i].name].clone());
         layers[i].params = clip.effects[i].params as z.infer<typeof Parameter>[];
     }
 

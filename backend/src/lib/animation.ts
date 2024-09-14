@@ -3,18 +3,22 @@ import { Parameter } from '../schema/clip';
 import type { z } from 'zod';
 import Color from './color';
 import type { Effect } from 'types';
+import _ from 'lodash';
 
 export default class Animation {
     name;
     targets;
     render;
     params;
+    clone;
+    extra: any;
 
-    constructor(name: string, targets: z.infer<typeof TargetType>[], params: z.infer<typeof Parameter>[], render: (input: RenderInput) => any) {
+    constructor(name: string, targets: z.infer<typeof TargetType>[], params: z.infer<typeof Parameter>[], render: (input: RenderInput) => any, clone: () => Animation) {
         this.name = name;
         this.targets = targets;
         this.params = params;
         this.render = render.bind(this);
+        this.clone = clone.bind(this);
     }
 
     public getParameter(name: string): any | undefined {

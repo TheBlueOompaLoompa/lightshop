@@ -23,7 +23,11 @@ const anim = new Animation(
             options: ['linear', 'easeInOutSine']
         }
     ],
-    render
+    render,
+    function clone(this: Animation) {
+        return new Animation(this.name, this.targets, this.params, render, this.clone)
+    }
+
 );
 
 export default anim;
@@ -33,14 +37,12 @@ function render(this: Animation, input: RenderInput) {
     const end = this.getParameter('End') as number;
     const func = this.getParameter('Function') as string;
 
-    input.extra = {};
-
     switch(func) {
         case 'easeInOutSine':
-            input.extra.time = easeInOutSine(input.time);
+            input.extra.time = easeInOutSine(input.extra.realTime);
             break;
         default:
-            input.extra.time = input.time;
+            input.extra.time = input.extra.realTime;
             break;
     }
 

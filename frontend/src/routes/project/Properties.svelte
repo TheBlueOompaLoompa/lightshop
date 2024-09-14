@@ -56,11 +56,11 @@
             {#each (effect.params as z.infer<typeof Parameter>[]) as param, pi}
                 <span>{param.name}</span>
                 {#if param.type == 'color'}
-                <input type="color" bind:value={param.value} oninput={e => updateParam(ei, pi, e.target.value)}/>
+                <input type="color" value={param.value} oninput={e => updateParam(ei, pi, e.target.value)}/>
                 {:else if param.type == 'number'}
-                <input type="number" bind:value={param.value} oninput={e => updateParam(ei, pi, parseFloat(e.target.value))}/>
+                <input type="number" value={param.value} oninput={e => updateParam(ei, pi, parseFloat(e.target.value))}/>
                 {:else if param.type == 'bool'}
-                <input type="checkbox" bind:checked={param.value} oninput={e => updateParam(ei, pi, e.currentTarget.checked)}/>
+                <input type="checkbox" checked={param.value} oninput={e => updateParam(ei, pi, e.currentTarget.checked)}/>
                 {:else if param.type == 'select'}
                 <select bind:value={param.value}>
                     {#each param.options as option}

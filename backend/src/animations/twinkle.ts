@@ -28,7 +28,13 @@ const anim = new Animation(
             value: 1
         }
     ],
-    render
+    render,
+    function clone(this: Animation) {
+        const n = new Animation(this.name, this.targets, this.params, render, this.clone)
+        n.extra = Math.random() * 100;
+        return n;
+    }
+
 );
 
 export default anim;
@@ -41,8 +47,10 @@ function render(this: Animation, input: RenderInput) {
     const color = this.getParameter('Color');
     const newColor = color.raw() == 0 ? Color.fromHsv(Math.random()*360, 100, 100).raw() : color.raw();
 
+    const rate = this.getParameter('Rate');
+
     for(let i = 0; i < ledCount; i++) {
-        const b = (noise(i*20, percent*this.getParameter('Rate')*10) + 1) / 2;
+        const b = (noise(i*20, (percent + this.extra)*rate*10) + 1) / 2;
         out[i] = b > .8 ? newColor : 0;
     }
 }

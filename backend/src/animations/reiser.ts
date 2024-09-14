@@ -17,7 +17,10 @@ const anim =  new Animation(
             value: 1
         }
     ],
-    render
+    render,
+    function clone(this: Animation) {
+        return new Animation(this.name, this.targets, this.params, render, this.clone)
+    }
 );
 export default anim;
 

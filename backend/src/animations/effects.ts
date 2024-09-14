@@ -6,6 +6,7 @@ import Twinkle from './twinkle';
 import Swipe from './swipe';
 import Gunshot from './shot';
 import TimeScale from './timescale';
+import AddMix from './addmix';
 
 export default {
     Solid,
@@ -14,7 +15,8 @@ export default {
     Twinkle,
     Swipe,
     Gunshot,
-    TimeScale
+    TimeScale,
+    AddMix
 } as A;
 
 interface A {
