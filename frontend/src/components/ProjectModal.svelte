@@ -20,6 +20,7 @@
 
             reader.onload = (_e: any) => {
                 if(typeof reader.result == 'string') project.music = reader.result;
+                console.log(project.music)
             };
 
             reader.readAsDataURL(file);

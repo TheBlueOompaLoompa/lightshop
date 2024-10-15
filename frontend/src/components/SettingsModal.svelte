@@ -35,7 +35,7 @@
         <button onclick={() => showNewTarget = true}>New Render Target</button>
         <div class="targets">
             {#each settings.targets as target}
-            <row class="subpanel"><span>{target.name}</span><button onclick={deleteTarget} >Delete</button></row>
+            <row class="subpanel"><span>{target.name}</span><button onclick={deleteTarget}>Edit</button><button onclick={deleteTarget}>Delete</button></row>
             {/each}
         </div>
     </content>
@@ -62,6 +62,9 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+    }
+
+    row span {
+        margin-right: auto;
     }
 </style>

@@ -1,8 +1,9 @@
 import ZodWorker from "$lib/zodworker";
 import { RenderTarget } from "$schema/settings";
 import { z } from "zod";
-import type { Message as RenderMessage } from "./renderer";
+import type { Message as RenderMessage, ConnectMessage } from "./renderer";
 import { apiClip, type TreeClip } from "$schema/clip";
+import { insertBpm } from "$schema/bpm";
 
 declare var self: Worker;
 
@@ -17,7 +18,6 @@ let targetClips: TargetClips = {};
 let beat = 0;
 
 function clipsMsg(msg: ClipsMessage) {
-    // TODO: Support tree
     msg.clips.forEach((clip: any) => {
         try {
             const data = Object.entries(targetClips).find(item => item[1].id == clip.parent) as any
@@ -53,10 +53,8 @@ function makeClip(clip: any) {
     }
 }
 
-// TODO: Make percent work
 function beatMsg(msg: BeatMessage) {
     beat = msg.beat;
-    // TODO: Support tree
     targets.forEach(target => {
         const children = targetClips[target.name].children;
         for(let i = 0; i < children.length; i++) {
@@ -73,7 +71,10 @@ function beatMsg(msg: BeatMessage) {
     });
 }
 
+let originalOpen: OpenMessage | null = null;
+
 function openMsg(msg: OpenMessage) {
+    originalOpen = msg;
     while(targets.length > 0) {
         targets[0].terminate();
         targets.splice(0, 1);
@@ -94,26 +95,50 @@ function openMsg(msg: OpenMessage) {
             end: 0
         };
 
-        renderer.msg({
+        let msg: ConnectMessage = {
             type: 'connect',
             uri: target.address,
             ledCount: target.ledCount,
-            spatialData: target.ledPositions
-        });
+        };
 
+        if(Object.keys(target).includes('ledPositions') && target.ledPositions) {
+            let lowerBound = [9990, 9990, 10000];
+            let upperBound = [0, 0, 0];
+            for(let i = 0; i < target.ledCount; i++) {
+                for(let j = 0; j < 3; j++) {
+                    lowerBound[j] = Math.min(target.ledPositions[i][j], lowerBound[j]);
+                    upperBound[j] = Math.max(target.ledPositions[i][j], upperBound[j]);
+                }
+            }
+
+            const center = [(lowerBound[0] + upperBound[0])/2, (lowerBound[1] + upperBound[1])/2, (lowerBound[2] + upperBound[2])];
+
+            msg.spatialData = {
+                positions: target.ledPositions,
+                bounds: [lowerBound, upperBound, center]
+            };
+        }
+
+        renderer.msg(msg);
         renderer.ref();
         targets.push(renderer);
     });
 }
 
+function bpmMsg(msg: BpmsMessage) {
+
+}
+
 const SBeatMessage = z.object({ type: z.literal('beat'), beat: z.number() });
 const SOpenMessage = z.object({ type: z.literal('open'), targets: z.array(z.object({ id: z.number(), target: RenderTarget})) });
 const SSetClips = z.object({ type: z.literal('clips'), clips: z.array(apiClip) });
+const SSetBpms = z.object({ type: z.literal('bpms'), bpms: z.array(insertBpm) })
 
 export const SMessage = z.discriminatedUnion('type', [
     SBeatMessage,
     SOpenMessage,
     SSetClips,
+    SSetBpms,
 ]);
 
 self.onmessage = (event: MessageEvent) => {
@@ -128,6 +153,8 @@ self.onmessage = (event: MessageEvent) => {
         case 'clips':
             clipsMsg(msg);
             break;
+        case 'bpms':
+            break;
         default:
             break;
     }
@@ -141,3 +168,4 @@ export type Message = z.infer<typeof SMessage>;
 type BeatMessage = z.infer<typeof SBeatMessage>;
 type OpenMessage = z.infer<typeof SOpenMessage>;
 type ClipsMessage = z.infer<typeof SSetClips>;
+type BpmsMessage = z.infer<typeof SSetBpms>;

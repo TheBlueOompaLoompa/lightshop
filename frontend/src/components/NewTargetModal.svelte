@@ -11,14 +11,28 @@
     let address = '';
     let ledCount = 0;
     let type = 'linear';
+    let ledPositions: number[][] = [];
 
     // TODO: Allow uploading LED positions file
+
+    async function fileChange(event: any) {
+        console.log(event.target.files);
+        const text = await event.target.files[event.target.files.length - 1].text();
+        const rows = text.split('\n');
+        alert(rows.length + ' leds found!');
+        ledPositions = [];
+
+        rows.forEach(row => {
+            const parts = row.split(';').map(str => parseInt(str));
+            ledPositions.push(parts);
+        });
+    }
 
     function onPositive() {
         onpositive();
         settings.targets = [
             ...settings.targets,
-            { name, address, ledCount, type }
+            { name, address, ledCount, type, ledPositions }
         ]
     }
 </script>
@@ -42,7 +56,7 @@
 
         {#if type == 'spatial'}
         <span>Spatial Data (; seperated, \n per led)</span>
-        <input type="file"/>
+        <input type="file" on:change={fileChange}/>
         {/if}
     </div>
 </ConfirmModal>

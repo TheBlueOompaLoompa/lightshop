@@ -1,3 +1,4 @@
+import Color from "../lib/color";
 import Animation, { type RenderInput } from "../lib/animation";
 import { TargetType } from "../schema/settings";
 
@@ -36,17 +37,43 @@ function mult(v: number, x: number): number {
 
 function render(this: Animation, input: RenderInput) {
     const direction = this.getParameter('Direction') as number;
+    const invertDirection = this.getParameter('InvertDirection') as boolean;
     const invertFill = this.getParameter('InvertFill') as boolean;
 
     let percent = input.time;
 
     percent = invertFill ? 1 - percent : percent;
 
-    for(let i = 0; i < input.out.length; i++) {
-        if(direction == 1) {
-            input.out[i] = mult(input.out[i], input.ledCount - i <= Math.floor(percent*input.out.length) ? 1 : 0);
-        }else {
-            input.out[i] = mult(input.out[i], i <= Math.floor(percent*input.out.length) ? 1 : 0);
+    if(input.spatialData) {
+        let coord = 0;
+        let bottomCoord = 0;
+        let topCoord = 0;
+
+        for(let i = 0; i < input.ledCount; i++) {
+            coord = input.spatialData.positions[i][direction];
+            if(!invertDirection) {
+                bottomCoord = input.spatialData.bounds[0][direction];
+                topCoord = input.spatialData.bounds[1][direction];
+
+                if(!((topCoord - bottomCoord) * percent + bottomCoord > coord)) {
+                    input.out[i] = 0;
+                }
+            }else {
+                bottomCoord = input.spatialData.bounds[1][direction];
+                topCoord = input.spatialData.bounds[0][direction];
+
+                if(!((topCoord - bottomCoord) * percent + bottomCoord < coord)) {
+                    input.out[i] = 0;
+                }
+            }
+        }
+    }else {
+        for(let i = 0; i < input.out.length; i++) {
+            if(direction == 1) {
+                input.out[i] = mult(input.out[i], input.ledCount - i <= Math.floor(percent*input.out.length) ? 1 : 0);
+            }else {
+                input.out[i] = mult(input.out[i], i <= Math.floor(percent*input.out.length) ? 1 : 0);
+            }
         }
     }
 }

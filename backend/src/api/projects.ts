@@ -29,6 +29,41 @@ export default router({
                 });
             cache.invalidate('project-list');
         }),
+    saveMusicPart: publicProcedure
+        .input(z.object({ project: z.string(), part: z.string(), end: z.boolean() }))
+        .mutation(async (opts) => {
+            const key = `music-upload-parts-${opts.input.project}`;
+            if(!Object.keys(opts.ctx.data).includes(key)) opts.ctx.data[key] = [] as string[];
+            opts.ctx.data[key].push(opts.input.part);
+
+            if(opts.input.end) {
+                let music = '';
+                opts.ctx.data[key].forEach(part => {
+                    music += part;
+                });
+
+                opts.ctx.data = {};
+                await diskDB.update(projects)
+                    .set({ music })
+                    .where(eq(projects.name, opts.input.project));
+            }
+        }),
+    loadMusicPart: publicProcedure
+        .input(z.object({ project: z.string(), offset: z.number() }))
+        .query(async (opts) => {
+            const music = (await diskDB.select({ music: projects.music })
+                .from(projects)
+                .where(eq(projects.name, opts.input.project)))[0].music;
+
+            if(!music) return new Error('Music not found');
+
+            const chunkSize = 6*1024*1024
+
+            const start = opts.input.offset * chunkSize;
+            const end = Math.min(music.length-1, (opts.input.offset + 1) * chunkSize);
+            const chunk = music.slice(start, end);
+            return { chunk, end: end == music.length-1 };
+        }),
     delete: publicProcedure
         .input(z.string({ description: 'Project name' }))
         .mutation(async (opts) => {
@@ -85,6 +120,10 @@ export default router({
 
 
             await caller.player.sendMsg({ type: 'clips', clips });
+
+            if(project.music && project.music.length > 6 * 1024 * 1024) {
+                project.music = 'part';
+            }
 
             return {
                 project

@@ -12,6 +12,13 @@ export default [
         ]
     },
     {
+        name: 'ColorFade',
+        targets: [TargetType.enum.linear, TargetType.enum.spatial],
+        effects: [
+            effects.ColorFade.effect
+        ]
+    },
+    {
         name: 'Section',
         targets: [TargetType.enum.linear, TargetType.enum.spatial],
         effects: [

@@ -2,11 +2,7 @@ import { z } from 'zod';
 
 export const TargetType = z.enum(['linear', 'spatial']);
 
-export const Vec3 = z.object({
-    x: z.number(),
-    y: z.number(),
-    z: z.number()
-}).default({ x: 0, y: 0, z: 0 });
+export const Vec3 = z.array(z.number()).length(3).default([0, 0, 0]);
 
 export const RenderTarget = z.object({
     name: z.string(),

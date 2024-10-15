@@ -53,7 +53,7 @@
 
     function onmousemove(event: MouseEvent) {
         if(!($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip)) return;
-        if($OnCursor.clip.targetType != clip.targetType) return;
+        if($OnCursor.clip.targetType != clip.targetType && !($OnCursor.clip.targetType == 'linear' && clip.targetType == 'spatial')) return;
 
         const rect = main.getBoundingClientRect();
         $TimelineHover = { x: rect.x, y: rect.y };
@@ -78,7 +78,7 @@
 
     async function onclick() {
         // When user clicks with clip on cursor
-        if($OnCursor && $OnCursor.type == 'clip' && $OnCursor.clip.targetType == clip.targetType && $TimelineHover) {
+        if($OnCursor && $OnCursor.type == 'clip' && ($OnCursor.clip.targetType == clip.targetType || ($OnCursor.clip.targetType == 'linear' && clip.targetType == 'spatial')) && $TimelineHover) {
             let newClip: Clip = {} as Clip;
             Object.assign(newClip, $OnCursor.clip);
             newClip.start += $HoverBeat;

@@ -5,15 +5,25 @@
     import effects from "@backend/animations/effects";
 
     function updateParam(ei: number, pi: number, val: any) {
+        console.log(ei, pi);
         if($Selected && $Selected.type == 'clip' && $Selected.clip && $Selected.clip.effects) {
             $Selected.clip.effects[ei].params[pi].value = val;
+            console.log($Selected.clip.effects);
             $Client.clips.update.mutate($Selected.clip);
         }
     }
 
     function addEffect() {
         if($Selected && $Selected.type == 'clip' && $Selected.clip && $Selected.clip.effects) {
-            $Selected.clip.effects = [...$Selected.clip.effects, { name: newEffect, params: Object.assign(effects[newEffect].params) }]
+            let effect = {
+                name: `${newEffect}`,
+                params: []
+            };
+
+            Object.assign(effect.params, JSON.parse(JSON.stringify(effects[newEffect].params)));
+            console.log(effect);
+            $Selected.clip.effects.push(effect);
+            $Selected.clip.effects = $Selected.clip.effects;
             $Client.clips.update.mutate($Selected.clip);
         }
     }
@@ -58,11 +68,11 @@
                 {#if param.type == 'color'}
                 <input type="color" value={param.value} oninput={e => updateParam(ei, pi, e.target.value)}/>
                 {:else if param.type == 'number'}
-                <input type="number" value={param.value} oninput={e => updateParam(ei, pi, parseFloat(e.target.value))}/>
+                <input type="number" value={$Selected.clip.effects[ei].params[pi].value} oninput={e => updateParam(ei, pi, parseFloat(e.target.value))}/>
                 {:else if param.type == 'bool'}
                 <input type="checkbox" checked={param.value} oninput={e => updateParam(ei, pi, e.currentTarget.checked)}/>
                 {:else if param.type == 'select'}
-                <select bind:value={param.value}>
+                <select value={param.value} oninput={e => updateParam(ei, pi, e.target.value)}>
                     {#each param.options as option}
                     <option value={option}>{option}</option>
                     {/each}

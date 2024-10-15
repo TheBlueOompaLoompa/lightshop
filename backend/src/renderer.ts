@@ -12,22 +12,22 @@ let ws: any;
 let layers: Animation[] = [];
 let out: Uint32Array | undefined;
 let ledCount: number = 1;
-let spatialData: z.infer<typeof Vec3>[] | undefined;
+let spatialData: { positions: z.infer<typeof Vec3>[], bounds: z.infer<typeof Vec3>[] } | undefined;
 
 self.onmessage = async (event: MessageEvent) => {
     const msg = SMessage.parse(event.data);
     try {
-    switch(msg.type) {
-        case 'clip':
-            onClip(msg);
-            break;
-        case 'render':
-            onRender(msg);
-            break;
-        case 'connect':
-            await onConnect(msg);
-            break;
-    }
+        switch(msg.type) {
+            case 'clip':
+                onClip(msg);
+                break;
+            case 'render':
+                onRender(msg);
+                break;
+            case 'connect':
+                await onConnect(msg);
+                break;
+        }
     }catch(e) {
         console.log(`--Renderer Error Dump--\nDevice: ${ws?.url}\n${e}`);
     }
@@ -124,7 +124,11 @@ function onClip(msg: ClipMessage) {
 }
 
 const SRenderMessage = z.object({ type: z.literal('render'), percent: z.number() });
-const SConnectMessage = z.object({ type: z.literal('connect'), uri: z.string(), ledCount: z.number(), spatialData: z.optional(Vec3.array()) });
+const SConnectMessage = z.object({
+    type: z.literal('connect'),
+    uri: z.string(),
+    ledCount: z.number(),
+    spatialData: z.optional(z.object({ positions: Vec3.array(), bounds: Vec3.array().length(3) })) });
 const SClipMessage = z.object({ type: z.literal('clip'), clip: STreeClip });
 
 const SMessage = z.discriminatedUnion('type',
@@ -134,4 +138,4 @@ const SMessage = z.discriminatedUnion('type',
 export type Message = z.infer<typeof SMessage>;
 type ClipMessage = z.infer<typeof SClipMessage>;
 type RenderMessage = z.infer<typeof SRenderMessage>;
-type ConnectMessage = z.infer<typeof SConnectMessage>;
+export type ConnectMessage = z.infer<typeof SConnectMessage>;

@@ -39,3 +39,7 @@ export function beats2time(beats: number, pbpms: Bpm[], startBpm: number | undef
 
     return time;
 }
+
+export function vecSub(a: number[], b: number[]) {
+    return a.map((v, i) => v - b[i]);
+}

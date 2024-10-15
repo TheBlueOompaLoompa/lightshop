@@ -13,7 +13,7 @@
 
     Client.subscribe(async client => {
         if(client) {
-            bpms = await client.bpm.listEvents.query(project.name);
+            bpms = await client.bpm.list.query(project.name);
             clips = await client.clips.list.query({ pool: 'Roots', project: project.name });
         }
     });
@@ -173,7 +173,7 @@
     </bar>
     
     <div>
-        <Playhead {scale} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
+        <Playhead {scale} trackCount={clips.length} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
         <Ticks {scale} beats={viewBeats} snapping={$Snapping} {onretime} />
         <timelines>
             {#each clips as _clip, i}

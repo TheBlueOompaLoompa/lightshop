@@ -3,6 +3,7 @@ import type { Settings as TSettings } from "../types";
 import Cache from "cache";
 import { publicProcedure } from "../trpc";
 import { router } from "../trpc";
+import { unlinkSync } from "node:fs";
 
 const SETTINGS_FILE = './settings.json';
 
@@ -22,6 +23,7 @@ export default router({
         .input(Settings)
         .mutation(opts => {
             cache.invalidate('settings');
+            unlinkSync(SETTINGS_FILE);
             const file = Bun.file(SETTINGS_FILE);
             const writer = file.writer()
             writer.write(JSON.stringify(opts.input));

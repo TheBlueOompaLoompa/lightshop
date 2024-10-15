@@ -21,7 +21,24 @@
     });
 
     async function createProject() {
-        await $Client.projects.save.mutate(newProject);
+        const chunkSize = 6 * 1024 * 1024;
+        let bigSong: string | null = null;
+        let temp = {};
+        Object.assign(temp, newProject);
+        if(newProject.music.length > chunkSize) {
+            bigSong = newProject.music;
+            temp.music = null;
+        }
+
+        await $Client.projects.save.mutate(temp);
+
+        if(bigSong) {
+            for(let i = 0; i < Math.ceil(newProject.music.length / chunkSize); i++) {
+                const start = i*chunkSize;
+                const end = Math.min(bigSong.length-1, (i+1)*chunkSize);
+                await $Client.projects.saveMusicPart.mutate({ project: newProject.name, part: bigSong.slice(start, end), end: end == bigSong.length-1 })
+            }
+        }
 
         location.href = `/project?name=${encodeURIComponent(newProject.name)}`;
     }

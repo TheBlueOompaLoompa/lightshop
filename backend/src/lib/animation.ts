@@ -52,9 +52,8 @@ export default class Animation {
 
 export interface RenderInput {
     ledCount: number,
-    spatialData: z.infer<typeof Vec3>[] | undefined,
+    spatialData: { positions: z.infer<typeof Vec3>[], bounds: z.infer<typeof Vec3>[] } | undefined,
     time: number
     out: Uint32Array,
     extra: any,
 }
-

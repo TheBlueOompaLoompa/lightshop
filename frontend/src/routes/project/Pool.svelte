@@ -6,11 +6,13 @@
     let open = $state(false);
 
     let clips: Clip[] | undefined = $state();
+    $inspect(clips);
 
     $effect(() => {
-        if(open && $Client) {
+        if(open && $Client && pool && pool.name) {
             $Client.clips.list.query({ pool: pool.name, project }).then((res: Clip[]) => {
                 clips = res;
+                console.log(res);
             });
         }
     });

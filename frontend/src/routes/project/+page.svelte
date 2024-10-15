@@ -20,11 +20,33 @@
 
     Client.subscribe(async client => {
         if(!client) return;
-        data = await client.projects.open.query(projectName);
-        if(data) {
-            $Project = data.project;
+        const temp = await client.projects.open.query(projectName);
+        if(temp) {
+            if(temp.project.music == 'part') {
+                let music = '';
+                let offset = -1;
+                let end = false;
+                while(!end) {
+                    const part = await client.projects.loadMusicPart.query({ project: temp.project.name, offset });
+                    music += part.chunk;
+                    end = part.end;
+
+                    offset += 1;
+                }
+
+                temp.project.music = music;
+            }
+            setProject(temp);
         }
     });
+
+    function setProject(temp: any) {
+        if(temp) {
+            $Project = temp.project;
+        }
+        
+        data = temp;
+    }
 
     $effect(() => {
         if(audio && data) {
@@ -34,7 +56,27 @@
 
     async function saveConfig() {
         if(!data) return;
-        await $Client.projects.save.mutate(data.project);
+        const chunkSize = 6 * 1024 * 1024;
+        let bigSong: string | null = null;
+        let temp = {};
+        Object.assign(temp, data.project);
+        if(data.project.music.length > chunkSize) {
+            bigSong = data.project.music;
+            temp.music = null;
+        }
+
+        await $Client.projects.save.mutate(temp);
+
+        data.project.music = `${bigSong}`;
+
+        if(bigSong) {
+            for(let i = 0; i < Math.ceil(data.project.music.length / chunkSize); i++) {
+                const start = i*chunkSize;
+                const end = Math.min(bigSong.length-1, (i+1)*chunkSize);
+                await $Client.projects.saveMusicPart.mutate({ project: data.project.name, part: bigSong.slice(start, end), end: end == bigSong.length-1 })
+            }
+        }
+        data = data;
     }
 </script>
 
@@ -54,10 +96,10 @@
             <div>
                 <Pools projectName={data.project.name}/>
             </div>
-            <div>
+            <div class="no-right">
                 <Properties/>
             </div>
-            <div class="no-right"><h2>Preview</h2></div>
+            <!--<div class="no-right"><h2>Preview</h2></div>-->
         </ResizePanel>
         <div class="timeline no-right">
             <Timeline project={data.project} bind:scale={scale} bind:beats={beats}/>
@@ -70,7 +112,7 @@
 {/if}
 
 <svelte:head>
-    <title>Lightshop {projectName}</title>
+    <title>Lightshop | {projectName}</title>
 </svelte:head>
 
 <style>
