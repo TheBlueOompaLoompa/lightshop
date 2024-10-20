@@ -28,7 +28,9 @@
             // Remove clips when deleted on server
             client.clips.onDelete.subscribe(undefined, {
                 onData(clip: TClip) {
-                    clips = clips.toSpliced(clips.findIndex(c => c.id == clip.id), 1);
+                    const whenRemoved = clips.findIndex(c => c.id == clip.id);
+                    if(whenRemoved < 0) return;
+                    clips = clips.toSpliced(whenRemoved, 1);
                 }
             });
 

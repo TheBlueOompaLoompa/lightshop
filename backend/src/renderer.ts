@@ -51,14 +51,14 @@ async function setupWs(msg: ConnectMessage) {
         if(!out || !ws) return;
         on = !on;
         out.fill(on ? 0xFFFFFFFF : 0);
-        ws.send(new Uint8Array(out.buffer));
+        sendZip(ws, new Uint8Array(out.buffer));
     }, delay);
 
     setTimeout(() => {
         clearInterval(int);
         if(!out || !ws) return;
         out.fill(0);
-        ws.send(new Uint8Array(out.buffer));
+        sendZip(ws, new Uint8Array(out.buffer));
     }, delay*amount*3);
     
     console.log(`Connected to ws://${msg.uri}:8080`);
@@ -108,7 +108,11 @@ function onRender(msg: RenderMessage) {
         
     }
 
-    if(ws) ws.send(new Uint8Array(out.buffer));
+    if(ws) sendZip(ws, new Uint8Array(out.buffer));
+}
+
+function sendZip(ws, buf) {
+    ws.send(Bun.gzipSync(buf));
 }
 
 function onClip(msg: ClipMessage) {
