@@ -1,7 +1,8 @@
 import NodeWebcam from 'node-webcam';
 import { rmSync } from 'node:fs';
 import { Jimp } from "jimp";
-import Color from './color';
+import Color from 'ledcolor';
+import { $ } from 'bun';
 
 async function prompt(question: string, confirm = true) {
     process.stdout.write(question + ': ');
@@ -33,24 +34,46 @@ async function prompt(question: string, confirm = true) {
     return out;
 }
 
+let posResolve: any[] = [];
+let nextCam: any[] = [];
+let nextRes: any[] = [];
+
+Bun.serve({
+    port: 3000,
+    hostname: '0.0.0.0',
+    async fetch(req) {
+        const url = new URL(req.url);
+        if(url.searchParams.get('x')) {
+            const x = parseInt(url.searchParams.get('x') ?? '0');
+            const y = parseInt(url.searchParams.get('y') ?? '0');
+            posResolve.forEach(res => res([x, y]));
+            posResolve = [];
+            nextCam.push(new Promise((res) => { nextRes.push(res) }))
+            await Promise.all(nextCam);
+            nextCam = [];
+        }
+        const filePath = url.pathname;
+        return new Response(Bun.file('static' + filePath));
+    },
+});
 
 const addr = await prompt('Target IP');
 const ledCount = parseInt(await prompt('How many leds?'));
 
 const port = 8080;
 
-const ledBuf = new Uint8Array(ledCount*4);
+const ledBuf = new Uint32Array(ledCount);
 
 const client = await Bun.udpSocket({
     port 
 });
 
 function send() {
-    client.send(ledBuf, port, addr);
+    client.send(Bun.gzipSync(new Uint8Array(ledBuf.buffer)), port, addr);
 }
 
 console.log('Confirming connection...');
-ledBuf.fill(255);
+ledBuf.fill(Color.fromHex('#ffffff').raw());
 send();
 if(await prompt('Is the device lit up? [y/n]', false) == 'n') process.exit(-1);
 ledBuf.fill(0);
@@ -69,23 +92,29 @@ const webcamOpts = {
 };
 
 const Webcam = NodeWebcam.create(webcamOpts);
+console.log(NodeWebcam.list());
 
 
 async function recordSide(): Promise<{ x: number, y: number }[]> {
     let pixels = [];
     for(let i = 0; i < ledCount; i++) {
         ledBuf.fill(0);
-        for(let j = 0; j < 4; j++) {
-            ledBuf[i*4+j] = 255;
-        }
+        ledBuf[i] = Color.fromRgb(255, 255, 255).raw();
         send();
-        Webcam.capture( "/tmp/lightcalib", (err, data) => {});
-        //await $`ffmpeg -y -f video4linux2 -s 1280x720 -i /dev/video0 -ss 0:0:2 -frames 1 /tmp/lightcalib.jpg`;
+        //Webcam.capture( "static/image", (err, data) => {});
+        await $`fswebcam -r 1280x720 --jpeg 100 -d /dev/video1 -F 2 /tmp/lightcalib.jpg`;
+        /*const res = nextRes.pop();
+        if(res) res();
+        nextRes = [];
+        const data = await new Promise((res) => {
+            posResolve.push(res);
+        });*/
         const image = await Jimp.read("/tmp/lightcalib.jpg");
+        //console.log(data);
 
         const ledPos = findLed(image);
         pixels.push(ledPos);
-        console.log(`Leds found ${pixels.length}/${ledCount}`);
+        console.log(`Leds found ${pixels.length}/${ledCount} at (${ledPos.x}, ${ledPos.y})`);
     }
 
     return pixels;
@@ -96,9 +125,8 @@ function findLed(image: any): { x: number, y: number } {
 
     let avgCount = 0;
 
-
     let brightnessFloor = 90;
-    let maxBright =0;
+    let maxBright = 0;
 
     while(avgCount < 1) {
         for(let y = 0; y < image.height; y++) {

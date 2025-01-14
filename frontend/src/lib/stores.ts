@@ -6,7 +6,7 @@ import type { Project as TProject } from "@backend/types";
 
 export const Invalidate = writable<Invalidations>(Invalidations.None);
 export const Client = writable<CreateTRPCClient<AppRouter>>();
-export const FPS = writable(120);
+export const FPS = writable(40);
 export const OnCursor = writable<CursorBasket>();
 export const TimelineHover = writable<{ x: number, y: number} | undefined>()
 

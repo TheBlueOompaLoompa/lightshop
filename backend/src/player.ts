@@ -102,20 +102,29 @@ function openMsg(msg: OpenMessage) {
         };
 
         if(Object.keys(target).includes('ledPositions') && target.ledPositions) {
-            let lowerBound = [9990, 9990, 10000];
-            let upperBound = [0, 0, 0];
-            for(let i = 0; i < target.ledCount; i++) {
-                for(let j = 0; j < 3; j++) {
-                    lowerBound[j] = Math.min(target.ledPositions[i][j], lowerBound[j]);
-                    upperBound[j] = Math.max(target.ledPositions[i][j], upperBound[j]);
-                }
-            }
+            let area = [
+                [0, 0, 0],
+                [0, 0, 0]
+            ];
 
-            const center = [(lowerBound[0] + upperBound[0])/2, (lowerBound[1] + upperBound[1])/2, (lowerBound[2] + upperBound[2])];
+            Object.assign(area[0], target.ledPositions[0]);
+            Object.assign(area[1], target.ledPositions[0]);
+   
+            target.ledPositions.forEach(pos => {
+                area[0][0] = pos[0] < area[0][0] ? pos[0] : area[0][0]
+                area[0][1] = pos[1] < area[0][1] ? pos[1] : area[0][1]
+                area[0][2] = pos[2] < area[0][2] ? pos[2] : area[0][2]
+   
+                area[1][0] = pos[0] > area[1][0] ? pos[0] : area[1][0]
+                area[1][1] = pos[1] > area[1][1] ? pos[1] : area[1][1]
+                area[1][2] = pos[2] > area[1][2] ? pos[2] : area[1][2]
+            });
+
+            const center = [(area[0][0] + area[1][0])/2, (area[0][1] + area[1][1])/2, (area[0][2] + area[1][2])/2];
 
             msg.spatialData = {
                 positions: target.ledPositions,
-                bounds: [lowerBound, upperBound, center]
+                bounds: [area[0], area[1], center]
             };
         }
 

@@ -1,4 +1,4 @@
-import Animation, { type RenderInput } from "../lib/animation";
+import Animation, { MixType, type RenderInput } from "../lib/animation";
 import Color from "../lib/color";
 import { TargetType } from "../schema/settings";
 
@@ -15,5 +15,5 @@ const anim = new Animation(
 export default anim;
 
 function render(this: Animation, input: RenderInput) {
-    return { layer: input.out.slice() }; 
+    return { layer: input.out.slice(), mix: MixType.Add }; 
 }

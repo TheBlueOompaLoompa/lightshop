@@ -64,14 +64,19 @@ function render(this: Animation, input: RenderInput) {
             }
         }
     }else {
-        const lower = spatialData.bounds[0][Orient[orientation]];
-        const upper = spatialData.bounds[1][Orient[orientation]];
+        const ori = Orient[orientation]
+        const lower = spatialData.bounds[0][ori];
+        const upper = spatialData.bounds[1][ori];
 
         const sectionHeight = (upper-lower)/sections;
         for(let i = 0; i < ledCount; i++) {
-                    if(!(spatialData.positions[i][Orient[orientation]] < sectionHeight * (section+1) && spatialData.positions[i][Orient[orientation]] > sectionHeight*section)) {
+            if(!(spatialData.positions[i][ori] > lower + sectionHeight * section &&
+                 spatialData.positions[i][ori] < lower + sectionHeight * (section+1))) {
+                input.out[i] = 0;
+            }
+                    /*if(!(spatialData.positions[i][Orient[orientation]] < sectionHeight * (section+1) && spatialData.positions[i][Orient[orientation]] > sectionHeight*section)) {
                         input.out[i] = 0;
-                    }
+                    }*/
             /*switch(orientation) {
                 case 'X':
                     break;

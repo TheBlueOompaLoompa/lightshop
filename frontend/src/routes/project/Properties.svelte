@@ -71,6 +71,8 @@
                 <input type="number" value={$Selected.clip.effects[ei].params[pi].value} oninput={e => updateParam(ei, pi, parseFloat(e.target.value))}/>
                 {:else if param.type == 'bool'}
                 <input type="checkbox" checked={param.value} oninput={e => updateParam(ei, pi, e.currentTarget.checked)}/>
+                {:else if param.type == 'text'}
+                <input type="text" value={$Selected.clip.effects[ei].params[pi].value} oninput={e => updateParam(ei, pi, e.target.value)}/>
                 {:else if param.type == 'select'}
                 <select value={param.value} oninput={e => updateParam(ei, pi, e.target.value)}>
                     {#each param.options as option}

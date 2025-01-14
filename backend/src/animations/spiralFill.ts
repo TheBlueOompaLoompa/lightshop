@@ -34,34 +34,35 @@ export default anim;
 
 function render(this: Animation, input: RenderInput) {
     const direction = this.getParameter('Direction') as boolean;
-    const invertFill = this.getParameter('InvertFill') as boolean;
+    const invertFill = !this.getParameter('InvertFill') as boolean;
     const orientation = this.getParameter('Orientation') as string;
 
     const angle = (invertFill?1-input.time:input.time)*2*Math.PI;
 
-    if(!input.spatialData) return
+    if(!input.spatialData) return;
     for(let i = 0; i < input.ledCount; i++) {
         let pointAngle = 0;
-        let pos = vecSub(input.spatialData.positions[i], input.spatialData.bounds[2]);
-        const greatest = Math.max(pos[0], pos[1], pos[2]);
-        pos[0] /= greatest;
-        pos[1] /= greatest;
-        pos[2] /= greatest;
+        const coord = normalized(vecSub(input.spatialData.positions[i], input.spatialData.bounds[2]));
         switch(orientation) {
             case 'X':
-                //pointAngle = Math.atan(pos[0]/pos[2]);
+                pointAngle = Math.atan2(coord[1], coord[0]);
                 break;
             case 'Y':
-                pointAngle = Math.atan(pos[1]/pos[0]);
+                pointAngle = Math.atan2(coord[2], coord[0]);
                 break;
             case 'Z':
-                //pointAngle = Math.atan(pos[1]/pos[2]);
+                pointAngle = Math.atan2(coord[1], coord[2]);
                 break;
         }
 
         if(pointAngle < 0) pointAngle += 2*Math.PI;
-        if((angle < pointAngle) != direction) input.out[i] = 0;
+        if((pointAngle < angle) != direction) input.out[i] = 0;
     }
+}
+
+function normalized(vec: number[]) {
+    const greatest = Math.max(Math.abs(vec[0]), Math.abs(vec[1]), Math.abs(vec[2]));
+    return [vec[0]/greatest, vec[1]/greatest, vec[2]/greatest];
 }
 
 /*
@@ -77,8 +78,8 @@ function render(this: Animation, time: number, input: RenderInput) {
     let coord = [0, 0, 0];
 
     for(let i = 0; i < input.ledCount; i++) {
-        coord = input.treeData.positions[i];
-        const vec = normalize(sub(coord, input.treeData.center));
+        coord = input.spatialData.positions[i];
+        const vec = normalize(sub(coord, input.spatialData.center));
         
         // Convert vec to angle
         let angle = Math.atan2(vec[1], vec[0]);
@@ -92,12 +93,12 @@ function render(this: Animation, time: number, input: RenderInput) {
 
         // Convert angle to coord
         coord = [
-            Math.cos(angle) * input.treeData.bounds[1][0],
-            Math.sin(angle) * input.treeData.bounds[1][1],
+            Math.cos(angle) * input.spatialData.bounds[1][0],
+            Math.sin(angle) * input.spatialData.bounds[1][1],
             0
         ];
 
-        if(input.treeData.bounds[0][0] < coord[0] && coord[0] < input.treeData.bounds[1][0] && input.treeData.bounds[0][1] < coord[1] && coord[1] < input.treeData.bounds[1][1]) {
+        if(input.spatialData.bounds[0][0] < coord[0] && coord[0] < input.spatialData.bounds[1][0] && input.spatialData.bounds[0][1] < coord[1] && coord[1] < input.spatialData.bounds[1][1]) {
             input.out[i] = (this.getParameter('Color') as Color).raw();
         }
     }

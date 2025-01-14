@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "jimp": "^1.6.0",
+    "ledcolor": "^1.0.1",
     "node-webcam": "^0.8.2"
   }
 }

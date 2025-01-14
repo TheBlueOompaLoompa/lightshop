@@ -26,6 +26,11 @@ export const Parameter = z.discriminatedUnion('type', [
         value: z.string(),
         options: z.array(z.string())
     }),
+    z.object({
+        name: z.string(),
+        type: z.literal('text'),
+        value: z.string(),
+    }),
 ]);
 
 export const Effect = z.object({
