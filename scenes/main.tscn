@@ -1,0 +1,141 @@
+[gd_scene load_steps=6 format=3 uid="uid://cdukr2fc1y4wq"]
+
+[ext_resource type="PackedScene" uid="uid://dw523n4gcfulq" path="res://scenes/ui/projects.tscn" id="1_j3igl"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_rkwqt"]
+[ext_resource type="PackedScene" uid="uid://b7vueinrtkcmq" path="res://scenes/ui/settings.tscn" id="3_8yuaw"]
+[ext_resource type="Script" path="res://scripts/db.gd" id="3_al6dv"]
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_n1iv2"]
+number_color = Color(0.319823, 0.527252, 1, 1)
+symbol_color = Color(0.654902, 1, 0.615686, 1)
+function_color = Color(1, 0.627451, 1, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rkwqt")
+
+[node name="Tabs" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 2
+
+[node name="Projects" parent="Tabs" node_paths=PackedStringArray("Db") instance=ExtResource("1_j3igl")]
+visible = false
+layout_mode = 2
+Db = NodePath("../../DB")
+
+[node name="Settings" parent="Tabs" instance=ExtResource("3_8yuaw")]
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Tabs"]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="GraphEdit" type="GraphEdit" parent="Tabs/MarginContainer"]
+layout_mode = 2
+right_disconnects = true
+connection_lines_thickness = 2.0
+
+[node name="GraphNode" type="GraphNode" parent="Tabs/MarginContainer/GraphEdit"]
+layout_mode = 2
+offset_left = 221.0
+offset_top = 84.0
+offset_right = 557.0
+offset_bottom = 439.0
+mouse_filter = 1
+position_offset = Vector2(221, 84)
+resizable = true
+title = "Test"
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color(1, 1, 1, 1)
+slot/0/left_icon = null
+slot/0/right_enabled = true
+slot/0/right_type = 0
+slot/0/right_color = Color(1, 1, 1, 1)
+slot/0/right_icon = null
+slot/0/draw_stylebox = true
+
+[node name="CodeEdit" type="CodeEdit" parent="Tabs/MarginContainer/GraphEdit/GraphNode"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "#[compute]
+#version 450
+#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require
+
+// Invocations in the (x, y, z) dimension
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+// A binding to the buffer we create in our script
+layout(set = 0, binding = 0, std430) restrict buffer led_buffer {
+    u8vec4 data[];
+} leds;
+
+layout(set = 0, binding = 1, std430) readonly buffer parameters {
+    float time;
+    float ledcount;
+} params;
+
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void main() {
+    leds.data[gl_GlobalInvocationID.x] = u8vec4(hsv2rgb(vec3((gl_GlobalInvocationID.x+params.time)/params.ledcount, 1, 1)) * 255, 255);
+}"
+placeholder_text = "Shader code"
+minimap_draw = true
+syntax_highlighter = SubResource("CodeHighlighter_n1iv2")
+line_folding = true
+gutters_draw_line_numbers = true
+indent_use_spaces = true
+indent_automatic = true
+indent_automatic_prefixes = Array[String](["{", "[", "("])
+
+[node name="EffectSolid" type="GraphNode" parent="Tabs/MarginContainer/GraphEdit"]
+layout_mode = 0
+offset_left = 600.0
+offset_right = 834.0
+offset_bottom = 229.0
+mouse_filter = 1
+position_offset = Vector2(600, 0)
+title = "Solid"
+slot/0/left_enabled = false
+slot/0/left_type = 0
+slot/0/left_color = Color(1, 1, 1, 1)
+slot/0/left_icon = null
+slot/0/right_enabled = true
+slot/0/right_type = 0
+slot/0/right_color = Color(0, 1, 0, 1)
+slot/0/right_icon = null
+slot/0/draw_stylebox = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Tabs/MarginContainer/GraphEdit/EffectSolid"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Tabs/MarginContainer/GraphEdit/EffectSolid/HBoxContainer"]
+layout_mode = 2
+text = "Color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="Tabs/MarginContainer/GraphEdit/EffectSolid/HBoxContainer"]
+layout_mode = 2
+text = "Color"
+color = Color(1, 1, 1, 1)
+
+[node name="DB" type="Node" parent="."]
+script = ExtResource("3_al6dv")
+db_name = "lightshop"

@@ -1,0 +1,135 @@
+[gd_scene load_steps=3 format=3 uid="uid://dw523n4gcfulq"]
+
+[ext_resource type="Script" path="res://scripts/ui/projects.gd" id="1_et0wt"]
+[ext_resource type="Script" path="res://scripts/ui/project_dialog.gd" id="2_7fkau"]
+
+[node name="Projects" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 4
+script = ExtResource("1_et0wt")
+metadata/_tab_index = 0
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="List" type="VBoxContainer" parent="Scroll"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/separation = 4
+
+[node name="Controls" type="HBoxContainer" parent="Scroll/List"]
+layout_mode = 2
+
+[node name="NewButton" type="Button" parent="Scroll/List/Controls"]
+layout_mode = 2
+text = "New Project"
+
+[node name="ProjectDialog" type="Window" parent="."]
+title = "Project Dialog"
+initial_position = 2
+size = Vector2i(400, 230)
+visible = false
+transient = true
+exclusive = true
+popup_window = true
+script = ExtResource("2_7fkau")
+
+[node name="VBox" type="VBoxContainer" parent="ProjectDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="ProjectDialog/VBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+columns = 2
+
+[node name="NameLabel" type="Label" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Untitled Project"
+
+[node name="TempoLabel" type="Label" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "Tempo"
+
+[node name="Tempo" type="LineEdit" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "120"
+
+[node name="TimeLabel" type="Label" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "Time"
+
+[node name="Time" type="LineEdit" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "0"
+placeholder_text = "time (s)"
+
+[node name="OffsetLabel" type="Label" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "Offset"
+
+[node name="Offset" type="LineEdit" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "0"
+placeholder_text = "offset (ms)"
+
+[node name="SongLabel" type="Label" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+text = "Song"
+
+[node name="BrowseBox" type="HBoxContainer" parent="ProjectDialog/VBox/GridContainer"]
+layout_mode = 2
+
+[node name="Browse" type="Button" parent="ProjectDialog/VBox/GridContainer/BrowseBox"]
+layout_mode = 2
+text = "Browse"
+
+[node name="FileLabel" type="Label" parent="ProjectDialog/VBox/GridContainer/BrowseBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="FileDialog" type="FileDialog" parent="ProjectDialog/VBox/GridContainer"]
+title = "Open a File"
+size = Vector2i(303, 180)
+ok_button_text = "Open"
+file_mode = 0
+filters = PackedStringArray("*.mp3,*.wav,*.ogg;Audio Files")
+use_native_dialog = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ProjectDialog/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Cancel" type="Button" parent="ProjectDialog/VBox/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="Confirm" type="Button" parent="ProjectDialog/VBox/HBoxContainer"]
+layout_mode = 2
+text = "Confirm"
+
+[connection signal="pressed" from="Scroll/List/Controls/NewButton" to="." method="_on_new_button_pressed"]
+[connection signal="visibility_changed" from="ProjectDialog" to="ProjectDialog" method="_on_visibility_changed"]
+[connection signal="pressed" from="ProjectDialog/VBox/GridContainer/BrowseBox/Browse" to="ProjectDialog" method="_on_browse_pressed"]
+[connection signal="file_selected" from="ProjectDialog/VBox/GridContainer/FileDialog" to="ProjectDialog" method="_on_file_dialog_file_selected"]
+[connection signal="pressed" from="ProjectDialog/VBox/HBoxContainer/Cancel" to="ProjectDialog" method="_on_cancel_pressed"]
+[connection signal="pressed" from="ProjectDialog/VBox/HBoxContainer/Confirm" to="ProjectDialog" method="_on_confirm_pressed"]

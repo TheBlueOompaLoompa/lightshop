@@ -1,0 +1,135 @@
+[gd_scene load_steps=4 format=3 uid="uid://b7vueinrtkcmq"]
+
+[ext_resource type="Script" path="res://scripts/renderer.gd" id="1_8wwek"]
+[ext_resource type="Script" path="res://scripts/ui/settings.gd" id="1_mx5tk"]
+[ext_resource type="Script" path="res://scripts/ui/target_window.gd" id="5_58a0h"]
+
+[node name="Settings" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 4
+script = ExtResource("1_mx5tk")
+metadata/_tab_index = 1
+
+[node name="Main" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonRow" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+
+[node name="AddRenderTarget" type="Button" parent="Main/ButtonRow"]
+layout_mode = 2
+text = "Add Render Target"
+
+[node name="Render" type="Button" parent="Main/ButtonRow"]
+layout_mode = 2
+text = "Render"
+script = ExtResource("1_8wwek")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Main"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Targets" type="VBoxContainer" parent="Main/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TargetWindow" type="Window" parent="."]
+title = "Target"
+initial_position = 2
+size = Vector2i(302, 210)
+visible = false
+transient = true
+popup_window = true
+script = ExtResource("5_58a0h")
+
+[node name="Vertical" type="VBoxContainer" parent="TargetWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Grid" type="GridContainer" parent="TargetWindow/Vertical"]
+layout_mode = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Target name"
+
+[node name="AddressLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Address"
+
+[node name="Address" type="LineEdit" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "hostname.local:8080"
+
+[node name="LedCountLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Led Count"
+
+[node name="LedCount" type="SpinBox" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+allow_greater = true
+
+[node name="TypeLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Type"
+
+[node name="Type" type="OptionButton" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Linear"
+popup/item_1/text = "Spatial"
+popup/item_1/id = 1
+
+[node name="Calibration" type="Button" parent="TargetWindow/Vertical"]
+layout_mode = 2
+text = "Open Calibration File"
+
+[node name="ButtonRow" type="HBoxContainer" parent="TargetWindow/Vertical"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Cancel" type="Button" parent="TargetWindow/Vertical/ButtonRow"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="Confirm" type="Button" parent="TargetWindow/Vertical/ButtonRow"]
+layout_mode = 2
+text = "Confirm"
+
+[node name="CalibrationFileDialog" type="FileDialog" parent="TargetWindow"]
+title = "Open a File"
+position = Vector2i(0, 36)
+size = Vector2i(303, 180)
+ok_button_text = "Open"
+file_mode = 0
+use_native_dialog = true
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="pressed" from="Main/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]
+[connection signal="pressed" from="Main/ButtonRow/Render" to="Main/ButtonRow/Render" method="start_render"]
+[connection signal="confirmed" from="TargetWindow" to="." method="_on_target_window_confirmed"]
+[connection signal="visibility_changed" from="TargetWindow" to="TargetWindow" method="_on_visibility_changed"]
+[connection signal="item_selected" from="TargetWindow/Vertical/Grid/Type" to="TargetWindow" method="_on_type_item_selected"]
+[connection signal="pressed" from="TargetWindow/Vertical/Calibration" to="TargetWindow" method="_on_calibration_pressed"]
+[connection signal="pressed" from="TargetWindow/Vertical/ButtonRow/Cancel" to="TargetWindow" method="_on_cancel_pressed"]
+[connection signal="pressed" from="TargetWindow/Vertical/ButtonRow/Confirm" to="TargetWindow" method="_on_confirm_pressed"]
+[connection signal="file_selected" from="TargetWindow/CalibrationFileDialog" to="TargetWindow" method="_on_calibration_file_selected"]

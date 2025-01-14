@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2qd0vl3nfw25"]
+
+[ext_resource type="Script" path="res://scripts/ui/project.gd" id="1_56pqr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c5gyb"]
+bg_color = Color(0.29219, 0.29219, 0.29219, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ProjectRow" type="PanelContainer"]
+offset_right = 505.0
+offset_bottom = 39.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_c5gyb")
+script = ExtResource("1_56pqr")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Untitled Project"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/separation = 9
+alignment = 2
+
+[node name="Open" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+text = "Open"
+
+[node name="Delete" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+text = "Delete"
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/HBoxContainer/Open" to="." method="_on_open_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/HBoxContainer/Delete" to="." method="_on_delete_pressed"]
