@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dm713ybxkx06y"]
+
+[ext_resource type="Script" uid="uid://di0jm2hicrwwv" path="res://scripts/ui/effect_editor/value_inputs/float.gd" id="1_yfnty"]
+
+[node name="Float" type="HBoxContainer"]
+script = ExtResource("1_yfnty")
+
+[node name="SpinBox" type="SpinBox" parent="."]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+
+[connection signal="value_changed" from="SpinBox" to="." method="_on_spin_box_value_changed"]

@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5nor3j4iffq1"]
+
+[sub_resource type="GDScript" id="GDScript_vde5y"]
+resource_name = "load port types"
+script/source = "extends OptionButton
+
+func _ready() -> void:
+    for type in Port.Type.keys():
+        add_item(type)
+"
+
+[node name="PortAddRow" type="HBoxContainer"]
+
+[node name="AddInput" type="Button" parent="."]
+layout_mode = 2
+text = "Add Input"
+
+[node name="Name" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Name"
+
+[node name="PortType" type="OptionButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+script = SubResource("GDScript_vde5y")
+
+[node name="AddOutput" type="Button" parent="."]
+layout_mode = 2
+text = "Add Output"

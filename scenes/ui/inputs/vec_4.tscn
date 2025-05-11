@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2h1wx6ecjikf"]
+
+[ext_resource type="Script" uid="uid://cwx7xom3vjlc4" path="res://scripts/ui/effect_editor/value_inputs/vec4.gd" id="1_xayru"]
+
+[node name="Vec4" type="HBoxContainer"]
+script = ExtResource("1_xayru")
+
+[node name="SpinBox" type="SpinBox" parent="."]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+
+[node name="SpinBox2" type="SpinBox" parent="."]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+
+[node name="SpinBox3" type="SpinBox" parent="."]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+
+[node name="SpinBox4" type="SpinBox" parent="."]
+layout_mode = 2
+step = 0.0
+allow_greater = true
+allow_lesser = true
+
+[connection signal="value_changed" from="SpinBox" to="." method="_on_spin_box_value_changed"]
+[connection signal="value_changed" from="SpinBox2" to="." method="_on_spin_box_2_value_changed"]
+[connection signal="value_changed" from="SpinBox3" to="." method="_on_spin_box_3_value_changed"]
+[connection signal="value_changed" from="SpinBox4" to="." method="_on_spin_box_4_value_changed"]

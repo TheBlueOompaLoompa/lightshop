@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://b7vueinrtkcmq"]
 
-[ext_resource type="Script" path="res://scripts/renderer.gd" id="1_8wwek"]
-[ext_resource type="Script" path="res://scripts/ui/settings.gd" id="1_mx5tk"]
-[ext_resource type="Script" path="res://scripts/ui/target_window.gd" id="5_58a0h"]
+[ext_resource type="Script" uid="uid://bl8i7pscnoa61" path="res://scripts/renderer.gd" id="1_8wwek"]
+[ext_resource type="Script" uid="uid://do7ymgs8b8y6g" path="res://scripts/ui/settings.gd" id="1_mx5tk"]
+[ext_resource type="Script" uid="uid://dm3h12vtrs3ne" path="res://scripts/ui/target_window.gd" id="5_58a0h"]
 
 [node name="Settings" type="MarginContainer"]
 anchors_preset = 15
@@ -14,28 +14,50 @@ theme_override_constants/margin_top = 4
 script = ExtResource("1_mx5tk")
 metadata/_tab_index = 1
 
-[node name="Main" type="VBoxContainer" parent="."]
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Scroll"]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ButtonRow" type="HBoxContainer" parent="Main"]
-layout_mode = 2
-
-[node name="AddRenderTarget" type="Button" parent="Main/ButtonRow"]
-layout_mode = 2
-text = "Add Render Target"
-
-[node name="Render" type="Button" parent="Main/ButtonRow"]
+[node name="Render" type="Button" parent="Scroll/VBox"]
 layout_mode = 2
 text = "Render"
 script = ExtResource("1_8wwek")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Main"]
+[node name="Grid" type="GridContainer" parent="Scroll/VBox"]
+layout_mode = 2
+columns = 2
+
+[node name="UIScaleLabel" type="Label" parent="Scroll/VBox/Grid"]
+layout_mode = 2
+text = "Scale"
+
+[node name="UIScale" type="SpinBox" parent="Scroll/VBox/Grid"]
+layout_mode = 2
+min_value = 0.5
+max_value = 3.0
+step = 0.01
+value = 1.0
+suffix = "x"
+
+[node name="ButtonRow" type="HBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="AddRenderTarget" type="Button" parent="Scroll/VBox/ButtonRow"]
+layout_mode = 2
+text = "Add Render Target"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Scroll/VBox"]
+custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Targets" type="VBoxContainer" parent="Main/ScrollContainer"]
+[node name="Targets" type="VBoxContainer" parent="Scroll/VBox/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -96,6 +118,7 @@ layout_mode = 2
 selected = 0
 item_count = 2
 popup/item_0/text = "Linear"
+popup/item_0/id = 0
 popup/item_1/text = "Spatial"
 popup/item_1/id = 1
 
@@ -124,8 +147,9 @@ file_mode = 0
 use_native_dialog = true
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
-[connection signal="pressed" from="Main/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]
-[connection signal="pressed" from="Main/ButtonRow/Render" to="Main/ButtonRow/Render" method="start_render"]
+[connection signal="pressed" from="Scroll/VBox/Render" to="Scroll/VBox/Render" method="start_render"]
+[connection signal="value_changed" from="Scroll/VBox/Grid/UIScale" to="." method="_on_ui_scale_value_changed"]
+[connection signal="pressed" from="Scroll/VBox/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]
 [connection signal="confirmed" from="TargetWindow" to="." method="_on_target_window_confirmed"]
 [connection signal="visibility_changed" from="TargetWindow" to="TargetWindow" method="_on_visibility_changed"]
 [connection signal="item_selected" from="TargetWindow/Vertical/Grid/Type" to="TargetWindow" method="_on_type_item_selected"]

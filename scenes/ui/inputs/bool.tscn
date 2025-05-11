@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://54sxhi33ndtn"]
+
+[ext_resource type="Script" uid="uid://iwtnag3hipoe" path="res://scripts/ui/effect_editor/value_inputs/bool.gd" id="1_uj2x6"]
+
+[node name="Bool" type="HBoxContainer"]
+script = ExtResource("1_uj2x6")
+
+[node name="CheckBox" type="CheckBox" parent="."]
+layout_mode = 2
+
+[connection signal="toggled" from="CheckBox" to="." method="_on_check_box_toggled"]

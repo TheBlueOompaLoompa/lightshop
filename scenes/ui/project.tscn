@@ -1,0 +1,169 @@
+[gd_scene load_steps=13 format=3 uid="uid://m4lmnfaqp3j3"]
+
+[ext_resource type="Script" uid="uid://bjbamksfpsjt5" path="res://scripts/ui/project.gd" id="1_iay77"]
+[ext_resource type="Theme" uid="uid://bvlme0tisedbu" path="res://theme.tres" id="2_er4s0"]
+[ext_resource type="Texture2D" uid="uid://rqsitxxwg4w8" path="res://textures/Play.svg" id="2_qby7e"]
+[ext_resource type="Texture2D" uid="uid://c15w18arm717p" path="res://textures/Stop.svg" id="3_gaejy"]
+[ext_resource type="Script" uid="uid://gwomvdehmyuo" path="res://scripts/ui/clickout.gd" id="4_tf14p"]
+[ext_resource type="Script" uid="uid://di5q5y70d4kig" path="res://scripts/ui/cursor_bucket.gd" id="6_d0jkc"]
+[ext_resource type="PackedScene" uid="uid://cwvenjrjscc0a" path="res://scenes/ui/clip.tscn" id="7_374cw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvdmd"]
+bg_color = Color(0.235294, 0.235294, 0.235294, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_sginn"]
+device = -1
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_er57u"]
+events = [SubResource("InputEventKey_sginn")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_qji3o"]
+device = -1
+shift_pressed = true
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_a1tp5"]
+events = [SubResource("InputEventKey_qji3o")]
+
+[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_iay77")
+audio_player = NodePath("AudioPlayer")
+minutes_node = NodePath("VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/Minutes")
+seconds_node = NodePath("VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/Seconds")
+metadata/_tab_index = 1
+
+[node name="VSplitContainer" type="VSplitContainer" parent="."]
+layout_mode = 2
+theme = ExtResource("2_er4s0")
+split_offset = 300
+
+[node name="BigSplit" type="HSplitContainer" parent="VSplitContainer"]
+layout_mode = 2
+theme = ExtResource("2_er4s0")
+split_offset = 426
+
+[node name="Clips" type="PanelContainer" parent="VSplitContainer/BigSplit"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer/BigSplit/Clips"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="VSplitContainer/BigSplit/Clips/ScrollContainer"]
+layout_mode = 2
+
+[node name="LittleSplit" type="HSplitContainer" parent="VSplitContainer/BigSplit"]
+layout_mode = 2
+theme = ExtResource("2_er4s0")
+split_offset = 426
+
+[node name="Effects" type="PanelContainer" parent="VSplitContainer/BigSplit/LittleSplit"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer/BigSplit/LittleSplit/Effects"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VSplitContainer/BigSplit/LittleSplit/Effects/ScrollContainer"]
+layout_mode = 2
+
+[node name="Preview" type="PanelContainer" parent="VSplitContainer/BigSplit/LittleSplit"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
+
+[node name="Bottom" type="PanelContainer" parent="VSplitContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
+
+[node name="VBox" type="VBoxContainer" parent="VSplitContainer/Bottom"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VSplitContainer/Bottom/VBox"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VSplitContainer/Bottom/VBox/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="Play" type="Button" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/AspectRatioContainer"]
+layout_mode = 2
+tooltip_text = "Pause/Play"
+focus_mode = 0
+shortcut = SubResource("Shortcut_er57u")
+icon = ExtResource("2_qby7e")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="Stop" type="Button" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/AspectRatioContainer2"]
+layout_mode = 2
+tooltip_text = "Stop"
+focus_mode = 0
+shortcut = SubResource("Shortcut_a1tp5")
+icon = ExtResource("3_gaejy")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Minutes" type="SpinBox" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Minutes"
+focus_mode = 2
+rounded = true
+allow_greater = true
+alignment = 3
+update_on_text_changed = true
+script = ExtResource("4_tf14p")
+
+[node name="Seconds" type="SpinBox" parent="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Seconds"
+max_value = 59.99
+step = 0.01
+script = ExtResource("4_tf14p")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer/Bottom/VBox"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="VSplitContainer/Bottom/VBox/ScrollContainer"]
+layout_mode = 2
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="CursorBucket" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("6_d0jkc")
+
+[node name="Clip" parent="CursorBucket" instance=ExtResource("7_374cw")]
+layout_mode = 2
+offset_right = 1600.0
+offset_bottom = 900.0
+
+[connection signal="pressed" from="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/AspectRatioContainer/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/AspectRatioContainer2/Stop" to="." method="_on_stop_pressed"]
+[connection signal="value_changed" from="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/Minutes" to="." method="_on_minutes_value_changed"]
+[connection signal="value_changed" from="VSplitContainer/Bottom/VBox/PanelContainer/MarginContainer/HBoxContainer/Seconds" to="." method="_on_seconds_value_changed"]

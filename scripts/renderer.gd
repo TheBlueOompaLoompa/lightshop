@@ -41,7 +41,7 @@ func _process(_d):
     client.put_packet(gzip_encode(out))
     
     gc._update_buffer(out, 0, 0)
-    conf_buf.encode_float(0, (Time.get_unix_time_from_system() - start) * 8)
+    conf_buf.encode_float(0, (Time.get_unix_time_from_system() - start) * 16)
     gc._update_buffer(conf_buf, 0, 1)
     gc._make_pipeline(Vector3i(led_count, 1, 1))
     gc._submit()

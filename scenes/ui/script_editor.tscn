@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1jr058pj22aq"]
+
+[sub_resource type="SystemFont" id="SystemFont_3t4p3"]
+font_names = PackedStringArray("Monospace")
+subpixel_positioning = 0
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_187r3"]
+resource_local_to_scene = true
+number_color = Color(0.319823, 0.527252, 1, 1)
+symbol_color = Color(0.654902, 1, 0.615686, 1)
+function_color = Color(1, 0.627451, 1, 1)
+member_variable_color = Color(0.698222, 0.597546, 1, 1)
+
+[node name="ScriptEditor" type="CodeEdit"]
+offset_right = 406.0
+offset_bottom = 343.0
+size_flags_vertical = 3
+theme_override_fonts/font = SubResource("SystemFont_3t4p3")
+placeholder_text = "GLSL Shader Code"
+minimap_draw = true
+syntax_highlighter = SubResource("CodeHighlighter_187r3")
+line_folding = true
+gutters_draw_line_numbers = true
+indent_use_spaces = true
+indent_automatic = true
+indent_automatic_prefixes = Array[String](["{", "[", "("])

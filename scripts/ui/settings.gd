@@ -4,8 +4,9 @@ signal Changed
 
 @export var settings: Settings
 
-@onready var targets_node = $Main/ScrollContainer/Targets
+@onready var targets_node = $Scroll/VBox/ScrollContainer/Targets
 @onready var target_window = $TargetWindow
+@onready var ui_scale_node = $Scroll/VBox/Grid/UIScale
 var target_row_prefab = preload("res://scenes/ui/target_row.tscn")
 
 # Called when the node enters the scene tree for the first time.
@@ -15,6 +16,11 @@ func _ready() -> void:
 func reset_ui():
     settings.save_res()
     Changed.emit()
+    
+    # Grid settings
+    ui_scale_node.value = settings.ui_scale
+    
+    # Render Targets
     for child in targets_node.get_children():
         child.queue_free()
     
@@ -59,3 +65,8 @@ func _on_visibility_changed() -> void:
     if visible:
         settings = Settings.load_res()
         reset_ui()
+
+
+func _on_ui_scale_value_changed(value: float) -> void:
+    settings.ui_scale = value
+    reset_ui()

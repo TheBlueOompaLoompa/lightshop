@@ -1,5 +1,7 @@
 extends Window
 
+signal Confirm
+
 @onready var name_input := $VBox/GridContainer/Name
 @onready var tempo_input := $VBox/GridContainer/Tempo
 @onready var time_input := $VBox/GridContainer/Time
@@ -40,6 +42,8 @@ func _on_confirm_pressed() -> void:
 
     Db.release()
     file_dialog.hide()
+    Confirm.emit()
+    hide()
 
 
 func _on_browse_pressed() -> void:
