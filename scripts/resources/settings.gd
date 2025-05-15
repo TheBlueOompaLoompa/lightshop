@@ -2,13 +2,19 @@ extends Resource
 class_name Settings
 
 @export var targets: Array[Target] = []:
-    set(_v):
+    set(v):
+        targets = v
         emit_changed()
-@export var ui_scale: float = 1:
-    set(_v):
+@export var ui_scale: float = 1.0:
+    set(v):
+        ui_scale = v
+        emit_changed()
+@export var invert_scroll: bool = false:
+    set(v):
+        invert_scroll = v
         emit_changed()
 
-static var settings_file = "user://settings.res"
+static var settings_file = "user://settings.tres"
 
 static func load_res():
     if FileAccess.file_exists(settings_file):

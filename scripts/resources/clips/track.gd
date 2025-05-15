@@ -1,8 +1,15 @@
 extends CompositeClip
 class_name TrackClip
+
+@export var render_enable: bool = true:
+    set(v):
+        render_enable = v
+
 @export var targets: Array[Target] = []:
-    set(_v):
+    set(v):
+        targets = v
         emit_changed()
+
 
 func render(percent: float):
     for clip in clips:

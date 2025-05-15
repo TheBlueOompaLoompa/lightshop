@@ -2,14 +2,18 @@ extends Resource
 class_name Parameter
 
 @export var name: String:
-    set(_v):
+    set(v):
+        name = v
         emit_changed()
 @export var type: Port.Type:
-    set(_v):
+    set(v):
+        type = v
         emit_changed()
 @export var data = null:
-    set(_v):
+    set(v):
+        data = v
         emit_changed()
 @export var presets = null:
-    set(_v):
+    set(v):
+        presets = v
         emit_changed()

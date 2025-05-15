@@ -2,16 +2,20 @@ extends Resource
 class_name Clip
 
 @export var name: String = "":
-    set(_v):
+    set(v):
+        name = v
         emit_changed()
 @export var start: float = 0:
-    set(_v):
+    set(v):
+        start = v
         emit_changed()
 @export var end: float = 0:
-    set(_v):
+    set(v):
+        end = v
         emit_changed()
 @export var type: Target.Type:
-    set(_v):
+    set(v):
+        type = v
         emit_changed()
 
 func new(_name: String, _start: float, _end: float, _type: Target.Type):

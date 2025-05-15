@@ -2,7 +2,8 @@ extends Clip
 class_name CompositeClip
 
 @export var clips: Array[Clip] = []:
-    set(_v):
+    set(v):
+        clips = v
         emit_changed()
 
 func render(percent: float):

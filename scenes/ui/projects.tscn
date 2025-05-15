@@ -117,6 +117,7 @@ title = "Open a File"
 size = Vector2i(303, 180)
 ok_button_text = "Open"
 file_mode = 0
+access = 2
 filters = PackedStringArray("*.ogg;Ogg Vorbis")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ProjectDialog/VBox"]

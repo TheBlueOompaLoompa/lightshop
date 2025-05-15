@@ -29,6 +29,10 @@ layout_mode = 2
 text = "Render"
 script = ExtResource("1_8wwek")
 
+[node name="Invert Timeline Scroll" type="CheckBox" parent="Scroll/VBox"]
+layout_mode = 2
+text = "Invert Timeline Scroll"
+
 [node name="Grid" type="GridContainer" parent="Scroll/VBox"]
 layout_mode = 2
 columns = 2
@@ -64,7 +68,7 @@ size_flags_horizontal = 3
 [node name="TargetWindow" type="Window" parent="."]
 title = "Target"
 initial_position = 2
-size = Vector2i(302, 210)
+size = Vector2i(350, 250)
 visible = false
 transient = true
 popup_window = true
@@ -148,6 +152,7 @@ use_native_dialog = true
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="Scroll/VBox/Render" to="Scroll/VBox/Render" method="start_render"]
+[connection signal="toggled" from="Scroll/VBox/Invert Timeline Scroll" to="." method="_on_invert_timeline_scroll_toggled"]
 [connection signal="value_changed" from="Scroll/VBox/Grid/UIScale" to="." method="_on_ui_scale_value_changed"]
 [connection signal="pressed" from="Scroll/VBox/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]
 [connection signal="confirmed" from="TargetWindow" to="." method="_on_target_window_confirmed"]

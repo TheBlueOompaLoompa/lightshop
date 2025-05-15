@@ -1,23 +1,23 @@
 extends PanelContainer
 
-signal open(id: String)
-signal delete(id: String)
+signal open(project_name: String)
+signal delete(project_name: String)
 
-var id = null
+var project_name = null
 
 @export var project: Project
 
 func set_proj_name(_name: String):
-    id = _name
-    $MarginContainer/HBoxContainer/Label.text = name
+    project_name = _name
+    $MarginContainer/HBoxContainer/Label.text = _name
 
 
 func _on_open_pressed() -> void:
-    if id != null:
-        open.emit(id)
+    if project_name != null:
+        open.emit(project_name)
 
 
 func _on_delete_pressed() -> void:
-    if id != null:
-        delete.emit(id)
+    if project_name != null:
+        delete.emit(project_name)
         

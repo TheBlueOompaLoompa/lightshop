@@ -28,9 +28,8 @@ size_flags_vertical = 3
 tab_alignment = 1
 current_tab = 0
 
-[node name="Projects" parent="Tabs" node_paths=PackedStringArray("Db") instance=ExtResource("1_j3igl")]
+[node name="Projects" parent="Tabs" instance=ExtResource("1_j3igl")]
 layout_mode = 2
-Db = NodePath("../../DB")
 
 [node name="Project" parent="Tabs" node_paths=PackedStringArray("Db") instance=ExtResource("3_lmt66")]
 visible = false

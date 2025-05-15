@@ -8,7 +8,6 @@ signal Confirm
 @onready var offset_input := $VBox/GridContainer/Offset
 @onready var file_dialog := $VBox/GridContainer/FileDialog
 @onready var file_label := $VBox/GridContainer/BrowseBox/FileLabel
-@onready var Db: DB = $"..".Db
 
 func _on_visibility_changed() -> void:
     if visible:
@@ -23,24 +22,26 @@ func _on_cancel_pressed() -> void:
 
 
 func _on_confirm_pressed() -> void:
-    var db = Db.getdb()
-    
-    var query = "SELECT * FROM projects WHERE name = ?;"
-    db.query_with_bindings(query, [name_input.text])
-
-    var name_good = name_input.text != '' and len(db.query_result) == 0
+    var project_dir = DirAccess.open("user://projects")
+    var name_good = name_input.text != '' and !project_dir.file_exists('user://projects/' + name_input.text + '.res')
     var tempo = float(tempo_input.text)
     var time = float(time_input.text)
     var offset = float(offset_input.text)
-    var file_good = FileAccess.file_exists(file_dialog.current_file)
-
+    var file_good = FileAccess.file_exists(file_dialog.current_path)
+    
     if file_good and name_good:
         var user_file = 'user://' + file_label.text
         var dir = DirAccess.open(file_dialog.current_dir)
-        dir.copy(file_dialog.current_file, user_file)
-        db.insert_row('projects', { 'name': name_input.text, 'tempo': tempo, 'time': time, 'offset': offset, 'song_file': user_file }) 
-
-    Db.release()
+        dir.copy(file_dialog.current_path, user_file)
+        var project = Project.new()
+        project.name = name_input.text
+        project.tempo = tempo
+        project.time = time
+        project.offset = offset
+        project.song_file = user_file
+        
+        ResourceSaver.save(project, 'user://projects/' + name_input.text + '.res')
+        
     file_dialog.hide()
     Confirm.emit()
     hide()

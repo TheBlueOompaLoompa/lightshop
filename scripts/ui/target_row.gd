@@ -3,6 +3,10 @@ extends PanelContainer
 signal edit(id: int)
 signal delete(id: int)
 
+@export var editable = true:
+    set(v):
+        editable = v
+        $Margin/TargetRow/HBoxContainer/Edit.visible = editable
 var id = -1
 
 func set_target_name(text: String):

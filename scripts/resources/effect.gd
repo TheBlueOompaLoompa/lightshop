@@ -2,5 +2,6 @@ extends Resource
 class_name Effect
 
 @export var parameters: Array[Parameter]:
-    set(_v):
+    set(v):
+        parameters = v
         emit_changed()
