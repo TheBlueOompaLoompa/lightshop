@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccir2nbfxepiw"]
+
+[ext_resource type="Script" uid="uid://b3wcl235r4kq8" path="res://scripts/ui/parameter_row.gd" id="1_4ag3g"]
+
+[node name="parameter_row" type="HBoxContainer" node_paths=PackedStringArray("title_label", "hbox")]
+offset_right = 231.0
+offset_bottom = 23.0
+size_flags_horizontal = 3
+alignment = 2
+script = ExtResource("1_4ag3g")
+title_label = NodePath("Label")
+hbox = NodePath("HBoxContainer")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+text = "Parameter Label"
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2

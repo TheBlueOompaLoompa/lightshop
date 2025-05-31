@@ -4,6 +4,7 @@ class_name TrackClip
 @export var render_enable: bool = true:
     set(v):
         render_enable = v
+        emit_changed()
 
 @export var targets: Array[Target] = []:
     set(v):

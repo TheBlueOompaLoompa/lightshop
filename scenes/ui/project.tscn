@@ -1,13 +1,19 @@
-[gd_scene load_steps=17 format=3 uid="uid://m4lmnfaqp3j3"]
+[gd_scene load_steps=23 format=3 uid="uid://m4lmnfaqp3j3"]
 
 [ext_resource type="Script" uid="uid://bjbamksfpsjt5" path="res://scripts/ui/project.gd" id="1_iay77"]
 [ext_resource type="Theme" uid="uid://bvlme0tisedbu" path="res://theme.tres" id="2_er4s0"]
-[ext_resource type="Texture2D" uid="uid://rqsitxxwg4w8" path="res://textures/Play.svg" id="2_qby7e"]
-[ext_resource type="Texture2D" uid="uid://c15w18arm717p" path="res://textures/Stop.svg" id="3_gaejy"]
+[ext_resource type="Script" uid="uid://cs7fhwl3mfjdc" path="res://scripts/ui/project_menu_bar.gd" id="2_ygaxq"]
+[ext_resource type="Texture2D" uid="uid://ble1fqyp3tyei" path="res://textures/icons/Save.svg" id="3_2ykfl"]
+[ext_resource type="Texture2D" uid="uid://bmfldtqde3yl7" path="res://textures/icons/GuiClose.svg" id="4_3l6yk"]
 [ext_resource type="Script" uid="uid://gwomvdehmyuo" path="res://scripts/ui/clickout.gd" id="4_tf14p"]
+[ext_resource type="Texture2D" uid="uid://dgpmm71bwutto" path="res://textures/icons/Play.svg" id="4_ygaxq"]
+[ext_resource type="Texture2D" uid="uid://ddddn54r34j12" path="res://textures/icons/Stop.svg" id="5_vb854"]
 [ext_resource type="Script" uid="uid://470hwec34k25" path="res://scripts/ui/ticks.gd" id="6_3sejc"]
 [ext_resource type="Script" uid="uid://di5q5y70d4kig" path="res://scripts/ui/cursor_bucket.gd" id="6_d0jkc"]
+[ext_resource type="PackedScene" uid="uid://dpixk1ikjgrjj" path="res://scenes/ui/effects_pane.tscn" id="6_u3oqd"]
 [ext_resource type="Script" uid="uid://dxvin7r57uh4q" path="res://scripts/ui/track_window.gd" id="8_3sejc"]
+[ext_resource type="Texture2D" uid="uid://dtafq0812pibj" path="res://textures/icons/Add.svg" id="9_3l6yk"]
+[ext_resource type="Texture2D" uid="uid://5dkstx816des" path="res://textures/icons/SnapTimeline.svg" id="9_yeef4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvdmd"]
 bg_color = Color(0.235294, 0.235294, 0.235294, 1)
@@ -51,7 +57,7 @@ corner_radius_bottom_left = 4
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb854"]
 bg_color = Color(1, 0, 0, 1)
 
-[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "tracks_container", "ticks")]
+[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "effects_pane", "tracks_container", "ticks", "division_label", "division_slider", "cursor_bucket")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -59,98 +65,122 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_iay77")
 audio_player = NodePath("AudioPlayer")
-minutes_node = NodePath("VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes")
-seconds_node = NodePath("VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds")
-tracks_container = NodePath("VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks")
-ticks = NodePath("VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks")
+minutes_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes")
+seconds_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds")
+effects_pane = NodePath("VBoxContainer/VSplitContainer/BigSplit/LittleSplit/EffectsPane")
+tracks_container = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks")
+ticks = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks")
+division_label = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division Label")
+division_slider = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division")
+cursor_bucket = NodePath("CursorBucket")
 metadata/_tab_index = 1
 
-[node name="VSplitContainer" type="VSplitContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MenuBar" type="MenuBar" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+flat = true
+script = ExtResource("2_ygaxq")
+
+[node name="File" type="PopupMenu" parent="VBoxContainer/HBoxContainer/MenuBar"]
+system_menu_id = 2
+prefer_native_menu = true
+item_count = 2
+item_0/text = "Save"
+item_0/icon = ExtResource("3_2ykfl")
+item_0/id = 0
+item_1/text = "Quit"
+item_1/icon = ExtResource("4_3l6yk")
+item_1/id = 2
+
+[node name="VSplitContainer" type="VSplitContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("2_er4s0")
+split_offset = 400
+
+[node name="BigSplit" type="HSplitContainer" parent="VBoxContainer/VSplitContainer"]
 layout_mode = 2
 theme = ExtResource("2_er4s0")
-split_offset = 300
+split_offset = 506
 
-[node name="BigSplit" type="HSplitContainer" parent="VSplitContainer"]
+[node name="Clips" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/ScrollContainer"]
+layout_mode = 2
+
+[node name="ClipButton" type="Button" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/ScrollContainer/Grid"]
+layout_mode = 2
+text = "Clip"
+
+[node name="LittleSplit" type="HSplitContainer" parent="VBoxContainer/VSplitContainer/BigSplit"]
 layout_mode = 2
 theme = ExtResource("2_er4s0")
-split_offset = 426
+split_offset = 516
 
-[node name="Clips" type="PanelContainer" parent="VSplitContainer/BigSplit"]
+[node name="EffectsPane" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit" instance=ExtResource("6_u3oqd")]
+layout_mode = 2
+
+[node name="Preview" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer/BigSplit/Clips"]
-layout_mode = 2
-
-[node name="Grid" type="GridContainer" parent="VSplitContainer/BigSplit/Clips/ScrollContainer"]
-layout_mode = 2
-
-[node name="LittleSplit" type="HSplitContainer" parent="VSplitContainer/BigSplit"]
-layout_mode = 2
-theme = ExtResource("2_er4s0")
-split_offset = 426
-
-[node name="Effects" type="PanelContainer" parent="VSplitContainer/BigSplit/LittleSplit"]
+[node name="Bottom" type="PanelContainer" parent="VBoxContainer/VSplitContainer"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer/BigSplit/LittleSplit/Effects"]
+[node name="BottomContainer" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VSplitContainer/BigSplit/LittleSplit/Effects/ScrollContainer"]
+[node name="ControlsContainer" type="PanelContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer"]
 layout_mode = 2
 
-[node name="Preview" type="PanelContainer" parent="VSplitContainer/BigSplit/LittleSplit"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
-
-[node name="Bottom" type="PanelContainer" parent="VSplitContainer"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
-
-[node name="BottomContainer" type="VBoxContainer" parent="VSplitContainer/Bottom"]
-layout_mode = 2
-
-[node name="ControlsContainer" type="PanelContainer" parent="VSplitContainer/Bottom/BottomContainer"]
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 2
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
 
-[node name="Play" type="Button" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer"]
+[node name="Play" type="Button" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer"]
 layout_mode = 2
 tooltip_text = "Pause/Play"
 focus_mode = 0
 shortcut = SubResource("Shortcut_er57u")
-icon = ExtResource("2_qby7e")
+icon = ExtResource("4_ygaxq")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
 
-[node name="Stop" type="Button" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2"]
+[node name="Stop" type="Button" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2"]
 layout_mode = 2
 tooltip_text = "Stop"
 focus_mode = 0
 shortcut = SubResource("Shortcut_a1tp5")
-icon = ExtResource("3_gaejy")
+icon = ExtResource("5_vb854")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Minutes" type="SpinBox" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+[node name="Minutes" type="SpinBox" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Minutes"
@@ -161,7 +191,7 @@ alignment = 3
 update_on_text_changed = true
 script = ExtResource("4_tf14p")
 
-[node name="Seconds" type="SpinBox" parent="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+[node name="Seconds" type="SpinBox" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Seconds"
@@ -169,7 +199,29 @@ max_value = 59.99
 step = 0.01
 script = ExtResource("4_tf14p")
 
-[node name="Margin" type="MarginContainer" parent="VSplitContainer/Bottom/BottomContainer"]
+[node name="Snapping" type="CheckBox" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Snapping"
+focus_mode = 0
+button_pressed = true
+icon = ExtResource("9_yeef4")
+
+[node name="Division" type="HSlider" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 1
+min_value = 1.0
+max_value = 8.0
+value = 2.0
+tick_count = 8
+
+[node name="Division Label" type="Label" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "1/2"
+vertical_alignment = 1
+
+[node name="Margin" type="MarginContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 4
@@ -177,48 +229,58 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="Vbox" type="VBoxContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin"]
+[node name="Vbox" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin"]
 layout_mode = 2
 
-[node name="AboveTracks" type="HBoxContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox"]
+[node name="AboveTracks" type="HBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="SideButtons" type="HBoxContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks"]
+[node name="SideButtons" type="HBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="NewTrack" type="Button" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/SideButtons"]
+[node name="NewTrack" type="Button" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/SideButtons"]
 layout_mode = 2
 focus_mode = 0
 text = "New Track"
+icon = ExtResource("9_3l6yk")
 
-[node name="TickContainer" type="Control" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks"]
+[node name="TickContainer" type="Control" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks"]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="Ticks" type="PanelContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer"]
+[node name="Ticks" type="PanelContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer"]
 clip_contents = true
 custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-offset_right = 1392.0
-offset_bottom = 31.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
+mouse_behavior_recursive = 2
+mouse_default_cursor_shape = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_3sejc")
 script = ExtResource("6_3sejc")
 
-[node name="Numbers" type="Control" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks"]
+[node name="Numbers" type="Control" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Ticks" type="Control" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks"]
+[node name="Ticks" type="Control" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Playhead" type="Control" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer"]
-z_index = 1
+[node name="Playhead" type="Control" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer"]
+z_index = 5
 anchors_preset = 0
+mouse_filter = 2
 
-[node name="Head" type="Panel" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Playhead"]
+[node name="Head" type="Panel" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Playhead"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -228,21 +290,23 @@ offset_top = 2.0
 offset_right = 8.0
 offset_bottom = 29.0
 grow_horizontal = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ygaxq")
 
-[node name="Line" type="Panel" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Playhead"]
+[node name="Line" type="Panel" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Playhead"]
 layout_mode = 0
 offset_top = 25.0
 offset_right = 1.0
 offset_bottom = 25.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_vb854")
 
-[node name="Scroll" type="ScrollContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox"]
+[node name="Scroll" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="Tracks" type="VBoxContainer" parent="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll"]
+[node name="Tracks" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -251,11 +315,14 @@ theme_override_constants/separation = 6
 [node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
 
 [node name="CursorBucket" type="Control" parent="."]
+z_index = 2
 layout_mode = 2
 mouse_filter = 2
+mouse_behavior_recursive = 1
 script = ExtResource("6_d0jkc")
 
-[node name="TrackWindow" type="Window" parent="."]
+[node name="TrackWindow" type="Window" parent="." node_paths=PackedStringArray("target_select", "project", "targets_container", "type_select")]
+oversampling_override = 1.0
 title = "Track"
 initial_position = 2
 size = Vector2i(453, 315)
@@ -263,6 +330,10 @@ visible = false
 transient = true
 popup_window = true
 script = ExtResource("8_3sejc")
+target_select = NodePath("MarginContainer/VBoxContainer/HBox/TargetSelect")
+project = NodePath("..")
+targets_container = NodePath("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer")
+type_select = NodePath("MarginContainer/VBoxContainer/GridContainer/TypeSelect")
 
 [node name="MarginContainer" type="MarginContainer" parent="TrackWindow"]
 anchors_preset = 15
@@ -336,14 +407,23 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Save"
 
-[connection signal="pressed" from="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer/Play" to="." method="_on_play_pressed"]
-[connection signal="pressed" from="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2/Stop" to="." method="_on_stop_pressed"]
-[connection signal="value_changed" from="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes" to="." method="_on_minutes_value_changed"]
-[connection signal="value_changed" from="VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds" to="." method="_on_seconds_value_changed"]
-[connection signal="pressed" from="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/SideButtons/NewTrack" to="." method="_on_new_track_pressed"]
-[connection signal="gui_input" from="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer" to="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" method="_on_gui_input"]
-[connection signal="gui_input" from="VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks" to="." method="_on_tracks_gui_input"]
-[connection signal="visibility_changed" from="TrackWindow" to="TrackWindow" method="_on_visibility_changed"]
+[connection signal="file_pressed" from="VBoxContainer/HBoxContainer/MenuBar" to="." method="_on_menu_bar_file_pressed"]
+[connection signal="index_pressed" from="VBoxContainer/HBoxContainer/MenuBar/File" to="VBoxContainer/HBoxContainer/MenuBar" method="_on_file_index_pressed"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/BigSplit/Clips/ScrollContainer/Grid/ClipButton" to="." method="_on_clip_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2/Stop" to="." method="_on_stop_pressed"]
+[connection signal="value_changed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes" to="." method="_on_minutes_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds" to="." method="_on_seconds_value_changed"]
+[connection signal="toggled" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Snapping" to="." method="_on_snapping_toggled"]
+[connection signal="value_changed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division" to="." method="_on_division_value_changed"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/SideButtons/NewTrack" to="." method="_on_new_track_pressed"]
+[connection signal="mouse_entered" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" to="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" to="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" method="_on_mouse_exited"]
+[connection signal="playhead_scroll" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" to="." method="_on_ticks_playhead_scroll"]
+[connection signal="retime" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks" to="." method="_on_ticks_retime"]
+[connection signal="gui_input" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks" to="." method="_on_tracks_gui_input"]
+[connection signal="save_track" from="TrackWindow" to="." method="_on_track_window_save_track"]
+[connection signal="text_changed" from="TrackWindow/MarginContainer/VBoxContainer/GridContainer/Title" to="TrackWindow" method="_on_title_text_changed"]
 [connection signal="item_selected" from="TrackWindow/MarginContainer/VBoxContainer/GridContainer/TypeSelect" to="TrackWindow" method="_on_type_select_item_selected"]
 [connection signal="pressed" from="TrackWindow/MarginContainer/VBoxContainer/HBox/AddTarget" to="TrackWindow" method="_on_add_target_pressed"]
 [connection signal="pressed" from="TrackWindow/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="TrackWindow" method="close"]

@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3 uid="uid://dx47s1bc16wpt"]
+
+[ext_resource type="Script" uid="uid://de3n4yu2vl6cb" path="res://scripts/ui/effect_row.gd" id="1_jxatq"]
+[ext_resource type="Texture2D" uid="uid://fwvucy12u7p6" path="res://textures/icons/MoveUp.svg" id="2_cxqs5"]
+[ext_resource type="Texture2D" uid="uid://bcl7g3is3iklt" path="res://textures/icons/MoveDown.svg" id="3_3p8pc"]
+[ext_resource type="Texture2D" uid="uid://b0a6ontsi8v1g" path="res://textures/icons/Remove.svg" id="3_cxqs5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_cxqs5"]
+font_size = 22
+
+[node name="EffectRow" type="HBoxContainer" node_paths=PackedStringArray("title_label", "parameters_container")]
+script = ExtResource("1_jxatq")
+title_label = NodePath("Main/Title")
+parameters_container = NodePath("Main/Parameters")
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="Up" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Move Effect Up"
+icon = ExtResource("2_cxqs5")
+
+[node name="Delete" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Delete"
+icon = ExtResource("3_cxqs5")
+
+[node name="Down" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Move Effect Down"
+icon = ExtResource("3_3p8pc")
+
+[node name="Main" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Main"]
+layout_mode = 2
+text = "Effect Title"
+label_settings = SubResource("LabelSettings_cxqs5")
+
+[node name="Parameters" type="VBoxContainer" parent="Main"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HSeparator" type="HSeparator" parent="Main"]
+layout_mode = 2
+
+[connection signal="pressed" from="Buttons/Up" to="." method="_on_up_pressed"]
+[connection signal="pressed" from="Buttons/Delete" to="." method="_on_delete_pressed"]
+[connection signal="pressed" from="Buttons/Down" to="." method="_on_down_pressed"]

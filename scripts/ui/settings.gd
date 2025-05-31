@@ -9,70 +9,70 @@ signal Changed
 @onready var ui_scale_node = $Scroll/VBox/Grid/UIScale
 @onready var invert_timeline_scroll = $"Scroll/VBox/Invert Timeline Scroll"
 var target_row_prefab = preload("res://scenes/ui/target_row.tscn")
-    
+	
 func reset_ui():
-    settings.save_res()
-    Changed.emit()
-    
-    invert_timeline_scroll.button_pressed = settings.invert_scroll
-    
-    # Grid settings
-    ui_scale_node.value = settings.ui_scale
-    
-    $TargetWindow.content_scale_factor = settings.ui_scale
-    
-    # Render Targets
-    for child in targets_node.get_children():
-        child.queue_free()
-    
-    for i in settings.targets.size():
-        var new_target = target_row_prefab.instantiate()
-        new_target.set_target_name(settings.targets[i].name)
-        new_target.set_target_id(i)
-        
-        new_target.edit.connect(func(id):
-            var temp = Target.new()
-            temp.name = settings.targets[i].name
-            temp.address = settings.targets[i].address
-            temp.type = settings.targets[i].type
-            temp.leds = settings.targets[i].leds
-            temp.points = PackedVector3Array(settings.targets[i].points)
-            target_window.target = temp
-            target_window.id = i
-            target_window.show()
-        )
-        
-        new_target.delete.connect(func(id):
-            settings.targets.pop_at(id)
-            reset_ui()   
-        )
-        
-        targets_node.add_child(new_target)
+	settings.save_res()
+	Changed.emit()
+	
+	invert_timeline_scroll.button_pressed = settings.invert_scroll
+	
+	# Grid settings
+	ui_scale_node.value = settings.ui_scale
+	
+	$TargetWindow.content_scale_factor = settings.ui_scale
+	
+	# Render Targets
+	for child in targets_node.get_children():
+		child.queue_free()
+	
+	for i in settings.targets.size():
+		var new_target = target_row_prefab.instantiate()
+		new_target.set_target_name(settings.targets[i].name)
+		new_target.set_target_id(i)
+		
+		new_target.edit.connect(func(id):
+			var temp = Target.new()
+			temp.name = settings.targets[i].name
+			temp.address = settings.targets[i].address
+			temp.type = settings.targets[i].type
+			temp.leds = settings.targets[i].leds
+			temp.points = PackedVector3Array(settings.targets[i].points)
+			target_window.target = temp
+			target_window.id = i
+			target_window.show()
+		)
+		
+		new_target.delete.connect(func(id):
+			settings.targets.pop_at(id)
+			reset_ui()   
+		)
+		
+		targets_node.add_child(new_target)
 
 
 func _on_add_render_target_pressed() -> void:
-    $TargetWindow.show()
+	$TargetWindow.show()
 
 
 func _on_target_window_confirmed(target: Target, id: int) -> void:
-    if id < 0:
-        settings.targets.append(target)
-    else:
-        settings.targets[id] = target
-    reset_ui()
+	if id < 0:
+		settings.targets.append(target)
+	else:
+		settings.targets[id] = target
+	reset_ui()
 
 
 func _on_visibility_changed() -> void:
-    if visible:
-        settings = Settings.load_res()
-        reset_ui()
+	if visible:
+		settings = Settings.load_res()
+		reset_ui()
 
 
 func _on_ui_scale_value_changed(value: float) -> void:
-    settings.ui_scale = value
-    reset_ui()
+	settings.ui_scale = value
+	reset_ui()
 
 
 func _on_invert_timeline_scroll_toggled(toggled_on: bool) -> void:
-    settings.invert_scroll = toggled_on
-    reset_ui()
+	settings.invert_scroll = toggled_on
+	reset_ui()

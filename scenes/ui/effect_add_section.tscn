@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://db3kt2upnr2w5"]
+
+[ext_resource type="Script" uid="uid://04r8cw600uhq" path="res://scripts/ui/effect_add_section.gd" id="1_23ch7"]
+
+[node name="EffectAddSection" type="FoldableContainer"]
+folded = true
+title = "Linear"
+script = ExtResource("1_23ch7")
+
+[node name="GridContainer" type="GridContainer" parent="."]
+visible = false
+layout_mode = 2
+columns = 3

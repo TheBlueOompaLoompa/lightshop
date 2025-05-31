@@ -1,11 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://cdukr2fc1y4wq"]
+[gd_scene load_steps=5 format=3 uid="uid://cdukr2fc1y4wq"]
 
 [ext_resource type="PackedScene" uid="uid://dw523n4gcfulq" path="res://scenes/ui/projects.tscn" id="1_j3igl"]
 [ext_resource type="Script" uid="uid://dd1jfs7v1i7mw" path="res://scripts/main.gd" id="1_rkwqt"]
 [ext_resource type="PackedScene" uid="uid://b7vueinrtkcmq" path="res://scenes/ui/settings.tscn" id="3_8yuaw"]
-[ext_resource type="Script" uid="uid://dyxqjvau4pfpd" path="res://scripts/db.gd" id="3_al6dv"]
 [ext_resource type="PackedScene" uid="uid://m4lmnfaqp3j3" path="res://scenes/ui/project.tscn" id="3_lmt66"]
-[ext_resource type="PackedScene" uid="uid://bb0uwhbs3w5na" path="res://scenes/ui/effect_editor.tscn" id="3_x27ik"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -31,23 +29,14 @@ current_tab = 0
 [node name="Projects" parent="Tabs" instance=ExtResource("1_j3igl")]
 layout_mode = 2
 
-[node name="Project" parent="Tabs" node_paths=PackedStringArray("Db") instance=ExtResource("3_lmt66")]
-visible = false
-layout_mode = 2
-Db = NodePath("../../DB")
-
-[node name="Effect Editor" parent="Tabs" instance=ExtResource("3_x27ik")]
+[node name="Project" parent="Tabs" instance=ExtResource("3_lmt66")]
 visible = false
 layout_mode = 2
 
 [node name="Settings" parent="Tabs" instance=ExtResource("3_8yuaw")]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 3
-
-[node name="DB" type="Node" parent="."]
-script = ExtResource("3_al6dv")
-db_name = "lightshop"
+metadata/_tab_index = 2
 
 [connection signal="OpenProject" from="Tabs/Projects" to="." method="_on_open_project"]
 [connection signal="OpenProject" from="Tabs/Projects" to="Tabs/Project" method="_on_open_project"]
