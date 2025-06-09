@@ -18,7 +18,7 @@ func compile():
     var input_node = get_node_or_null("Input")
     var output_node = get_node_or_null("Output")
     if input_node == null or output_node == null: return null
-    
+        
     for node in get_children():
         if node is EffectNode:
             var out = node.compile()

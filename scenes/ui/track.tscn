@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dti6q07tc44qm"]
 
 [ext_resource type="Script" uid="uid://bt34tbtrq61on" path="res://scripts/ui/track.gd" id="1_p4ped"]
-[ext_resource type="Texture2D" uid="uid://0wcv8bge4gfe" path="res://textures/icons/Edit.svg" id="2_e4uuf"]
+[ext_resource type="Texture2D" uid="uid://caf75k0k527fq" path="res://textures/icons/Tools.svg" id="2_e8w7r"]
 [ext_resource type="Script" uid="uid://64qkk2wtqq7w" path="res://scripts/ui/track_container.gd" id="2_soo8j"]
 [ext_resource type="Texture2D" uid="uid://b0a6ontsi8v1g" path="res://textures/icons/Remove.svg" id="3_e8w7r"]
 
@@ -72,12 +72,12 @@ text = "Rendering"
 [node name="HBoxContainer" type="HBoxContainer" parent="HSplit/Side/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Edit" type="Button" parent="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Config" type="Button" parent="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
-tooltip_text = "Edit Track"
+tooltip_text = "Configure Track"
 focus_mode = 0
-icon = ExtResource("2_e4uuf")
+icon = ExtResource("2_e8w7r")
 
 [node name="Trash" type="Button" parent="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -92,7 +92,7 @@ size_flags_horizontal = 3
 script = ExtResource("2_soo8j")
 
 [connection signal="toggled" from="HSplit/Side/MarginContainer/VBoxContainer/RenderToggle" to="." method="_on_render_toggle_toggled"]
-[connection signal="pressed" from="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer/Edit" to="." method="_on_edit_pressed"]
+[connection signal="pressed" from="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer/Config" to="." method="_on_edit_pressed"]
 [connection signal="pressed" from="HSplit/Side/MarginContainer/VBoxContainer/HBoxContainer/Trash" to="." method="_on_trash_pressed"]
 [connection signal="clip_clicked" from="HSplit/Main" to="." method="_on_main_clip_clicked"]
 [connection signal="clip_drag_clicked" from="HSplit/Main" to="." method="_on_main_clip_drag_clicked"]

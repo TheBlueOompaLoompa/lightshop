@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://dx8xcn5b2bmvn"]
+
+[ext_resource type="Script" uid="uid://b550v04qhp6rw" path="res://scripts/ui/effect_editor/graph_edit.gd" id="1_jyvof"]
+[ext_resource type="Script" uid="uid://bcyp22gfn6n1y" path="res://scripts/ui/effect_editor/built_effect.gd" id="2_kl47d"]
+[ext_resource type="Script" uid="uid://bwouwxu8j5myn" path="res://scripts/effects/ports/port.gd" id="3_50v1s"]
+[ext_resource type="Script" uid="uid://buiysaowx2a07" path="res://scripts/ui/effect_editor/script_node.gd" id="4_6oj2x"]
+[ext_resource type="Script" uid="uid://3qow0n6knk71" path="res://scripts/ui/effect_editor/edge_node.gd" id="5_xcdwr"]
+
+[sub_resource type="Resource" id="Resource_vc7ug"]
+script = ExtResource("3_50v1s")
+is_output = false
+type = 5
+name = "color"
+removable = false
+metadata/_custom_type_script = "uid://bwouwxu8j5myn"
+
+[sub_resource type="Resource" id="Resource_fm650"]
+script = ExtResource("3_50v1s")
+is_output = true
+type = 5
+name = "color"
+removable = false
+metadata/_custom_type_script = "uid://bwouwxu8j5myn"
+
+[node name="GraphEdit" type="GraphEdit"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+right_disconnects = true
+script = ExtResource("1_jyvof")
+metadata/_custom_type_script = "uid://b550v04qhp6rw"
+
+[node name="BuiltEffect" type="GraphNode" parent="."]
+layout_mode = 0
+offset_left = 234.0
+offset_top = 353.0
+offset_right = 406.0
+offset_bottom = 456.0
+mouse_filter = 1
+position_offset = Vector2(234, 353)
+title = "Color"
+script = ExtResource("2_kl47d")
+ports = Array[ExtResource("3_50v1s")]([SubResource("Resource_vc7ug"), SubResource("Resource_fm650")])
+metadata/_custom_type_script = "uid://bcyp22gfn6n1y"
+
+[node name="ScriptNode" type="GraphNode" parent="."]
+layout_mode = 0
+offset_right = 9.0
+offset_bottom = 55.0
+mouse_filter = 1
+script = ExtResource("4_6oj2x")
+metadata/_custom_type_script = "uid://buiysaowx2a07"
+
+[node name="Input" type="GraphNode" parent="."]
+layout_mode = 0
+offset_left = 52.0
+offset_top = 296.0
+offset_right = 61.0
+offset_bottom = 351.0
+mouse_filter = 1
+position_offset = Vector2(52, 296)
+script = ExtResource("5_xcdwr")
+
+[node name="Output" type="GraphNode" parent="."]
+layout_mode = 0
+offset_left = 978.0
+offset_top = 299.0
+offset_right = 987.0
+offset_bottom = 354.0
+mouse_filter = 1
+position_offset = Vector2(978, 299)
+script = ExtResource("5_xcdwr")
+type = 1
+
+[connection signal="connection_request" from="." to="." method="_on_connection_request"]
+[connection signal="disconnection_request" from="." to="." method="_on_disconnection_request"]

@@ -85,20 +85,17 @@ size_flags_vertical = 3
 [node name="FoldableContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer" instance=ExtResource("2_b2ug6")]
 layout_mode = 2
 
-[node name="FoldableContainer2" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="FoldableContainer2" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer" instance=ExtResource("2_b2ug6")]
 layout_mode = 2
-folded = true
 title = "Spatial"
 
-[node name="FoldableContainer3" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="FoldableContainer3" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer" instance=ExtResource("2_b2ug6")]
 layout_mode = 2
-folded = true
 title = "Binary"
 
-[node name="FoldableContainer4" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="FoldableContainer4" parent="AddEffectPopup/MarginContainer/VBoxContainer/VBoxContainer" instance=ExtResource("2_b2ug6")]
 layout_mode = 2
-folded = true
-title = "Rotation"
+title = "Motion"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer"]
 layout_mode = 2

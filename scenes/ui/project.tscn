@@ -1,10 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://m4lmnfaqp3j3"]
+[gd_scene load_steps=27 format=3 uid="uid://m4lmnfaqp3j3"]
 
 [ext_resource type="Script" uid="uid://bjbamksfpsjt5" path="res://scripts/ui/project.gd" id="1_iay77"]
 [ext_resource type="Theme" uid="uid://bvlme0tisedbu" path="res://theme.tres" id="2_er4s0"]
 [ext_resource type="Script" uid="uid://cs7fhwl3mfjdc" path="res://scripts/ui/project_menu_bar.gd" id="2_ygaxq"]
 [ext_resource type="Texture2D" uid="uid://ble1fqyp3tyei" path="res://textures/icons/Save.svg" id="3_2ykfl"]
 [ext_resource type="Texture2D" uid="uid://bmfldtqde3yl7" path="res://textures/icons/GuiClose.svg" id="4_3l6yk"]
+[ext_resource type="Texture2D" uid="uid://dflr7ludrnrq0" path="res://textures/icons/GraphEdit.svg" id="4_s0f2y"]
 [ext_resource type="Script" uid="uid://gwomvdehmyuo" path="res://scripts/ui/clickout.gd" id="4_tf14p"]
 [ext_resource type="Texture2D" uid="uid://dgpmm71bwutto" path="res://textures/icons/Play.svg" id="4_ygaxq"]
 [ext_resource type="Texture2D" uid="uid://ddddn54r34j12" path="res://textures/icons/Stop.svg" id="5_vb854"]
@@ -14,6 +15,9 @@
 [ext_resource type="Script" uid="uid://dxvin7r57uh4q" path="res://scripts/ui/track_window.gd" id="8_3sejc"]
 [ext_resource type="Texture2D" uid="uid://dtafq0812pibj" path="res://textures/icons/Add.svg" id="9_3l6yk"]
 [ext_resource type="Texture2D" uid="uid://5dkstx816des" path="res://textures/icons/SnapTimeline.svg" id="9_yeef4"]
+[ext_resource type="Script" uid="uid://bl8i7pscnoa61" path="res://scripts/renderer.gd" id="15_lbwwm"]
+[ext_resource type="Script" uid="uid://6sva3tsqvt8y" path="res://scripts/ui/effect_editor_window.gd" id="16_ivu5r"]
+[ext_resource type="PackedScene" uid="uid://bb0uwhbs3w5na" path="res://scenes/ui/effect_editor.tscn" id="17_s0f2y"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvdmd"]
 bg_color = Color(0.235294, 0.235294, 0.235294, 1)
@@ -57,7 +61,7 @@ corner_radius_bottom_left = 4
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb854"]
 bg_color = Color(1, 0, 0, 1)
 
-[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "effects_pane", "tracks_container", "ticks", "division_label", "division_slider", "cursor_bucket")]
+[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "effects_pane", "effect_editor_win", "tracks_container", "ticks", "division_label", "division_slider", "cursor_bucket")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -68,6 +72,7 @@ audio_player = NodePath("AudioPlayer")
 minutes_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes")
 seconds_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds")
 effects_pane = NodePath("VBoxContainer/VSplitContainer/BigSplit/LittleSplit/EffectsPane")
+effect_editor_win = NodePath("EffectEditorWindow")
 tracks_container = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks")
 ticks = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/AboveTracks/TickContainer/Ticks")
 division_label = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division Label")
@@ -86,16 +91,19 @@ layout_mode = 2
 flat = true
 script = ExtResource("2_ygaxq")
 
-[node name="File" type="PopupMenu" parent="VBoxContainer/HBoxContainer/MenuBar"]
+[node name="Project" type="PopupMenu" parent="VBoxContainer/HBoxContainer/MenuBar"]
 system_menu_id = 2
 prefer_native_menu = true
-item_count = 2
+item_count = 3
 item_0/text = "Save"
 item_0/icon = ExtResource("3_2ykfl")
 item_0/id = 0
-item_1/text = "Quit"
-item_1/icon = ExtResource("4_3l6yk")
+item_1/text = "Open Effects Editor"
+item_1/icon = ExtResource("4_s0f2y")
 item_1/id = 2
+item_2/text = "Quit"
+item_2/icon = ExtResource("4_3l6yk")
+item_2/id = 2
 
 [node name="VSplitContainer" type="VSplitContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -407,8 +415,22 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Save"
 
+[node name="Renderer" type="Node" parent="."]
+script = ExtResource("15_lbwwm")
+
+[node name="EffectEditorWindow" type="Window" parent="."]
+auto_translate_mode = 1
+oversampling_override = 1.0
+title = "Effect Editor"
+position = Vector2i(0, 36)
+size = Vector2i(1280, 720)
+visible = false
+script = ExtResource("16_ivu5r")
+
+[node name="Effect Editor" parent="EffectEditorWindow" instance=ExtResource("17_s0f2y")]
+
 [connection signal="file_pressed" from="VBoxContainer/HBoxContainer/MenuBar" to="." method="_on_menu_bar_file_pressed"]
-[connection signal="index_pressed" from="VBoxContainer/HBoxContainer/MenuBar/File" to="VBoxContainer/HBoxContainer/MenuBar" method="_on_file_index_pressed"]
+[connection signal="index_pressed" from="VBoxContainer/HBoxContainer/MenuBar/Project" to="VBoxContainer/HBoxContainer/MenuBar" method="_on_file_index_pressed"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/BigSplit/Clips/ScrollContainer/Grid/ClipButton" to="." method="_on_clip_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2/Stop" to="." method="_on_stop_pressed"]
