@@ -45,7 +45,7 @@
 </script>
 
 {#if showSettings}
-<SettingsModal onpositive={() => showSettings = false} onnegative={() => showSettings = false} />
+<SettingsModal onpositive={() => {showSettings = false}} onnegative={() => {showSettings = false}} />
 {/if}
 
 {#if showNewProject}

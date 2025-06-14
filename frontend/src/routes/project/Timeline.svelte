@@ -4,7 +4,11 @@
     import type { Clip, Project, Bpm } from "@backend/types";
     import { Client, FPS, Snapping } from '$lib/stores';
     import { time2beats, beats2time } from '@backend/util';
+    import { snap } from '$lib/util';
 	import Playhead from "./Playhead.svelte";
+    import PlayIcon from "svelte-bootstrap-icons/lib/PlayFill.svelte";
+    import StopIcon from "svelte-bootstrap-icons/lib/StopFill.svelte";
+    import MetronomeIcon from '../../assets/Metronome.svg?raw';
 
     let { project, scale = $bindable(2), beats: bindBeats = $bindable(0) }:
         { project: Project, scale: number, beats: number } = $props();
@@ -25,6 +29,7 @@
     let beats = $derived(Math.max(time2beats(time, bpms, project.tempo), 0));
     let viewBeats = $state(0);
     let playing = $state(false);
+    let metronomeEnabled = $state(true);
 
     $effect(() => {
         viewBeats = Math.max(viewBeats, 0)
@@ -72,8 +77,9 @@
         }
     }
 
-    const clickAudio = new Audio('click.wav');
-    clickAudio.play();
+    const clickAudioWheel = [new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav'), new Audio('click.wav')];
+    let clickIdx = 0;
+    clickAudioWheel[clickIdx].play();
 
     let lastTime = 0;
     let lastClick = 0;
@@ -82,8 +88,10 @@
         if(time >= project.time * 1000) player.pause();
         if(!player.paused) {
             if(lastClick + 1/$Snapping < beats) {
-                //clickAudio.play();
-                lastClick = beats;
+                if(metronomeEnabled) clickAudioWheel[clickIdx].play();
+                clickIdx++;
+                clickIdx %= clickAudioWheel.length;
+                lastClick = snap(beats, $Snapping);
             }
             window.requestAnimationFrame(timing);
         }
@@ -95,7 +103,7 @@
             lastTime = Date.now();
             time = player.currentTime*1000;
             startTime = player.currentTime*1000;
-            lastClick = beats;
+            lastClick = snap(beats, $Snapping);
             //time += project.offset - latency;
             
             timing();
@@ -161,19 +169,22 @@
             playPause();
         }
     });
+
+    let playheadBeats = $derived(time2beats(time, bpms, project.tempo) - viewBeats);
 </script>
 
 <main bind:this={timelineBody} {onmousemove} style={mouseDrag ? 'cursor: move;' : ''}>
     <bar>
-        <button onclick={playPause} class="ibutton">⏯</button>
-        <button onclick={stop} class="ibutton">⏹</button>
+        <button onclick={playPause} class="ibutton"><PlayIcon width={24} height={24}/></button>
+        <button onclick={stop} class="ibutton"><StopIcon width={24} height={24}/></button>
         <input type="number" bind:value={minutes} onchange={onChangeTime}>:<input type="number" bind:value={seconds} onchange={onChangeTime}>
         <input type="checkbox" bind:checked={$Snapping}/>
         <input type="range" min="1" max="8" step="1" bind:value={$Snapping}>1/{$Snapping}
+        <button class="ibutton" onclick={() => metronomeEnabled = !metronomeEnabled} style="{metronomeEnabled ? 'background-color: var(--accent-color);' : ''}">{@html MetronomeIcon}</button>
     </bar>
     
     <div>
-        <Playhead {scale} trackCount={clips.length} beats={time2beats(player.currentTime*1000, bpms, project.tempo) - viewBeats + time - time}/>
+        <Playhead {scale} trackCount={clips.length} beats={playheadBeats}/>
         <Ticks {scale} beats={viewBeats} snapping={$Snapping} {onretime} />
         <timelines>
             {#each clips as _clip, i}
@@ -212,6 +223,7 @@
 
     bar * {
         margin: 0 calc(var(--spacing)/2);
+        max-height: 38px;
     }
 
     bar input[type="number"] {
@@ -219,6 +231,8 @@
     }
 
     .ibutton {
-        font-size: larger;
+        height: 38px;
+        width: 38px;
+        min-width: 38px;
     }
 </style>

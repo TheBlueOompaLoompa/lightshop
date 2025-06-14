@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { snap } from '$lib/util';
     import Head from '../../assets/head.svg?raw';
     import { timelineSpacing } from '$lib/constants';
 
@@ -11,7 +10,6 @@
 
     export let onclick: undefined | (() => any);
 
-    let playheadElement: HTMLElement;
     let svgContainerElement: HTMLDivElement;
     let svgElement: SVGSVGElement;
 
@@ -25,15 +23,15 @@
     }
 </script>
 
-<playhead class="retiming {onclick ? '' : 'not-selectable'}" bind:this={playheadElement} style="filter: hue-rotate({color}deg); left: calc({beats * timelineSpacing * scale + 200}px + var(--spacing) * 2);" {onclick}>
+<markerhead class="retiming {onclick ? '' : 'not-selectable'}" style="filter: hue-rotate({color}deg); left: calc({beats * timelineSpacing * scale + 200}px + var(--spacing) * 2);" {onclick}>
     <div bind:this={svgContainerElement} style="left: calc(-1rem/4);">
         {@html Head}
     </div>
     <headline style="height: calc(100px * {trackCount} + 1rem + 1px)"></headline>
-</playhead>
+</markerhead>
 
 <style>
-    playhead {
+    markerhead {
         position: absolute;
         top: 0px;
         left: 0px;
