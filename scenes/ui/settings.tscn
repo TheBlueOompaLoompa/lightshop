@@ -1,6 +1,5 @@
-[gd_scene load_steps=4 format=3 uid="uid://b7vueinrtkcmq"]
+[gd_scene load_steps=3 format=3 uid="uid://b7vueinrtkcmq"]
 
-[ext_resource type="Script" uid="uid://bl8i7pscnoa61" path="res://scripts/renderer.gd" id="1_8wwek"]
 [ext_resource type="Script" uid="uid://do7ymgs8b8y6g" path="res://scripts/ui/settings.gd" id="1_mx5tk"]
 [ext_resource type="Script" uid="uid://dm3h12vtrs3ne" path="res://scripts/ui/target_window.gd" id="5_58a0h"]
 
@@ -23,11 +22,6 @@ horizontal_scroll_mode = 0
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 4
-
-[node name="Render" type="Button" parent="Scroll/VBox"]
-layout_mode = 2
-text = "Render"
-script = ExtResource("1_8wwek")
 
 [node name="Invert Timeline Scroll" type="CheckBox" parent="Scroll/VBox"]
 layout_mode = 2
@@ -65,7 +59,8 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TargetWindow" type="Window" parent="."]
+[node name="TargetWindow" type="Window" parent="." node_paths=PackedStringArray("name_node", "address_node", "type_node", "calibration_node", "led_count_node", "framerate_node")]
+oversampling_override = 1.0
 title = "Target"
 initial_position = 2
 size = Vector2i(350, 250)
@@ -73,6 +68,12 @@ visible = false
 transient = true
 popup_window = true
 script = ExtResource("5_58a0h")
+name_node = NodePath("Vertical/Grid/Name")
+address_node = NodePath("Vertical/Grid/Address")
+type_node = NodePath("Vertical/Grid/Type")
+calibration_node = NodePath("Vertical/Calibration")
+led_count_node = NodePath("Vertical/Grid/LedCount")
+framerate_node = NodePath("Vertical/Grid/Framerate")
 
 [node name="Vertical" type="VBoxContainer" parent="TargetWindow"]
 anchors_preset = 15
@@ -113,6 +114,15 @@ text = "Led Count"
 layout_mode = 2
 allow_greater = true
 
+[node name="FramerateLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Framerate"
+
+[node name="Framerate" type="SpinBox" parent="TargetWindow/Vertical/Grid"]
+layout_mode = 2
+allow_greater = true
+suffix = "FPS"
+
 [node name="TypeLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
 layout_mode = 2
 text = "Type"
@@ -145,13 +155,12 @@ text = "Confirm"
 [node name="CalibrationFileDialog" type="FileDialog" parent="TargetWindow"]
 title = "Open a File"
 position = Vector2i(0, 36)
-size = Vector2i(303, 180)
+size = Vector2i(348, 180)
 ok_button_text = "Open"
 file_mode = 0
 use_native_dialog = true
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
-[connection signal="pressed" from="Scroll/VBox/Render" to="Scroll/VBox/Render" method="start_render"]
 [connection signal="toggled" from="Scroll/VBox/Invert Timeline Scroll" to="." method="_on_invert_timeline_scroll_toggled"]
 [connection signal="value_changed" from="Scroll/VBox/Grid/UIScale" to="." method="_on_ui_scale_value_changed"]
 [connection signal="pressed" from="Scroll/VBox/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]

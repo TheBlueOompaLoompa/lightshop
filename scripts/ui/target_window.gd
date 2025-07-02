@@ -2,11 +2,12 @@ extends Window
 
 signal confirmed(target: Target)
 
-@onready var name_node = $Vertical/Grid/Name
-@onready var address_node = $Vertical/Grid/Address
-@onready var type_node = $Vertical/Grid/Type
-@onready var calibration_node = $Vertical/Calibration
-@onready var led_count_node = $Vertical/Grid/LedCount
+@export var name_node: LineEdit
+@export var address_node: LineEdit
+@export var type_node: OptionButton
+@export var calibration_node: Button
+@export var led_count_node: SpinBox
+@export var framerate_node: SpinBox
 
 @export var target = Target.new()
 @export var id = -1
@@ -22,6 +23,7 @@ func reset_content():
     type_node.selected = target.type
     led_count_node.value = target.leds
     calibration_node.visible = target.type == 1
+    framerate_node.value = target.framerate
 
 
 func _on_type_item_selected(index: int) -> void:
@@ -44,13 +46,16 @@ func _on_confirm_pressed() -> void:
         return
     if led_count_node.value < 1:
         return
+    if framerate_node.value < 1:
+        return
     
     target.name = name_node.text
     target.address = address_node.text
     target.type = type_node.selected
     target.leds = led_count_node.value
+    target.framerate = framerate_node.value
     
-    confirmed.emit(target, id)
+    confirmed.emit(target.duplicate_deep(Resource.ResourceDeepDuplicateMode.RESOURCE_DEEP_DUPLICATE_ALL), id)
     hide()
     reset_content()
     target = Target.new()

@@ -6,12 +6,8 @@ signal cancel
 @export var effect: Effect:
     set(v):
         effect = v
-        if effect != null:
-            name_edit.text = effect.name
-            linear_check.button_pressed = effect.target_types.has(Target.Type.LINEAR)
-            spatial_check.button_pressed = effect.target_types.has(Target.Type.SPATIAL)
-            binary_check.button_pressed = effect.target_types.has(Target.Type.BINARY)
-            motion_check.button_pressed = effect.target_types.has(Target.Type.MOTION)
+        update()
+@export var effects: Effects
 
 @export var name_edit: LineEdit
 @export var linear_check: CheckBox
@@ -19,15 +15,40 @@ signal cancel
 @export var binary_check: CheckBox
 @export var motion_check: CheckBox
 
+@export var params_vbox: VBoxContainer
+
+const EFFECT_CONFIG_PARAM_ROW = preload("uid://bxfc3api2u7vt")
+
+func update():
+    if effect != null:
+        for child in params_vbox.get_children():
+            child.queue_free()
+        
+        name_edit.text = effect.name
+        linear_check.button_pressed = effect.target_types.has(Target.Type.LINEAR)
+        spatial_check.button_pressed = effect.target_types.has(Target.Type.SPATIAL)
+        binary_check.button_pressed = effect.target_types.has(Target.Type.BINARY)
+        motion_check.button_pressed = effect.target_types.has(Target.Type.MOTION)
+        
+        for param in effect.parameters:
+            var row = EFFECT_CONFIG_PARAM_ROW.instantiate()
+            row.parameter = param
+            row.delete.connect(func():
+                effect.parameters.erase(param)
+                update()
+            )
+            params_vbox.add_child(row)
+
 
 func new_effect():
     effect = Effect.new()
-    effect.uid = uuid.v4()
+    effect.uid = effects.uid_count
+    effects.uid_count += 1
     show()
 
 
 func open_effect(eff: Effect):
-    effect = eff.duplicate()
+    effect = eff.dupe()
     show()
 
 
@@ -71,3 +92,14 @@ func _on_motion_toggled(toggled_on: bool) -> void:
         effect.target_types.push_back(Target.Type.MOTION)
     else:
         effect.target_types.erase(Target.Type.MOTION)
+
+
+func _on_add_parameter_pressed() -> void:
+    var param = Parameter.new()
+    param.type = Parameter.Type.Int
+    param.data = 0
+    param.name = ""
+    param.title = ""
+    effect.parameters.append(param)
+    effect.parameters = effect.parameters
+    update()

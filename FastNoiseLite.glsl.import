@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://chs8n0y84qdfw"
+path="res://.godot/imported/FastNoiseLite.glsl-6aa5c65dd03588b32ff9906328fb84d8.res"
+
+[deps]
+
+source_file="res://FastNoiseLite.glsl"
+dest_files=["res://.godot/imported/FastNoiseLite.glsl-6aa5c65dd03588b32ff9906328fb84d8.res"]
+
+[params]
+

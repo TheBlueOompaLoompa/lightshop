@@ -1,0 +1,4 @@
+[gd_resource type="SystemFont" format=3 uid="uid://cci52b2a6cujv"]
+
+[resource]
+font_names = PackedStringArray("DejaVu Sans Mono", "Fira Mono", "DM Mono", "Monospace")

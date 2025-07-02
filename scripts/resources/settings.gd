@@ -13,6 +13,8 @@ class_name Settings
     set(v):
         invert_scroll = v
         emit_changed()
+@export var look_speed: float = 1.0
+@export var move_speed: float = 1.0
 
 static var settings_file = "user://settings.tres"
 

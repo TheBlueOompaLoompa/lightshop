@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://cyjwb1bq5qovs"]
+
+[ext_resource type="Script" uid="uid://ewvhfivhdpox" path="res://scripts/ui/curve_editor/curve_editor.gd" id="1_psjob"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_84i00"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 1)
+corner_detail = 5
+
+[sub_resource type="Curve" id="Curve_psjob"]
+_data = [Vector2(0.056770645, 0.0416013), 0.0, 3.1870024, 0, 0, Vector2(0.43504336, 0.4157666), 0.001259882, 0.001259882, 0, 0, Vector2(0.7641976, 0.23359269), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="CurveEditor" type="PanelContainer" node_paths=PackedStringArray("line", "controls")]
+clip_contents = true
+custom_minimum_size = Vector2(100, 100)
+anchors_preset = -1
+anchor_right = 0.062000003
+anchor_bottom = 0.11100001
+offset_right = -99.200005
+offset_bottom = -99.90001
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_84i00")
+script = ExtResource("1_psjob")
+curve = SubResource("Curve_psjob")
+line = NodePath("Line2D")
+controls = NodePath("Controls")
+
+[node name="Controls" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="Line2D" type="Line2D" parent="."]
+width = 2.0
+default_color = Color(1, 0, 0, 1)
+joint_mode = 2
+antialiased = true
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

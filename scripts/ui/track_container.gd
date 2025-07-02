@@ -82,10 +82,5 @@ func _on_track_clip_changed():
     _on_sort_children()
 
 
-func _ready() -> void:
-    if track_clip != null:
-        track_clip.changed.connect(_on_track_clip_changed)
-
-
 func _input(event):
     emit_signal("container_input", event)

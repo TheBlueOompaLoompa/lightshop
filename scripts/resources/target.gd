@@ -25,6 +25,14 @@ class_name Target
     set(v):
         gpu_layers = v
         emit_changed()
+@export var framerate: float = 30:
+    set(v):
+        framerate = v
+        emit_changed()
+@export var renderer_source: String:
+    set(v):
+        renderer_source = v
+        emit_changed()
 
 enum Type {
     LINEAR,

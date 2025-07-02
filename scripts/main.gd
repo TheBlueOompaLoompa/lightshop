@@ -13,6 +13,15 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+    var effects_exists = FileAccess.file_exists("user://effects.tres")
+    if effects_exists:
+        project_tab.effects = ResourceLoader.load("user://effects.tres")
+    else:
+        project_tab.effects = Effects.new()
+        print(ResourceSaver.save(project_tab.effects, "user://effects.tres"))
+    project_tab.effects.changed.connect(func():
+        ResourceSaver.save(project_tab.effects, "user://effects.tres")
+    )
     Input.use_accumulated_input = false
     $Tabs.set_tab_disabled(1, true)
     apply_settings()

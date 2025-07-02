@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8rwsekyjj7wh"]
+
+[ext_resource type="Script" uid="uid://b2qc0fascph14" path="res://scripts/ui/preset_row.gd" id="1_owixq"]
+[ext_resource type="Texture2D" uid="uid://b0a6ontsi8v1g" path="res://textures/icons/Remove.svg" id="2_xegcp"]
+[ext_resource type="PackedScene" uid="uid://cthll73hn7cu2" path="res://scenes/ui/parameter_input.tscn" id="3_c8e4b"]
+
+[node name="PresetRow" type="HBoxContainer"]
+script = ExtResource("1_owixq")
+
+[node name="Delete" type="Button" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Delete Preset"
+icon = ExtResource("2_xegcp")
+
+[node name="Name" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 4
+placeholder_text = "Preset Name"
+
+[node name="ParameterInput" parent="." instance=ExtResource("3_c8e4b")]
+layout_mode = 2
+size_flags_vertical = 4
+
+[connection signal="pressed" from="Delete" to="." method="_on_delete_pressed"]
+[connection signal="text_submitted" from="Name" to="." method="_on_name_text_submitted"]

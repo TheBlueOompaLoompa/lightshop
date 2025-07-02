@@ -36,6 +36,7 @@ func reset_ui():
             temp.address = settings.targets[i].address
             temp.type = settings.targets[i].type
             temp.leds = settings.targets[i].leds
+            temp.framerate = settings.targets[i].framerate
             temp.points = PackedVector3Array(settings.targets[i].points)
             target_window.target = temp
             target_window.id = i
@@ -59,6 +60,7 @@ func _on_target_window_confirmed(target: Target, id: int) -> void:
         settings.targets.append(target)
     else:
         settings.targets[id] = target
+        print(target.framerate)
     reset_ui()
 
 

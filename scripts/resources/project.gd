@@ -25,7 +25,8 @@ class_name Project
     set(v):
         tracks = v
         emit_changed()
-@export var effects: Array[Effect]:
+# UID: Effect
+@export var effects: Dictionary[int, Effect]:
     set(v):
         effects = v
         emit_changed()
@@ -33,9 +34,26 @@ class_name Project
     set(v):
         follow_playhead = v
         emit_changed()
+@export var uid_count: int = 0
+@export var preview_cam_pos: Vector3 = Vector3.ZERO
+@export var preview_cam_rot: Vector2 = Vector2.ZERO
+@export var beats := 0.0
+@export var view_beats := 0.0
+@export var scale_px := 20.0
 
 func beats2seconds(beats: float) -> float:
     return 1 / tempo * beats * 60
 
+
 func seconds2beats(seconds: float) -> float:
     return seconds/60 * tempo
+
+func compile_effects():
+    var renderer_source = FileAccess.open("res://renderer.glsl", FileAccess.READ)
+    
+    var effects_source = ""
+    var run_source = ""
+    
+    for effect in effects.values():
+        var struct_source = effect.generate_params_glsl()
+    

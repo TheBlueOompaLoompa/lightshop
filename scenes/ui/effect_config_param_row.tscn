@@ -1,0 +1,117 @@
+[gd_scene load_steps=5 format=3 uid="uid://bxfc3api2u7vt"]
+
+[ext_resource type="Texture2D" uid="uid://b0a6ontsi8v1g" path="res://textures/icons/Remove.svg" id="1_etvck"]
+[ext_resource type="Script" uid="uid://o3wtjn430br4" path="res://scripts/ui/effect_config_param_row.gd" id="1_ne16e"]
+[ext_resource type="PackedScene" uid="uid://cthll73hn7cu2" path="res://scenes/ui/parameter_input.tscn" id="2_ne16e"]
+[ext_resource type="PackedScene" uid="uid://c8rwsekyjj7wh" path="res://scenes/ui/preset_row.tscn" id="3_583o3"]
+
+[node name="EffectConfigParamRow" type="PanelContainer" node_paths=PackedStringArray("name_input", "title_input", "type_input", "param_input", "presets_panel", "preset_box")]
+script = ExtResource("1_ne16e")
+name_input = NodePath("MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/Name")
+title_input = NodePath("MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/Title")
+type_input = NodePath("MarginContainer/HBoxContainer/Type")
+param_input = NodePath("MarginContainer/HBoxContainer/ParameterInput")
+presets_panel = NodePath("MarginContainer/HBoxContainer/Presets/PresetsPanel")
+preset_box = NodePath("MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Delete" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+tooltip_text = "Delete Parameter"
+icon = ExtResource("1_etvck")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Title"
+
+[node name="Title" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="TypeLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Type"
+
+[node name="Type" type="OptionButton" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Presets" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Presets"
+
+[node name="PresetsPanel" type="PanelContainer" parent="MarginContainer/HBoxContainer/Presets"]
+visible = false
+z_index = 1
+layout_mode = 1
+offset_top = 34.0
+offset_right = 359.0
+offset_bottom = 194.0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="NewPreset" type="Button" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "New Preset"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PresetRow" parent="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_583o3")]
+layout_mode = 2
+
+[node name="ParameterInput" parent="MarginContainer/HBoxContainer" instance=ExtResource("2_ne16e")]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 4
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxContainer/Delete" to="." method="_on_delete_pressed"]
+[connection signal="text_changed" from="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/Name" to="." method="_on_name_text_changed"]
+[connection signal="text_changed" from="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/Title" to="." method="_on_title_text_changed"]
+[connection signal="item_selected" from="MarginContainer/HBoxContainer/Type" to="." method="_on_type_item_selected"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Presets" to="." method="_on_presets_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Presets/PresetsPanel/MarginContainer/VBoxContainer/NewPreset" to="." method="_on_new_preset_pressed"]

@@ -33,7 +33,6 @@ var mouse = false
 
 func _ready() -> void:
     setup()
-    track_clip.changed.connect(setup)
     main.track_clip = track_clip
 
 

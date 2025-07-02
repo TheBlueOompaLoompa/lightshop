@@ -1,14 +1,26 @@
 extends FoldableContainer
+class_name EffectAddSection
 
-@export var project: Project:
+signal effect_selected(effect: Effect)
+
+@export var effects: Effects:
     set(v):
-        project = v
-        update()
+        effects = v
+        if effects != null:
+            effects.changed.connect(update)
+            update()
 @export var type: Target.Type
 
 func update():
-    for effect in project.effects:
+    for child in $HFlowContainer.get_children():
+        child.queue_free()
+    for key in effects.keys():
+        var effect = effects.g(key)
         if effect.target_types.has(type):
-            var button = Button.new()
+            var button := Button.new()
             button.text = effect.name
             button.set_meta("effect", effect)
+            button.pressed.connect(func():
+                effect_selected.emit(effect)
+            )
+            $HFlowContainer.add_child(button)

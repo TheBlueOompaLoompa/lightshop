@@ -1,0 +1,116 @@
+[gd_scene load_steps=5 format=3 uid="uid://b4tammbv0ni2g"]
+
+[ext_resource type="Script" uid="uid://btbhtndrga67g" path="res://scripts/ui/curve_editor/curve_point.gd" id="1_ddmcv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_psjob"]
+bg_color = Color(0, 1, 0, 1)
+border_blend = true
+corner_radius_top_left = 1000
+corner_radius_top_right = 1000
+corner_radius_bottom_right = 1000
+corner_radius_bottom_left = 1000
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cjtwg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 5
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j38i8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0.6313726, 1, 1)
+border_color = Color(0, 0.6313726, 1, 1)
+border_blend = true
+corner_radius_top_left = 1000
+corner_radius_top_right = 1000
+corner_radius_bottom_right = 1000
+corner_radius_bottom_left = 1000
+corner_detail = 5
+anti_aliasing = false
+
+[node name="Control" type="Control" node_paths=PackedStringArray("point_panel", "right_panel", "right_arm", "left_panel", "left_arm")]
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+mouse_behavior_recursive = 1
+script = ExtResource("1_ddmcv")
+point_panel = NodePath("Point")
+right_panel = NodePath("RightArm/ControlPoint")
+right_arm = NodePath("RightArm")
+left_panel = NodePath("LeftArm/ControlPoint")
+left_arm = NodePath("LeftArm")
+
+[node name="Point" type="Panel" parent="."]
+z_index = 2
+layout_mode = 0
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0
+pivot_offset = Vector2(5, 5)
+mouse_behavior_recursive = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_psjob")
+
+[node name="RightArm" type="Panel" parent="."]
+z_index = 1
+z_as_relative = false
+layout_mode = 0
+offset_top = -1.0
+offset_right = 20.0
+offset_bottom = 1.0
+pivot_offset = Vector2(0, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_cjtwg")
+
+[node name="ControlPoint" type="Panel" parent="RightArm"]
+z_index = 1
+layout_mode = 0
+offset_left = 15.0
+offset_top = -3.0
+offset_right = 23.0
+offset_bottom = 5.0
+mouse_behavior_recursive = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_j38i8")
+
+[node name="LeftArm" type="Panel" parent="."]
+z_index = 1
+z_as_relative = false
+layout_mode = 0
+offset_top = -1.0
+offset_right = 20.0
+offset_bottom = 1.0
+rotation = 3.1415927
+pivot_offset = Vector2(0, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_cjtwg")
+
+[node name="ControlPoint" type="Panel" parent="LeftArm"]
+z_index = 1
+layout_mode = 0
+offset_left = 15.0
+offset_top = -3.0000014
+offset_right = 23.0
+offset_bottom = 4.9999986
+mouse_behavior_recursive = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_j38i8")
+
+[connection signal="gui_input" from="Point" to="." method="_on_point_gui_input"]
+[connection signal="mouse_entered" from="Point" to="." method="_on_point_mouse_entered"]
+[connection signal="mouse_exited" from="Point" to="." method="_on_point_mouse_exited"]
+[connection signal="gui_input" from="RightArm/ControlPoint" to="." method="_on_right_control_point_gui_input"]
+[connection signal="mouse_entered" from="RightArm/ControlPoint" to="." method="_on_right_control_point_mouse_entered"]
+[connection signal="mouse_exited" from="RightArm/ControlPoint" to="." method="_on_right_control_point_mouse_exited"]
+[connection signal="gui_input" from="LeftArm/ControlPoint" to="." method="_on_left_control_point_gui_input"]
+[connection signal="mouse_entered" from="LeftArm/ControlPoint" to="." method="_on_left_control_point_mouse_entered"]
+[connection signal="mouse_exited" from="LeftArm/ControlPoint" to="." method="_on_left_control_point_mouse_exited"]

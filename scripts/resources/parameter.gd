@@ -5,6 +5,10 @@ class_name Parameter
     set(v):
         name = v
         emit_changed()
+@export var title: String:
+    set(v):
+        title = v
+        emit_changed()
 @export var type: Type:
     set(v):
         type = v
@@ -13,7 +17,7 @@ class_name Parameter
     set(v):
         data = v
         emit_changed()
-@export var presets: Array[Variant] = []:
+@export var presets: Dictionary[String, Variant] = {}:
     set(v):
         presets = v
         emit_changed()

@@ -8,7 +8,8 @@ signal right_click
 @export var clip: Clip:
     set(v):
         clip = v
-        clip.changed.connect(update)
+        if not clip.changed.is_connected(update):
+            clip.changed.connect(update)
         update()
 
 var unselected_style = preload("uid://d0x2u5pjggxrk")
@@ -17,7 +18,6 @@ var selected_style = preload("uid://wasdno3fdw3c")
 # Called when the node enters the scene tree for the first time.
 func _enter_tree() -> void:
     add_theme_stylebox_override("panel", unselected_style)
-    clip.changed.connect(update)
 
 func update():
     update_name()

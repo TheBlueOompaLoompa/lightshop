@@ -5,12 +5,15 @@ extends MarginContainer
 @export var seconds_node: SpinBox
 
 @export var effects_pane: EffectsPane
+@export var preview: Preview
 @export var effect_editor_win: EffectEditorWindow
 @export var tracks_container: VBoxContainer
 @export var ticks: PanelContainer
 @export var division_label: Label
 @export var division_slider: HSlider
 @export var cursor_bucket: CursorBucket
+@export var renderer: Renderer
+@export var effects: Effects
 @export var settings: Settings:
     set(v):
         settings = v
@@ -34,9 +37,11 @@ var selected_clip_track: TrackControl = null
 var dragging_clip: Clip = null
 var drag_direction: int = -1
 var dragging_track: TrackControl = null
+var hovered_track: TrackClip = null
 var scale_px = 20.0:
     set(v):
         scale_px = v
+        project.scale_px = scale_px
         for track in tracks_container.get_children():
             track.scale_px = scale_px
         ticks.scale_px = scale_px
@@ -47,10 +52,12 @@ var division = 2.0:
 var beats = 0.0:
     set(v):
         beats = v
+        project.beats = beats
         ticks.beats = beats
 var view_beats = 0.0:
     set(v):
         view_beats = v
+        project.view_beats = view_beats
         ticks.view_beats = view_beats
         for track in tracks_container.get_children():
             track.view_beats = view_beats
@@ -72,6 +79,7 @@ func update_tracks():
             project.tracks = project.tracks
         )
         track_scene.mouse_over.connect(func(b: float):
+            hovered_track = track
             if cursor_bucket.get_child_count() == 0: return
             var clip_scene = cursor_bucket.get_child(0)
             if clip_scene is ClipControl:
@@ -88,6 +96,7 @@ func update_tracks():
                 track.clips = track.clips
         )
         track_scene.mouse_out.connect(func():
+            hovered_track = null
             if cursor_bucket.get_child_count() == 0: return
             var clip_scene = cursor_bucket.get_child(0)
             if clip_scene is ClipControl:
@@ -128,9 +137,17 @@ func update_tracks():
 
 
 func _on_project_changed():
-    effects_pane.project = project
-    effect_editor_win.project = project
+    effects_pane.effects = effects
+    effect_editor_win.effects = effects
+    renderer.effects = effects
+    renderer.project = project
+    preview.project = project
     update_tracks()
+    view_beats = project.view_beats
+    beats = project.beats
+    pause_time = project.beats2seconds(beats)
+    play_time = pause_time
+    scale_px = project.scale_px
 
 
 func reset_ui():
@@ -169,9 +186,16 @@ func _on_stop_pressed() -> void:
 var minutes_focused = false
 var seconds_focused = false
 
+var last_beats = 0
 
-func _process(_d) -> void:
+var render_delta = 0
+
+func _process(delta) -> void:
     if project == null: return
+    if beats != last_beats:
+        render_delta = 0
+        renderer.render(beats, delta)
+        last_beats = beats
     if audio_player.playing:
         beats = project.seconds2beats(audio_player.get_playback_position() if audio_player.playing else pause_time)
     if audio_player.playing:
@@ -264,7 +288,7 @@ func _on_tracks_gui_input(event: InputEvent) -> void:
             view_beats -= dir / 10.0
         elif scroll_right or scroll_down:
             view_beats += dir / 10.0
-    scale_px = minf(maxf(10.0, scale_px), 100.0)
+    scale_px = minf(maxf(10.0, scale_px), 200.0)
     view_beats = maxf(0.0, view_beats)
 
 
@@ -276,6 +300,7 @@ func _on_settings_changed():
     $TrackWindow.content_scale_factor = settings.ui_scale
     effects_pane.settings = settings
     effect_editor_win.settings = settings
+    preview.settings = settings
     
 
 
@@ -345,9 +370,59 @@ func _on_clip_button_pressed():
     var clip = EffectClip.new()
     clip.name = 'example'
     clip.start = 0
-    clip.end = 4
-    clip.length = 4
+    clip.end = 1
+    clip.length = 1
     clip.type = Target.Type.LINEAR
     clip_scene.clip = clip
     add_to_cursor_bucket(clip_scene)
     set_cursor_bucket_visible(true)
+
+
+func _on_effects_pane_effect_param_changed() -> void:
+    if selected_clip_track == null: return
+    renderer.param_edit(selected_clip_track.track_clip)
+
+
+var clipboard: Clip = null
+
+
+func _on_copy_pressed() -> void:
+    if selected_clip != null:
+        clipboard = selected_clip.duplicate(true)
+        if clipboard is EffectClip:
+            for effect in clipboard.effects:
+                effect.dupe()
+
+
+func _on_cut_pressed() -> void:
+    _on_copy_pressed()
+    var idx = selected_clip_track.track_clip.clips.find(selected_clip)
+    selected_clip_track.track_clip.clips.remove_at(idx)
+    selected_clip_track.track_clip.emit_changed()
+
+
+func _on_paste_pressed() -> void:
+    if not(clipboard is EffectClip): return
+    var clip_scene = ClipScene.instantiate()
+    clipboard = selected_clip.duplicate(true)
+    clipboard.selected = false
+    clipboard.length = clipboard.end - clipboard.start
+    if clipboard is EffectClip:
+        for effect in clipboard.effects:
+            effect.dupe()
+    clip_scene.clip = clipboard
+    add_to_cursor_bucket(clip_scene)
+    set_cursor_bucket_visible(true)
+
+
+func _on_cursor_bucket_clear() -> void:
+    if cursor_bucket.get_child_count() == 0: return
+    var clip_scene = cursor_bucket.get_child(0)
+    if clip_scene is ClipControl and hovered_track != null:
+        var clip = clip_scene.clip
+        if hovered_track.clips.has(clip):
+            var idx = hovered_track.clips.find(clip)
+            hovered_track.clips.remove_at(idx)
+            hovered_track.clips = hovered_track.clips
+    
+    cursor_bucket.delete_children()

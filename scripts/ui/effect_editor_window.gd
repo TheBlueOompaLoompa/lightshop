@@ -1,10 +1,10 @@
 extends Window
 class_name EffectEditorWindow
 
-@export var project: Project:
+@export var effects: Effects:
     set(v):
-        $"Effect Editor".project = v
-        project = v
+        $"Effect Editor".effects = v
+        effects = v
 
 @export var settings: Settings:
     set(v):
@@ -15,3 +15,7 @@ class_name EffectEditorWindow
 
 func _on_settings_changed():
     content_scale_factor = settings.ui_scale
+
+
+func _on_close_requested() -> void:
+    hide()
