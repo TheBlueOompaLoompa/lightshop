@@ -1,8 +1,8 @@
 extends EffectNode
 class_name ScriptNode
 
-const ScriptEditorNode = preload("res://scenes/ui/script_editor.tscn")
-const PortAddRowNode = preload("res://scenes/ui/port_add_row.tscn")
+const SCRIPT_EDITOR = preload("uid://c1jr058pj22aq")
+const PORT_ADD_ROW = preload("uid://b5nor3j4iffq1")
 
 @export_storage var setup = false
 
@@ -12,8 +12,8 @@ func _ready():
     var vbox = VBoxContainer.new()
     vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
     
-    var editor = ScriptEditorNode.instantiate()    
-    var row = PortAddRowNode.instantiate()
+    var editor = SCRIPT_EDITOR.instantiate()    
+    var row = PORT_ADD_ROW.instantiate()
 
     vbox.add_child(editor)
     vbox.add_child(row)

@@ -24,7 +24,7 @@ class_name Effect
 
 func dupe() -> Effect:
     var new: Effect = self.duplicate()
-    new.parameters = new.parameters.duplicate_deep(RESOURCE_DEEP_DUPLICATE_ALL)
+    new.parameters = new.parameters.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_ALL)
     return new
 
 

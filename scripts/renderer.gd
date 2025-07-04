@@ -92,10 +92,11 @@ func param_edit(track: TrackClip):
 func render(beats: float, delta: float):
     for track in project.tracks:
         var has_clip = false
-        for clip in track.clips:
-            if clip.start <= beats and clip.end > beats:
-                render_clip(track, clip, (beats - clip.start)/(clip.end-clip.start), delta)
-                has_clip = true
+        if track.render_enable:
+            for clip in track.clips:
+                if clip.start <= beats and clip.end > beats:
+                    render_clip(track, clip, (beats - clip.start)/(clip.end-clip.start), delta)
+                    has_clip = true
         if not has_clip:
             for target in track.targets:
                 connections.get(target.name).no_clip()

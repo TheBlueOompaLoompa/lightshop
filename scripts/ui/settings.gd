@@ -9,7 +9,28 @@ signal Changed
 @onready var ui_scale_node = $Scroll/VBox/Grid/UIScale
 @onready var invert_timeline_scroll = $"Scroll/VBox/Invert Timeline Scroll"
 var target_row_prefab = preload("res://scenes/ui/target_row.tscn")
-    
+
+var beacon_peer = PacketPeerUDP.new()
+var config_peer = PacketPeerUDP.new()
+func _ready() -> void:
+    beacon_peer.bind(1336, "0.0.0.0")
+    config_peer.bind(8238, "0.0.0.0")
+    config_peer.set_dest_address("127.0.0.1", 1335)
+    var payload = '{"INTROSPECT":{}}'.to_multibyte_char_buffer("ascii")
+    config_peer.put_packet(payload)
+    payload = '{"CONFIG":{"new_config":{"name":"hi", "outputs": []}}}'.to_multibyte_char_buffer("ascii")
+    config_peer.put_packet(payload)
+    payload = '{"INTROSPECT":{}}'.to_multibyte_char_buffer("ascii")
+    config_peer.put_packet(payload)
+
+
+func _process(_delta: float) -> void:
+    if beacon_peer.get_available_packet_count() > 0:
+        print(beacon_peer.get_packet())
+    if config_peer.get_available_packet_count() > 0:
+        print(JSON.parse_string(config_peer.get_packet().get_string_from_ascii()))
+
+
 func reset_ui():
     settings.save_res()
     Changed.emit()

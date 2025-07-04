@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccir2nbfxepiw"]
+
+[ext_resource type="Script" uid="uid://b3wcl235r4kq8" path="res://scripts/ui/project/parameter_row.gd" id="1_4ag3g"]
+[ext_resource type="PackedScene" uid="uid://cthll73hn7cu2" path="res://scenes/ui/project/effects_pane/parameter_input.tscn" id="2_u2qqq"]
+
+[node name="parameter_row" type="HBoxContainer" node_paths=PackedStringArray("title_label", "input")]
+offset_right = 231.0
+offset_bottom = 23.0
+size_flags_horizontal = 3
+alignment = 2
+script = ExtResource("1_4ag3g")
+title_label = NodePath("Label")
+input = NodePath("ParameterInput")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+text = "Parameter Label"
+vertical_alignment = 1
+
+[node name="ParameterInput" parent="." instance=ExtResource("2_u2qqq")]
+layout_mode = 2

@@ -55,7 +55,7 @@ func _on_confirm_pressed() -> void:
     target.leds = led_count_node.value
     target.framerate = framerate_node.value
     
-    confirmed.emit(target.duplicate_deep(Resource.ResourceDeepDuplicateMode.RESOURCE_DEEP_DUPLICATE_ALL), id)
+    confirmed.emit(target.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_ALL), id)
     hide()
     reset_content()
     target = Target.new()

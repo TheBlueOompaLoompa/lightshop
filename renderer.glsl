@@ -21,6 +21,7 @@
 #define PIXEL_COUNT constant.count
 #define TIME time
 #define TARGET constant.target
+#define INDEX ind
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
@@ -50,6 +51,7 @@ layout(set = 0, binding = 4, std430) restrict buffer out_bufffer {
 
 uint layer = 0;
 uint p_i = 0;
+uint ind = 0;
 uint params_i = 0;
 float time = 0;
 
@@ -102,6 +104,7 @@ void run_effect(uint effect_idx) {
 
 void main() {
     p_i = gl_GlobalInvocationID.x;
+    INDEX = p_i;
     time = constant.time;
     PIXEL = vec4(0.0, 0.0, 0.0, 1.0);
     layer = 0;

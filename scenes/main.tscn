@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dw523n4gcfulq" path="res://scenes/ui/projects.tscn" id="1_j3igl"]
 [ext_resource type="Script" uid="uid://dd1jfs7v1i7mw" path="res://scripts/main.gd" id="1_rkwqt"]
 [ext_resource type="PackedScene" uid="uid://b7vueinrtkcmq" path="res://scenes/ui/settings.tscn" id="3_8yuaw"]
-[ext_resource type="PackedScene" uid="uid://m4lmnfaqp3j3" path="res://scenes/ui/project.tscn" id="3_lmt66"]
+[ext_resource type="PackedScene" uid="uid://m4lmnfaqp3j3" path="res://scenes/ui/project/project.tscn" id="3_lmt66"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
