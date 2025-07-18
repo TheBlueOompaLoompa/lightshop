@@ -13,7 +13,7 @@ signal effect_param_changed
         $AddEffectPopup.content_scale_factor = settings.ui_scale
 @export var effects_vbox: VBoxContainer
 @export var clip_title_line: LineEdit
-@export var add_effect_popup: Window
+@export var add_effect_popup: AddEffectPopup
 @export var clip: EffectClip:
     set(v):
         if clip != null:
@@ -28,8 +28,9 @@ const effect_row_scene = preload("uid://dx47s1bc16wpt")
 
 
 func update():
-    clip_title_line.text = clip.name
-    
+    add_effect_popup.clip_type = clip.type
+    if not clip_title_line.is_editing():
+        clip_title_line.text = clip.name
     for child in effects_vbox.get_children():
         child.queue_free()
 

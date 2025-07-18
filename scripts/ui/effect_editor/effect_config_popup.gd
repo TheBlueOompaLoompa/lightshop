@@ -8,13 +8,12 @@ signal cancel
         effect = v
         update()
 @export var effects: Effects
-
 @export var name_edit: LineEdit
 @export var linear_check: CheckBox
 @export var spatial_check: CheckBox
 @export var binary_check: CheckBox
-@export var motion_check: CheckBox
-
+@export var position_check: CheckBox
+@export var rotation_check: CheckBox
 @export var params_vbox: VBoxContainer
 
 const EFFECT_CONFIG_PARAM_ROW = preload("uid://bxfc3api2u7vt")
@@ -28,7 +27,8 @@ func update():
         linear_check.button_pressed = effect.target_types.has(Target.Type.LINEAR)
         spatial_check.button_pressed = effect.target_types.has(Target.Type.SPATIAL)
         binary_check.button_pressed = effect.target_types.has(Target.Type.BINARY)
-        motion_check.button_pressed = effect.target_types.has(Target.Type.MOTION)
+        position_check.button_pressed = effect.target_types.has(Target.Type.POSITION)
+        rotation_check.button_pressed = effect.target_types.has(Target.Type.ROTATION)
         
         for param in effect.parameters:
             var row = EFFECT_CONFIG_PARAM_ROW.instantiate()
@@ -87,11 +87,18 @@ func _on_binary_toggled(toggled_on: bool) -> void:
         effect.target_types.erase(Target.Type.BINARY)
 
 
-func _on_motion_toggled(toggled_on: bool) -> void:
+func _on_position_toggled(toggled_on: bool) -> void:
     if toggled_on:
-        effect.target_types.push_back(Target.Type.MOTION)
+        effect.target_types.push_back(Target.Type.POSITION)
     else:
-        effect.target_types.erase(Target.Type.MOTION)
+        effect.target_types.erase(Target.Type.POSITION)
+
+
+func _on_rotation_toggled(toggled_on: bool) -> void:
+    if toggled_on:
+        effect.target_types.push_back(Target.Type.ROTATION)
+    else:
+        effect.target_types.erase(Target.Type.ROTATION)
 
 
 func _on_add_parameter_pressed() -> void:

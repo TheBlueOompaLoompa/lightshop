@@ -1,4 +1,4 @@
-extends MarginContainer
+class_name ProjectTab extends MarginContainer
 
 @export var audio_player: AudioStreamPlayer
 @export var minutes_node: SpinBox
@@ -6,7 +6,6 @@ extends MarginContainer
 
 @export var effects_pane: EffectsPane
 @export var preview: Preview
-@export var effect_editor_win: EffectEditorWindow
 @export var track_visibility: Window
 @export var tracks_container: VBoxContainer
 @export var clips_pool: PanelContainer
@@ -20,7 +19,6 @@ extends MarginContainer
         effects = v
         if effects != null:
             effects_pane.effects = effects
-            effect_editor_win.effects = effects
             renderer.effects = effects
 @export var settings: Settings:
     set(v):
@@ -164,6 +162,15 @@ func update_tracks():
         tracks_container.add_child(track_scene)
     ticks.track_count = i
 
+
+func _notification(what):
+    if what == NOTIFICATION_WM_CLOSE_REQUEST:
+        if selected_clip != null:
+            selected_clip.selected = false
+        save()
+        get_tree().quit()
+
+
 func reset_ui():
     audio_player.stream = AudioStreamOggVorbis.load_from_file(project.song_file)
     update_tracks()
@@ -171,6 +178,7 @@ func reset_ui():
 
 func _on_open_project(project_name: String) -> void:
     project = ResourceLoader.load('user://projects/'+project_name+'.res')
+    renderer.preview = preview
     renderer.project = project
     preview.project = project
     project.tracks_changed.connect(update_tracks)
@@ -308,9 +316,8 @@ func _on_new_track_pressed() -> void:
 func _on_settings_changed():
     $TrackWindow.content_scale_factor = settings.ui_scale
     effects_pane.settings = settings
-    effect_editor_win.settings = settings
     preview.settings = settings
-    
+    renderer.settings = settings
 
 
 func _on_ticks_playhead_scroll(bts: float) -> void:
@@ -328,20 +335,12 @@ func _on_ticks_retime(b: float) -> void:
         pause_time = seconds
 
 
-func _on_menu_bar_file_pressed(text):
-    if text == 'Save':
-        ResourceSaver.save(project, 'user://projects/'+project.name+'.res')
-    elif text == 'Open Effects Editor':
-        effect_editor_win.show()
-    elif text == 'Quit':
-        get_tree().quit()
-
-
 func _on_track_window_save_track(track_clip, id):
     if id != -1:
         project.tracks[id] = track_clip
     else:
         project.tracks.append(track_clip)
+    project.tracks_changed.emit()
     update_tracks()
 
 
@@ -435,7 +434,7 @@ func _on_cursor_bucket_clear() -> void:
     cursor_bucket.delete_children()
 
 
-func _on_save_pressed() -> void:
+func save() -> void:
     ResourceSaver.save(project, 'user://projects/'+project.name+'.res')
 
 

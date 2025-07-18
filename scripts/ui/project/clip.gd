@@ -40,9 +40,17 @@ func update():
     
     remove_theme_stylebox_override("panel")
     if clip.selected:
-        add_theme_stylebox_override("panel", selected_style.duplicate())
+        add_theme_stylebox_override("panel", selected_style.duplicate(true))
     else:
-        add_theme_stylebox_override("panel", unselected_style.duplicate())
+        add_theme_stylebox_override("panel", unselected_style.duplicate(true))
+    if clip is EffectClip:
+        var style: StyleBoxFlat = get_theme_stylebox("panel")
+        for effect in clip.effects:
+            var e: Effect = effect
+            for param in e.parameters:
+                if param.data is Color:
+                    style.bg_color = param.data
+                    return
     
 func update_name():
     $LabelContainerContainer/LabelContainer/Label.text = clip.name

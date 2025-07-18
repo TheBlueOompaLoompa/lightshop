@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7yi32fu0e4br"]
+
+[ext_resource type="Script" uid="uid://d4k0jxbdqo4o4" path="res://scenes/ui/project/add_output_row.gd" id="1_314p3"]
+
+[node name="AddOutputRow" type="Button"]
+text = "Path"
+script = ExtResource("1_314p3")

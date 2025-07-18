@@ -19,6 +19,7 @@ func update():
         if effect.target_types.has(type):
             var button := Button.new()
             button.text = effect.name
+            button.focus_mode = Control.FOCUS_ACCESSIBILITY
             button.set_meta("effect", effect)
             button.pressed.connect(func():
                 effect_selected.emit(effect)

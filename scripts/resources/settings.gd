@@ -1,6 +1,13 @@
 extends Resource
 class_name Settings
 
+signal device_changed(device: Device, idx: int)
+
+@export var network_settings: NetworkSettings = NetworkSettings.new()
+@export var devices: Array[Device] = []:
+    set(v):
+        devices = v
+        emit_changed()
 @export var targets: Array[Target] = []:
     set(v):
         targets = v

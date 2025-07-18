@@ -12,7 +12,9 @@ signal clip_saved(clip: EffectClip)
 
 @export var main: Container
 @export var title: Label
-@export var render_toggle: Button
+@export var render_toggle: CheckButton
+@export var render_output_enable: CheckBox
+@export var preview_output_enable: CheckBox
 @export var view_beats: float = 0.0:
     set(v):
         view_beats = v
@@ -39,12 +41,22 @@ func _ready() -> void:
 
 func setup():
     render_toggle.button_pressed = track_clip.render_enable
+    render_output_enable.button_pressed = track_clip.render_output_enable
+    preview_output_enable.button_pressed = track_clip.preview_output_enable
     title.text = track_clip.name
 
 
 func _on_render_toggle_toggled(toggled_on: bool) -> void:
     track_clip.render_enable = toggled_on
 
+
+func _on_render_output_toggled(toggled_on: bool) -> void:
+    track_clip.render_output_enable = toggled_on
+
+
+func _on_render_preview_toggled(toggled_on: bool) -> void:
+    track_clip.preview_output_enable = toggled_on
+    
 
 func _on_edit_pressed():
     edit.emit()

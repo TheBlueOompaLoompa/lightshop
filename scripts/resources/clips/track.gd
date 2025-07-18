@@ -1,21 +1,27 @@
 extends CompositeClip
 class_name TrackClip
 
+signal renderer_reload
+
 @export var render_enable: bool = true:
     set(v):
         render_enable = v
+        renderer_reload.emit()
         emit_changed()
 @export var render_output_enable: bool = true:
     set(v):
         render_output_enable = v
+        renderer_reload.emit()
         emit_changed()
 @export var preview_output_enable: bool = true:
     set(v):
         preview_output_enable = v
+        renderer_reload.emit()
         emit_changed()
 @export var targets: Array[Target] = []:
     set(v):
         targets = v
+        renderer_reload.emit()
         emit_changed()
 @export var visible: bool = true:
     set(v):

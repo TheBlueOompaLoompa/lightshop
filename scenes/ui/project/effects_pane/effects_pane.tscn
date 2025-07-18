@@ -1,11 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://dpixk1ikjgrjj"]
+[gd_scene load_steps=10 format=3 uid="uid://dpixk1ikjgrjj"]
 
 [ext_resource type="Script" uid="uid://beedcfjtrx8vq" path="res://scripts/ui/project/effects_pane.gd" id="1_h601b"]
 [ext_resource type="Texture2D" uid="uid://bitgexsup06bf" path="res://textures/icons/VisualShaderNodeColorConstant.svg" id="2_7gnk7"]
+[ext_resource type="Script" uid="uid://gwomvdehmyuo" path="res://scripts/ui/clickout.gd" id="2_i6mjb"]
 [ext_resource type="Script" uid="uid://d27abgi6vkb8s" path="res://scripts/ui/project/add_effect_popup.gd" id="2_pijur"]
 [ext_resource type="Texture2D" uid="uid://de1lbrwd70ygk" path="res://textures/icons/TexturePreviewChannels.svg" id="3_57ias"]
-[ext_resource type="FoldableGroup" uid="uid://dan7lfdt7ti24" path="res://add_effect_fold_group.tres" id="6_57ias"]
-[ext_resource type="Script" uid="uid://04r8cw600uhq" path="res://scripts/ui/project/effect_add_section.gd" id="6_i6mjb"]
+[ext_resource type="Texture2D" uid="uid://bof0fn1g7i2or" path="res://textures/icons/Search.svg" id="6_11ak2"]
+[ext_resource type="Script" uid="uid://c313c7sruet37" path="res://scripts/ui/base_searchable_list.gd" id="6_pcmeb"]
+[ext_resource type="PackedScene" uid="uid://g4g6h7qqgdr" path="res://scenes/ui/project/effects_pane/add_effect_item.tscn" id="8_cvgbu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvdmd"]
 bg_color = Color(0.235294, 0.235294, 0.235294, 1)
@@ -39,6 +41,7 @@ size_flags_horizontal = 3
 [node name="ClipTitle" type="LineEdit" parent="MarginContainer/ScrollContainer/VBox"]
 layout_mode = 2
 placeholder_text = "Title"
+script = ExtResource("2_i6mjb")
 
 [node name="EffectsVBox" type="VBoxContainer" parent="MarginContainer/ScrollContainer/VBox"]
 layout_mode = 2
@@ -60,7 +63,7 @@ focus_mode = 3
 text = "Add Layer"
 icon = ExtResource("3_57ias")
 
-[node name="AddEffectPopup" type="Window" parent="." node_paths=PackedStringArray("linear_fold", "spatial_fold", "binary_fold", "motion_fold")]
+[node name="AddEffectPopup" type="Window" parent="." node_paths=PackedStringArray("list")]
 oversampling_override = 1.0
 title = "Add an Effect"
 initial_position = 2
@@ -68,10 +71,7 @@ size = Vector2i(680, 350)
 visible = false
 transient = true
 script = ExtResource("2_pijur")
-linear_fold = NodePath("MarginContainer/ScrollContainer/VBoxContainer/LinearFold")
-spatial_fold = NodePath("MarginContainer/ScrollContainer/VBoxContainer/SpatialFold")
-binary_fold = NodePath("MarginContainer/ScrollContainer/VBoxContainer/BinaryFold")
-motion_fold = NodePath("MarginContainer/ScrollContainer/VBoxContainer/MotionFold")
+list = NodePath("MarginContainer/VBoxContainer/ScrollContainer/EffectList")
 
 [node name="MarginContainer" type="MarginContainer" parent="AddEffectPopup"]
 anchors_preset = 15
@@ -84,84 +84,29 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="ScrollContainer" type="ScrollContainer" parent="AddEffectPopup/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="AddEffectPopup/MarginContainer"]
 layout_mode = 2
+
+[node name="Searchbox" type="LineEdit" parent="AddEffectPopup/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Search..."
+right_icon = ExtResource("6_11ak2")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer"]
+[node name="EffectList" type="HFlowContainer" parent="AddEffectPopup/MarginContainer/VBoxContainer/ScrollContainer" node_paths=PackedStringArray("search_box")]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="LinearFold" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer"]
-layout_mode = 2
-title = "Linear"
-foldable_group = ExtResource("6_57ias")
-script = ExtResource("6_i6mjb")
-
-[node name="GridContainer" type="GridContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/LinearFold"]
-layout_mode = 2
-columns = 3
-
-[node name="HFlowContainer" type="HFlowContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/LinearFold"]
-layout_mode = 2
-
-[node name="SpatialFold" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer"]
-layout_mode = 2
-folded = true
-title = "Spatial"
-foldable_group = ExtResource("6_57ias")
-script = ExtResource("6_i6mjb")
-type = 1
-
-[node name="GridContainer" type="GridContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/SpatialFold"]
-visible = false
-layout_mode = 2
-columns = 3
-
-[node name="HFlowContainer" type="HFlowContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/SpatialFold"]
-visible = false
-layout_mode = 2
-
-[node name="BinaryFold" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer"]
-layout_mode = 2
-folded = true
-title = "Binary"
-foldable_group = ExtResource("6_57ias")
-script = ExtResource("6_i6mjb")
-type = 2
-
-[node name="GridContainer" type="GridContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/BinaryFold"]
-visible = false
-layout_mode = 2
-columns = 3
-
-[node name="HFlowContainer" type="HFlowContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/BinaryFold"]
-visible = false
-layout_mode = 2
-
-[node name="MotionFold" type="FoldableContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer"]
-layout_mode = 2
-folded = true
-title = "Motion"
-foldable_group = ExtResource("6_57ias")
-script = ExtResource("6_i6mjb")
-type = 3
-
-[node name="GridContainer" type="GridContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/MotionFold"]
-visible = false
-layout_mode = 2
-columns = 3
-
-[node name="HFlowContainer" type="HFlowContainer" parent="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/MotionFold"]
-visible = false
-layout_mode = 2
+script = ExtResource("6_pcmeb")
+search_box = NodePath("../../Searchbox")
+row_scene = ExtResource("8_cvgbu")
 
 [connection signal="text_changed" from="MarginContainer/ScrollContainer/VBox/ClipTitle" to="." method="_on_clip_title_text_changed"]
 [connection signal="pressed" from="MarginContainer/ScrollContainer/VBox/EffectAdd/AddEffect" to="." method="_on_add_pressed"]
 [connection signal="pressed" from="MarginContainer/ScrollContainer/VBox/EffectAdd/AddLayer" to="." method="_on_add_layer_pressed"]
 [connection signal="close_requested" from="AddEffectPopup" to="AddEffectPopup" method="_on_close_requested"]
 [connection signal="effect_selected" from="AddEffectPopup" to="." method="_on_add_effect_popup_effect_selected"]
-[connection signal="effect_selected" from="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/LinearFold" to="AddEffectPopup" method="_on_linear_fold_effect_selected"]
-[connection signal="effect_selected" from="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/SpatialFold" to="AddEffectPopup" method="_on_spatial_fold_effect_selected"]
-[connection signal="effect_selected" from="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/BinaryFold" to="AddEffectPopup" method="_on_binary_fold_effect_selected"]
-[connection signal="effect_selected" from="AddEffectPopup/MarginContainer/ScrollContainer/VBoxContainer/MotionFold" to="AddEffectPopup" method="_on_motion_fold_effect_selected"]
+[connection signal="event" from="AddEffectPopup/MarginContainer/VBoxContainer/ScrollContainer/EffectList" to="AddEffectPopup" method="_on_effect_list_event"]

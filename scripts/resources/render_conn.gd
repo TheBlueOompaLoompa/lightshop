@@ -1,8 +1,9 @@
-class_name RenderConn extends PacketPeerUDP
+class_name RenderConn extends RefCounted
 
 @export var target: Target
 @export var render_delta := 0.0
 @export var renderer_source: String
+@export var renderer_loaded = false
 
 var thread: Thread
 var semaphore: Semaphore
@@ -16,40 +17,50 @@ var clip: EffectClip:
         clip = v
         clip_changed = true
 var time: float
+var output_peer: PacketPeerUDP = PacketPeerUDP.new()
+var preview_peer: PacketPeerUDP = PacketPeerUDP.new()
 
-func _init(p_target: Target):
+
+func _init(p_target: Target, p_track: TrackClip, preview: Preview):
     target = p_target
+    track = p_track
 
     thread = Thread.new()
     semaphore = Semaphore.new()
     mutex = Mutex.new()
-
+    
+    var preview_port = preview.restart(p_target.path, p_target)
+    var addrs = IP.resolve_hostname_addresses(p_target.address, IP.TYPE_ANY)
+    output_peer.connect_to_host(addrs[0], p_target.port)
+    preview_peer.connect_to_host("127.0.0.1", preview_port)
+    
     thread.start(_render_thread)
 
 var loaded = false
 
 func load_renderer():
     mutex.lock()
-    action_queue.push_front([Action.LOAD_RENDERER])
+    action_queue.push_back([Action.LOAD_RENDERER])
     if loaded:
-        action_queue.push_front([Action.UNLOAD_RENDERER])
+        action_queue.push_back([Action.UNLOAD_RENDERER])
     loaded = true
     mutex.unlock()
     semaphore.post()
+    renderer_loaded = true
 
 
 func _render_thread():
     var rd := RenderingServer.create_local_rendering_device()
     
     mutex.lock()
-    var layers = PackedByteArray()
-    layers.resize(target.leds*4*4*target.gpu_layers)
+    var layers_bytes = PackedByteArray()
+    layers_bytes.resize(target.count*4*4*target.gpu_layers)
     
     var shader: RID
-    var layers_buffer: RID = rd.storage_buffer_create(layers.size(), layers)
+    var layers_buf: RID = rd.storage_buffer_create(layers_bytes.size(), layers_bytes)
 
     var nothing = PackedByteArray()
-    nothing.resize(4*target.leds)
+    nothing.resize(4*target.count)
     nothing = nothing.compress(FileAccess.CompressionMode.COMPRESSION_GZIP)
 
     var const_bytes := PackedByteArray()
@@ -59,16 +70,16 @@ func _render_thread():
     const_bytes.resize(20)
     param_bytes.resize(1) # Buffer size cannot be zero
     effect_bytes.resize(1)
-    out_bytes.resize(target.leds*4)
+    out_bytes.resize(target.count*4)
     var const_buf = rd.storage_buffer_create(20, const_bytes)
     var param_buf = rd.storage_buffer_create(1, param_bytes)
     var effect_buf = rd.storage_buffer_create(1, effect_bytes)
-    var out_buf = rd.storage_buffer_create(target.leds*4, out_bytes)
+    var out_buf = rd.storage_buffer_create(target.count*4, out_bytes)
 
     var layers_uniform := RDUniform.new()
     layers_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
     layers_uniform.binding = 0
-    layers_uniform.add_id(layers_buffer)
+    layers_uniform.add_id(layers_buf)
     var const_uniform := RDUniform.new()
     const_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
     const_uniform.binding = 1
@@ -116,21 +127,29 @@ func _render_thread():
                 shader = rd.shader_create_from_spirv(shader_spirv)
             elif action[0] == Action.UNLOAD_RENDERER:
                 rd.free_rid(shader)
+            elif action[0] == Action.RESET_OUTPUT_PARAMS:
+                out_bytes.resize(target.count*4)
+                rd.buffer_update(out_buf, 0, out_bytes.size(), out_bytes)
+                layers_bytes.resize(target.count*4*4*target.gpu_layers)
+                rd.buffer_update(layers_buf, 0, layers_bytes.size(), layers_bytes)
             if len(action_queue) > 0:
                 mutex.unlock()
                 continue
         if clip == null or clip.effects.size() == 0:
-            put_packet(nothing)
+            if track.preview_output_enable:
+                preview_peer.put_packet(nothing)
+            if track.render_output_enable:
+                output_peer.put_packet(nothing)
             mutex.unlock()
             continue
         if clip_changed:
             clip_changed = false
             param_bytes.clear()
 
-            layers.fill(0)
-            rd.buffer_update(layers_buffer, 0, layers.size(), layers)
+            layers_bytes.fill(0)
+            rd.buffer_update(layers_buf, 0, layers_bytes.size(), layers_bytes)
             layers_uniform.clear_ids()
-            layers_uniform.add_id(layers_buffer)
+            layers_uniform.add_id(layers_buf)
 
             for effect in clip.effects:
                 for param in effect.parameters:
@@ -171,7 +190,7 @@ func _render_thread():
             #    rd.free_rid(pipeline)
         
         const_bytes.encode_float(0, time)
-        const_bytes.encode_u32(4, target.leds)
+        const_bytes.encode_u32(4, target.count)
         const_bytes.encode_u32(8, target.gpu_layers)
         const_bytes.encode_u32(12, clip.effects.size())
         const_bytes.encode_u32(16, target.type)
@@ -183,12 +202,17 @@ func _render_thread():
         var compute_list := rd.compute_list_begin()
         rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
         rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
-        rd.compute_list_dispatch(compute_list, target.leds, 1, 1)
+        rd.compute_list_dispatch(compute_list, target.count, 1, 1)
         rd.compute_list_end()
         rd.submit()
         rd.sync()
+        
+        var out = rd.buffer_get_data(out_buf).compress(FileAccess.CompressionMode.COMPRESSION_GZIP)
 
-        put_packet(rd.buffer_get_data(out_buf).compress(FileAccess.CompressionMode.COMPRESSION_GZIP))
+        if track.preview_output_enable:
+            preview_peer.put_packet(out)
+        if track.render_output_enable:
+            output_peer.put_packet(out)
         
         mutex.unlock()
 
@@ -224,6 +248,17 @@ func no_clip():
         mutex.unlock()
         semaphore.post()
 
+
+func reset_output_params(p_target: Target):
+    mutex.lock()
+    var addrs = IP.resolve_hostname_addresses(p_target.address, IP.TYPE_ANY)
+    output_peer.connect_to_host(addrs[0], p_target.port)
+    target = p_target
+    action_queue.push_front([Action.RESET_OUTPUT_PARAMS])
+    mutex.unlock()
+    semaphore.post()
+
+
 func deinit():
     mutex.lock()
     thread.free()
@@ -231,5 +266,6 @@ func deinit():
 
 enum Action {
     LOAD_RENDERER,
-    UNLOAD_RENDERER
+    UNLOAD_RENDERER,
+    RESET_OUTPUT_PARAMS
 }

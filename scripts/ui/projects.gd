@@ -14,7 +14,6 @@ func list_projects():
     var projects: Array[Project] = []
     for file in project_files:
         var project: Project = ResourceLoader.load('user://projects/'+file)
-        print(project.song_file)
         projects.append(project)
     
     const Project_Row = preload("res://scenes/ui/project_row.tscn")

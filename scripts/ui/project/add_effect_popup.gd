@@ -1,36 +1,23 @@
-extends Window
+class_name AddEffectPopup extends Window
 
 signal effect_selected(effect: Effect)
 
-@export var effects: Effects:
+@export var list: BaseSearchableList
+@export var clip_type: Target.Type:
     set(v):
-        effects = v
-        if effects != null:
-            linear_fold.effects = effects
-            spatial_fold.effects = effects
-            binary_fold.effects = effects
-            motion_fold.effects = effects
-@export var linear_fold: EffectAddSection
-@export var spatial_fold: EffectAddSection
-@export var binary_fold: EffectAddSection
-@export var motion_fold: EffectAddSection
+        clip_type = v
+        update_list()
+@export var effects: Effects
 
 
-func _on_linear_fold_effect_selected(effect: Effect) -> void:
-    effect_selected.emit(effect)
-
-
-func _on_spatial_fold_effect_selected(effect: Effect) -> void:
-    effect_selected.emit(effect)
-
-
-func _on_binary_fold_effect_selected(effect: Effect) -> void:
-    effect_selected.emit(effect)
-
-
-func _on_motion_fold_effect_selected(effect: Effect) -> void:
-    effect_selected.emit(effect)
+func update_list():
+    list.data = effects.values().filter(func(effect): return effect.target_types.has(clip_type))
 
 
 func _on_close_requested() -> void:
     hide()
+
+
+func _on_effect_list_event(event_name: String, _id: int, data: Variant) -> void:
+    if event_name == "effect_selected":
+        effect_selected.emit(data)

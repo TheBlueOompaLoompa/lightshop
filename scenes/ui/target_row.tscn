@@ -1,17 +1,24 @@
-[gd_scene load_steps=3 format=3 uid="uid://dltmtfearhooo"]
+[gd_scene load_steps=4 format=3 uid="uid://dltmtfearhooo"]
 
+[ext_resource type="StyleBox" uid="uid://dca5qs7fthnii" path="res://styles/row_panel_style.tres" id="1_hqy58"]
 [ext_resource type="Script" uid="uid://cumuw5b5bnban" path="res://scripts/ui/target_row.gd" id="1_vjw8w"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g80mp"]
-bg_color = Color(0.294118, 0.294118, 0.294118, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hqy58"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.9843137, 1, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 20
 
-[node name="TargetRow" type="PanelContainer"]
-theme_override_styles/panel = SubResource("StyleBoxFlat_g80mp")
+[node name="TargetRow" type="PanelContainer" node_paths=PackedStringArray("status_panel")]
+theme_override_styles/panel = ExtResource("1_hqy58")
 script = ExtResource("1_vjw8w")
+status_panel = NodePath("Margin/TargetRow/Status Indicator")
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -27,6 +34,13 @@ layout_mode = 2
 layout_mode = 2
 text = "Target"
 
+[node name="Status Indicator" type="Panel" parent="Margin/TargetRow"]
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_hqy58")
+
 [node name="HBoxContainer" type="HBoxContainer" parent="Margin/TargetRow"]
 layout_mode = 2
 size_flags_horizontal = 10
@@ -41,5 +55,6 @@ text = "Edit"
 layout_mode = 2
 text = "Delete"
 
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="Margin/TargetRow/HBoxContainer/Edit" to="." method="_on_edit_pressed"]
 [connection signal="pressed" from="Margin/TargetRow/HBoxContainer/Delete" to="." method="_on_delete_pressed"]

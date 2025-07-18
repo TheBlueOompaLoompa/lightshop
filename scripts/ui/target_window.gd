@@ -1,66 +1,31 @@
-extends Window
+class_name TargetWindow extends Window
 
-signal confirmed(target: Target)
+signal confirm(target: Target)
 
 @export var name_node: LineEdit
-@export var address_node: LineEdit
+@export var port_node: SpinBox
+@export var count_node: SpinBox
+@export var pins_node: LineEdit
+@export var framerate_node: SpinBox
 @export var type_node: OptionButton
 @export var calibration_node: Button
-@export var led_count_node: SpinBox
-@export var framerate_node: SpinBox
+@export var target: Target
 
-@export var target = Target.new()
 @export var id = -1
 
-func _on_visibility_changed():
-    if visible:
-        reset_content()
-
-
-func reset_content():
+func open(t: Target = Target.new(), i = -1):
+    id = i
+    target = t.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
     name_node.text = target.name
-    address_node.text = target.address
-    type_node.selected = target.type
-    led_count_node.value = target.leds
-    calibration_node.visible = target.type == 1
+    port_node.value = target.port
+    count_node.value = target.count
+    pins_node.text = ",".join(PackedStringArray(target.pins))
     framerate_node.value = target.framerate
-
+    type_node.selected = target.type
+    show()
 
 func _on_type_item_selected(index: int) -> void:
-    calibration_node.visible = index == 1
-
-
-func _on_cancel_pressed() -> void:
-    hide()
-    reset_content()
-    target = Target.new()
-    id = -1
-
-
-func _on_confirm_pressed() -> void:
-    if len(name_node.text) < 1:
-        return
-    if len(address_node.text) < 1:
-        return
-    if type_node.selected == 1 and target.points.size() < 1:
-        return
-    if led_count_node.value < 1:
-        return
-    if framerate_node.value < 1:
-        return
-    
-    target.name = name_node.text
-    target.address = address_node.text
-    target.type = type_node.selected
-    target.leds = led_count_node.value
-    target.framerate = framerate_node.value
-    
-    confirmed.emit(target.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_ALL), id)
-    hide()
-    reset_content()
-    target = Target.new()
-    id = -1
-
+    calibration_node.visible = index == Target.Type.SPATIAL
 
 func _on_calibration_file_selected(path: String) -> void:
     var text = FileAccess.open(path, FileAccess.READ).get_as_text()
@@ -69,7 +34,52 @@ func _on_calibration_file_selected(path: String) -> void:
         var vec_arr = line.split(';')
         if len(vec_arr) > 2:
             target.points.append(Vector3(float(vec_arr[0]), float(vec_arr[1]), float(vec_arr[2])))
-
+    
+    var lower_bound = target.points[0]
+    var upper_bound = target.points[0]
+    
+    for point in target.points:
+        if point.x < lower_bound.x: lower_bound.x = point.x
+        if point.y < lower_bound.y: lower_bound.y = point.y
+        if point.z < lower_bound.z: lower_bound.z = point.z
+        if point.x > upper_bound.x: upper_bound.x = point.x
+        if point.y > upper_bound.y: upper_bound.y = point.y
+        if point.z > upper_bound.z: upper_bound.z = point.z
+    
+    var offset = upper_bound - lower_bound
+    
+    for i in target.points.size():
+        target.points[i] = (target.points[i] - lower_bound) / offset
 
 func _on_calibration_pressed() -> void:
     $CalibrationFileDialog.show()
+
+
+func _on_cancel_pressed() -> void:
+    hide()
+
+
+func _on_confirm_pressed() -> void:
+    target.name = name_node.text
+    target.port = int(port_node.value)
+    target.count = int(count_node.value)
+    if pins_node.text.length() >= 1:
+        target.pins = []
+        for pin_str in pins_node.text.split(','):
+            target.pins.append(int(pin_str))
+    else:
+        return
+    target.framerate = framerate_node.value
+    target.type = type_node.selected as Target.Type
+    
+    if target.name.length() < 1:
+        return
+    if target.count < 1:
+        return
+    if target.framerate < 1:
+        return
+    if target.type == Target.Type.SPATIAL and target.points.size() != target.count:
+        return
+    
+    confirm.emit(target)
+    hide()

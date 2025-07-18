@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://bxod3rujy6g4a"]
+
+[ext_resource type="StyleBox" uid="uid://dca5qs7fthnii" path="res://styles/row_panel_style.tres" id="1_2ujdi"]
+[ext_resource type="Script" uid="uid://b6jejagqdnge6" path="res://scripts/ui/device_target_row.gd" id="2_bynor"]
+[ext_resource type="Texture2D" uid="uid://0wcv8bge4gfe" path="res://textures/icons/Edit.svg" id="3_ldeqc"]
+[ext_resource type="Texture2D" uid="uid://b0a6ontsi8v1g" path="res://textures/icons/Remove.svg" id="4_fkb7k"]
+
+[node name="DeviceTargetRow" type="PanelContainer" node_paths=PackedStringArray("label")]
+theme_override_styles/panel = ExtResource("1_2ujdi")
+script = ExtResource("2_bynor")
+label = NodePath("MarginContainer/HBoxContainer/TargetName")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TargetName" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Target Name"
+
+[node name="Edit" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+icon = ExtResource("3_ldeqc")
+
+[node name="Delete" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+icon = ExtResource("4_fkb7k")
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Edit" to="." method="_on_edit_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Delete" to="." method="_on_delete_pressed"]

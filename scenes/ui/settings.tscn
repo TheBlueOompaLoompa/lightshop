@@ -1,9 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://b7vueinrtkcmq"]
+[gd_scene load_steps=6 format=3 uid="uid://b7vueinrtkcmq"]
 
 [ext_resource type="Script" uid="uid://do7ymgs8b8y6g" path="res://scripts/ui/settings.gd" id="1_mx5tk"]
-[ext_resource type="Script" uid="uid://dm3h12vtrs3ne" path="res://scripts/ui/target_window.gd" id="5_58a0h"]
+[ext_resource type="Texture2D" uid="uid://dtafq0812pibj" path="res://textures/icons/Add.svg" id="2_ptynm"]
+[ext_resource type="Script" uid="uid://cjxmol3u7dg0q" path="res://scripts/ui/target_window.gd" id="4_ptynm"]
+[ext_resource type="Script" uid="uid://dm3h12vtrs3ne" path="res://scripts/ui/device_window.gd" id="5_58a0h"]
 
-[node name="Settings" type="MarginContainer"]
+[sub_resource type="LabelSettings" id="LabelSettings_7pacj"]
+font_size = 24
+
+[node name="Settings" type="MarginContainer" node_paths=PackedStringArray("targets_node", "beacons_node", "device_window")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,6 +16,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_top = 4
 script = ExtResource("1_mx5tk")
+targets_node = NodePath("Scroll/VBox/Device/MarginContainer/Device Scroll/Devices")
+beacons_node = NodePath("Scroll/VBox/Beacons/MarginContainer/Beacon Scroll/BeaconTargets")
+device_window = NodePath("DeviceWindow")
 metadata/_tab_index = 1
 
 [node name="Scroll" type="ScrollContainer" parent="."]
@@ -43,39 +51,184 @@ step = 0.01
 value = 1.0
 suffix = "x"
 
+[node name="Render Targets Label" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+text = "Devices"
+label_settings = SubResource("LabelSettings_7pacj")
+
 [node name="ButtonRow" type="HBoxContainer" parent="Scroll/VBox"]
 layout_mode = 2
 
-[node name="AddRenderTarget" type="Button" parent="Scroll/VBox/ButtonRow"]
+[node name="AddDevice" type="Button" parent="Scroll/VBox/ButtonRow"]
 layout_mode = 2
-text = "Add Render Target"
+tooltip_text = "Add Device Manually"
+icon = ExtResource("2_ptynm")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Scroll/VBox"]
-custom_minimum_size = Vector2(0, 400)
+[node name="Device" type="PanelContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Scroll/VBox/Device"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Device Scroll" type="ScrollContainer" parent="Scroll/VBox/Device/MarginContainer"]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="Targets" type="VBoxContainer" parent="Scroll/VBox/ScrollContainer"]
+[node name="Devices" type="VBoxContainer" parent="Scroll/VBox/Device/MarginContainer/Device Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TargetWindow" type="Window" parent="." node_paths=PackedStringArray("name_node", "address_node", "type_node", "calibration_node", "led_count_node", "framerate_node")]
+[node name="BeaconsLabel" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+text = "Discovered Devices"
+label_settings = SubResource("LabelSettings_7pacj")
+
+[node name="Beacons" type="PanelContainer" parent="Scroll/VBox"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Scroll/VBox/Beacons"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Beacon Scroll" type="ScrollContainer" parent="Scroll/VBox/Beacons/MarginContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="BeaconTargets" type="VBoxContainer" parent="Scroll/VBox/Beacons/MarginContainer/Beacon Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeviceWindow" type="Window" parent="." node_paths=PackedStringArray("name_node", "address_node", "targets_node", "target_window")]
 oversampling_override = 1.0
-title = "Target"
+title = "Configure Device"
 initial_position = 2
 size = Vector2i(350, 250)
 visible = false
 transient = true
+exclusive = true
 popup_window = true
 script = ExtResource("5_58a0h")
+name_node = NodePath("MarginContainer/Vertical/Grid/Name")
+address_node = NodePath("MarginContainer/Vertical/Grid/Address")
+targets_node = NodePath("MarginContainer/Vertical/Panel/MarginContainer/ScrollContainer/MarginContainer/VBoxContainer")
+target_window = NodePath("TargetWindow")
+
+[node name="MarginContainer" type="MarginContainer" parent="DeviceWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Vertical" type="VBoxContainer" parent="DeviceWindow/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Grid" type="GridContainer" parent="DeviceWindow/MarginContainer/Vertical"]
+layout_mode = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="DeviceWindow/MarginContainer/Vertical/Grid"]
+layout_mode = 2
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="DeviceWindow/MarginContainer/Vertical/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Target name"
+
+[node name="AddressLabel" type="Label" parent="DeviceWindow/MarginContainer/Vertical/Grid"]
+layout_mode = 2
+text = "Address"
+
+[node name="Address" type="LineEdit" parent="DeviceWindow/MarginContainer/Vertical/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "hostname.local:8080"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DeviceWindow/MarginContainer/Vertical"]
+layout_mode = 2
+
+[node name="TargetsLabel" type="Label" parent="DeviceWindow/MarginContainer/Vertical/HBoxContainer"]
+layout_mode = 2
+text = "Targets"
+
+[node name="AddTarget" type="Button" parent="DeviceWindow/MarginContainer/Vertical/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "New Target"
+icon = ExtResource("2_ptynm")
+
+[node name="Panel" type="PanelContainer" parent="DeviceWindow/MarginContainer/Vertical"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="DeviceWindow/MarginContainer/Vertical/Panel"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DeviceWindow/MarginContainer/Vertical/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="DeviceWindow/MarginContainer/Vertical/Panel/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DeviceWindow/MarginContainer/Vertical/Panel/MarginContainer/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonRow" type="HBoxContainer" parent="DeviceWindow/MarginContainer/Vertical"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Cancel" type="Button" parent="DeviceWindow/MarginContainer/Vertical/ButtonRow"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="Confirm" type="Button" parent="DeviceWindow/MarginContainer/Vertical/ButtonRow"]
+layout_mode = 2
+text = "Confirm"
+
+[node name="TargetWindow" type="Window" parent="DeviceWindow" node_paths=PackedStringArray("name_node", "port_node", "count_node", "pins_node", "framerate_node", "type_node", "calibration_node")]
+oversampling_override = 1.0
+title = "Configure Target"
+initial_position = 2
+size = Vector2i(335, 275)
+visible = false
+transient = true
+exclusive = true
+popup_window = true
+script = ExtResource("4_ptynm")
 name_node = NodePath("Vertical/Grid/Name")
-address_node = NodePath("Vertical/Grid/Address")
+port_node = NodePath("Vertical/Grid/Port")
+count_node = NodePath("Vertical/Grid/LedCount")
+pins_node = NodePath("Vertical/Grid/Pins")
+framerate_node = NodePath("Vertical/Grid/Framerate")
 type_node = NodePath("Vertical/Grid/Type")
 calibration_node = NodePath("Vertical/Calibration")
-led_count_node = NodePath("Vertical/Grid/LedCount")
-framerate_node = NodePath("Vertical/Grid/Framerate")
 
-[node name="Vertical" type="VBoxContainer" parent="TargetWindow"]
+[node name="Vertical" type="VBoxContainer" parent="DeviceWindow/TargetWindow"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -84,50 +237,60 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Grid" type="GridContainer" parent="TargetWindow/Vertical"]
+[node name="Grid" type="GridContainer" parent="DeviceWindow/TargetWindow/Vertical"]
 layout_mode = 2
 columns = 2
 
-[node name="NameLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+[node name="NameLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 text = "Name"
 
-[node name="Name" type="LineEdit" parent="TargetWindow/Vertical/Grid"]
+[node name="Name" type="LineEdit" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Target name"
 
-[node name="AddressLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+[node name="PortLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
-text = "Address"
+text = "Port"
 
-[node name="Address" type="LineEdit" parent="TargetWindow/Vertical/Grid"]
+[node name="Port" type="SpinBox" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "hostname.local:8080"
+max_value = 65535.0
+value = 8080.0
+rounded = true
 
-[node name="LedCountLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+[node name="LedCountLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 text = "Led Count"
 
-[node name="LedCount" type="SpinBox" parent="TargetWindow/Vertical/Grid"]
+[node name="LedCount" type="SpinBox" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 allow_greater = true
 
-[node name="FramerateLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+[node name="PinsLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
+layout_mode = 2
+text = "Pins"
+
+[node name="Pins" type="LineEdit" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "0,1,2..."
+
+[node name="FramerateLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 text = "Framerate"
 
-[node name="Framerate" type="SpinBox" parent="TargetWindow/Vertical/Grid"]
+[node name="Framerate" type="SpinBox" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 allow_greater = true
 suffix = "FPS"
 
-[node name="TypeLabel" type="Label" parent="TargetWindow/Vertical/Grid"]
+[node name="TypeLabel" type="Label" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 text = "Type"
 
-[node name="Type" type="OptionButton" parent="TargetWindow/Vertical/Grid"]
+[node name="Type" type="OptionButton" parent="DeviceWindow/TargetWindow/Vertical/Grid"]
 layout_mode = 2
 selected = 0
 item_count = 2
@@ -136,23 +299,23 @@ popup/item_0/id = 0
 popup/item_1/text = "Spatial"
 popup/item_1/id = 1
 
-[node name="Calibration" type="Button" parent="TargetWindow/Vertical"]
+[node name="Calibration" type="Button" parent="DeviceWindow/TargetWindow/Vertical"]
 layout_mode = 2
 text = "Open Calibration File"
 
-[node name="ButtonRow" type="HBoxContainer" parent="TargetWindow/Vertical"]
+[node name="ButtonRow" type="HBoxContainer" parent="DeviceWindow/TargetWindow/Vertical"]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Cancel" type="Button" parent="TargetWindow/Vertical/ButtonRow"]
+[node name="Cancel" type="Button" parent="DeviceWindow/TargetWindow/Vertical/ButtonRow"]
 layout_mode = 2
 text = "Cancel"
 
-[node name="Confirm" type="Button" parent="TargetWindow/Vertical/ButtonRow"]
+[node name="Confirm" type="Button" parent="DeviceWindow/TargetWindow/Vertical/ButtonRow"]
 layout_mode = 2
 text = "Confirm"
 
-[node name="CalibrationFileDialog" type="FileDialog" parent="TargetWindow"]
+[node name="CalibrationFileDialog" type="FileDialog" parent="DeviceWindow/TargetWindow"]
 title = "Open a File"
 position = Vector2i(0, 36)
 size = Vector2i(348, 180)
@@ -163,11 +326,15 @@ use_native_dialog = true
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="toggled" from="Scroll/VBox/Invert Timeline Scroll" to="." method="_on_invert_timeline_scroll_toggled"]
 [connection signal="value_changed" from="Scroll/VBox/Grid/UIScale" to="." method="_on_ui_scale_value_changed"]
-[connection signal="pressed" from="Scroll/VBox/ButtonRow/AddRenderTarget" to="." method="_on_add_render_target_pressed"]
-[connection signal="confirmed" from="TargetWindow" to="." method="_on_target_window_confirmed"]
-[connection signal="visibility_changed" from="TargetWindow" to="TargetWindow" method="_on_visibility_changed"]
-[connection signal="item_selected" from="TargetWindow/Vertical/Grid/Type" to="TargetWindow" method="_on_type_item_selected"]
-[connection signal="pressed" from="TargetWindow/Vertical/Calibration" to="TargetWindow" method="_on_calibration_pressed"]
-[connection signal="pressed" from="TargetWindow/Vertical/ButtonRow/Cancel" to="TargetWindow" method="_on_cancel_pressed"]
-[connection signal="pressed" from="TargetWindow/Vertical/ButtonRow/Confirm" to="TargetWindow" method="_on_confirm_pressed"]
-[connection signal="file_selected" from="TargetWindow/CalibrationFileDialog" to="TargetWindow" method="_on_calibration_file_selected"]
+[connection signal="pressed" from="Scroll/VBox/ButtonRow/AddDevice" to="." method="_on_add_render_target_pressed"]
+[connection signal="confirmed" from="DeviceWindow" to="." method="_on_device_window_confirmed"]
+[connection signal="visibility_changed" from="DeviceWindow" to="DeviceWindow" method="_on_visibility_changed"]
+[connection signal="pressed" from="DeviceWindow/MarginContainer/Vertical/HBoxContainer/AddTarget" to="DeviceWindow" method="_on_add_target_pressed"]
+[connection signal="pressed" from="DeviceWindow/MarginContainer/Vertical/ButtonRow/Cancel" to="DeviceWindow" method="_on_cancel_pressed"]
+[connection signal="pressed" from="DeviceWindow/MarginContainer/Vertical/ButtonRow/Confirm" to="DeviceWindow" method="_on_confirm_pressed"]
+[connection signal="confirm" from="DeviceWindow/TargetWindow" to="DeviceWindow" method="_on_target_window_confirm"]
+[connection signal="item_selected" from="DeviceWindow/TargetWindow/Vertical/Grid/Type" to="DeviceWindow/TargetWindow" method="_on_type_item_selected"]
+[connection signal="pressed" from="DeviceWindow/TargetWindow/Vertical/Calibration" to="DeviceWindow/TargetWindow" method="_on_calibration_pressed"]
+[connection signal="pressed" from="DeviceWindow/TargetWindow/Vertical/ButtonRow/Cancel" to="DeviceWindow/TargetWindow" method="_on_cancel_pressed"]
+[connection signal="pressed" from="DeviceWindow/TargetWindow/Vertical/ButtonRow/Confirm" to="DeviceWindow/TargetWindow" method="_on_confirm_pressed"]
+[connection signal="file_selected" from="DeviceWindow/TargetWindow/CalibrationFileDialog" to="DeviceWindow/TargetWindow" method="_on_calibration_file_selected"]

@@ -29,6 +29,7 @@ func update():
         button.pressed.connect(func():
             track.visible = !track.visible
             project_page.update_tracks()
+            update()
         )
         button.icon = show_icon if track.visible else hide_icon
         row.add_child(label)

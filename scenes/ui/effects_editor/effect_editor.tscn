@@ -1,12 +1,22 @@
-[gd_scene load_steps=8 format=3 uid="uid://bb0uwhbs3w5na"]
+[gd_scene load_steps=11 format=3 uid="uid://bb0uwhbs3w5na"]
 
 [ext_resource type="Script" uid="uid://bv6m0gitplrwb" path="res://scripts/ui/effect_editor/effect_editor.gd" id="1_vmfn6"]
 [ext_resource type="SystemFont" uid="uid://cci52b2a6cujv" path="res://code_font.tres" id="2_33y43"]
 [ext_resource type="Script" uid="uid://ds03uem0axihv" path="res://scripts/ui/effect_editor/effect_config_popup.gd" id="2_amixn"]
+[ext_resource type="Texture2D" uid="uid://ble1fqyp3tyei" path="res://textures/icons/Save.svg" id="2_u1obr"]
 [ext_resource type="Texture2D" uid="uid://dtafq0812pibj" path="res://textures/icons/Add.svg" id="3_33y43"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qd05v"]
 font_size = 24
+
+[sub_resource type="InputEventKey" id="InputEventKey_tr2ww"]
+device = -1
+ctrl_pressed = true
+keycode = 83
+unicode = 115
+
+[sub_resource type="Shortcut" id="Shortcut_j7ip5"]
+events = [SubResource("InputEventKey_tr2ww")]
 
 [sub_resource type="CodeHighlighter" id="CodeHighlighter_33y43"]
 number_color = Color(0, 0.76952046, 0.510095, 1)
@@ -31,7 +41,7 @@ keyword_colors = {
 "void": Color(0, 0.76862746, 0.50980395, 1)
 }
 
-[node name="Effect Editor" type="MarginContainer" node_paths=PackedStringArray("effects_list", "graph_box", "effect_config_popup", "effect_label", "code_edit", "params_text")]
+[node name="Effect Editor" type="MarginContainer" node_paths=PackedStringArray("effects_list", "graph_box", "effect_config_popup", "effect_label", "code_edit", "params_text", "error_logs")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -39,11 +49,12 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vmfn6")
 effects_list = NodePath("Split/EffectPanel/VBox/ScrollContainer/Effects")
-graph_box = NodePath("Split/VBoxContainer/GraphBox")
+graph_box = NodePath("Split/HSplitContainer/VBoxContainer/GraphBox")
 effect_config_popup = NodePath("EffectConfigPopup")
-effect_label = NodePath("Split/VBoxContainer/HBoxContainer/EffectLabel")
-code_edit = NodePath("Split/VBoxContainer/GraphBox/VSplitContainer/CodeEdit")
-params_text = NodePath("Split/VBoxContainer/GraphBox/VSplitContainer/Params")
+effect_label = NodePath("Split/HSplitContainer/VBoxContainer/HBoxContainer/EffectLabel")
+code_edit = NodePath("Split/HSplitContainer/VBoxContainer/GraphBox/VSplitContainer/CodeEdit")
+params_text = NodePath("Split/HSplitContainer/VBoxContainer/GraphBox/VSplitContainer/Params")
+error_logs = NodePath("Split/HSplitContainer/Error Logs")
 metadata/_tab_index = 2
 
 [node name="Split" type="HSplitContainer" parent="."]
@@ -85,29 +96,35 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Split"]
+[node name="HSplitContainer" type="HSplitContainer" parent="Split"]
+layout_mode = 2
+split_offset = 810
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Split/HSplitContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Split/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Split/HSplitContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="EffectLabel" type="Label" parent="Split/VBoxContainer/HBoxContainer"]
+[node name="EffectLabel" type="Label" parent="Split/HSplitContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Save" type="Button" parent="Split/VBoxContainer/HBoxContainer"]
+[node name="Save" type="Button" parent="Split/HSplitContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+shortcut = SubResource("Shortcut_j7ip5")
 text = "Save"
+icon = ExtResource("2_u1obr")
 
-[node name="GraphBox" type="BoxContainer" parent="Split/VBoxContainer"]
+[node name="GraphBox" type="BoxContainer" parent="Split/HSplitContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VSplitContainer" type="VSplitContainer" parent="Split/VBoxContainer/GraphBox"]
+[node name="VSplitContainer" type="VSplitContainer" parent="Split/HSplitContainer/VBoxContainer/GraphBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 split_offset = 190
 
-[node name="Params" type="CodeEdit" parent="Split/VBoxContainer/GraphBox/VSplitContainer"]
+[node name="Params" type="CodeEdit" parent="Split/HSplitContainer/VBoxContainer/GraphBox/VSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_33y43")
@@ -117,10 +134,9 @@ syntax_highlighter = SubResource("CodeHighlighter_33y43")
 highlight_all_occurrences = true
 highlight_current_line = true
 gutters_draw_line_numbers = true
-delimiter_strings = Array[String](["\" \"", "' '"])
 indent_use_spaces = true
 
-[node name="CodeEdit" type="CodeEdit" parent="Split/VBoxContainer/GraphBox/VSplitContainer"]
+[node name="CodeEdit" type="CodeEdit" parent="Split/HSplitContainer/VBoxContainer/GraphBox/VSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -135,7 +151,11 @@ gutters_draw_fold_gutter = true
 indent_use_spaces = true
 indent_automatic = true
 
-[node name="EffectConfigPopup" type="Window" parent="." node_paths=PackedStringArray("name_edit", "linear_check", "spatial_check", "binary_check", "motion_check", "params_vbox")]
+[node name="Error Logs" type="CodeEdit" parent="Split/HSplitContainer"]
+layout_mode = 2
+editable = false
+
+[node name="EffectConfigPopup" type="Window" parent="." node_paths=PackedStringArray("name_edit", "linear_check", "spatial_check", "binary_check", "position_check", "rotation_check", "params_vbox")]
 oversampling_override = 1.0
 title = "Effect Config"
 position = Vector2i(0, 36)
@@ -147,7 +167,8 @@ name_edit = NodePath("VBoxContainer/GridContainer/Name")
 linear_check = NodePath("VBoxContainer/GridContainer/Types/Linear")
 spatial_check = NodePath("VBoxContainer/GridContainer/Types/Spatial")
 binary_check = NodePath("VBoxContainer/GridContainer/Types/Binary")
-motion_check = NodePath("VBoxContainer/GridContainer/Types/Motion")
+position_check = NodePath("VBoxContainer/GridContainer/Types/Position")
+rotation_check = NodePath("VBoxContainer/GridContainer/Types/Rotation")
 params_vbox = NodePath("VBoxContainer/MarginContainer/Panel/Vbox/Scroll/MarginContainer/ParamsVbox")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="EffectConfigPopup"]
@@ -192,9 +213,13 @@ text = "Spatial"
 layout_mode = 2
 text = "Binary"
 
-[node name="Motion" type="CheckBox" parent="EffectConfigPopup/VBoxContainer/GridContainer/Types"]
+[node name="Position" type="CheckBox" parent="EffectConfigPopup/VBoxContainer/GridContainer/Types"]
 layout_mode = 2
-text = "Motion"
+text = "Position"
+
+[node name="Rotation" type="CheckBox" parent="EffectConfigPopup/VBoxContainer/GridContainer/Types"]
+layout_mode = 2
+text = "Rotation"
 
 [node name="MarginContainer" type="MarginContainer" parent="EffectConfigPopup/VBoxContainer"]
 layout_mode = 2
@@ -255,14 +280,15 @@ text = "Save"
 
 [connection signal="pressed" from="Split/EffectPanel/VBox/ButtonBar/CreateEffect" to="." method="_on_create_effect_pressed"]
 [connection signal="pressed" from="Split/EffectPanel/VBox/ButtonBar/AddNewEffect" to="." method="_on_add_new_effect_pressed"]
-[connection signal="pressed" from="Split/VBoxContainer/HBoxContainer/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="Split/HSplitContainer/VBoxContainer/HBoxContainer/Save" to="." method="_on_save_pressed"]
 [connection signal="save" from="EffectConfigPopup" to="." method="_on_effect_config_popup_save"]
 [connection signal="visibility_changed" from="EffectConfigPopup" to="EffectConfigPopup" method="_on_visibility_changed"]
 [connection signal="text_changed" from="EffectConfigPopup/VBoxContainer/GridContainer/Name" to="EffectConfigPopup" method="_on_name_text_changed"]
 [connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Linear" to="EffectConfigPopup" method="_on_linear_toggled"]
 [connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Spatial" to="EffectConfigPopup" method="_on_spatial_toggled"]
 [connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Binary" to="EffectConfigPopup" method="_on_binary_toggled"]
-[connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Motion" to="EffectConfigPopup" method="_on_motion_toggled"]
+[connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Position" to="EffectConfigPopup" method="_on_position_toggled"]
+[connection signal="toggled" from="EffectConfigPopup/VBoxContainer/GridContainer/Types/Rotation" to="EffectConfigPopup" method="_on_rotation_toggled"]
 [connection signal="pressed" from="EffectConfigPopup/VBoxContainer/MarginContainer/Panel/Vbox/HBoxContainer/AddParameter" to="EffectConfigPopup" method="_on_add_parameter_pressed"]
 [connection signal="pressed" from="EffectConfigPopup/VBoxContainer/HBoxContainer/Cancel" to="EffectConfigPopup" method="_on_cancel_pressed"]
 [connection signal="pressed" from="EffectConfigPopup/VBoxContainer/HBoxContainer/Save" to="EffectConfigPopup" method="_on_save_pressed"]

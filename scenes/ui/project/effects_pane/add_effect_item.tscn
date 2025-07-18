@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://g4g6h7qqgdr"]
+
+[ext_resource type="Script" uid="uid://rdkofewr68us" path="res://scripts/ui/project/add_effect_item.gd" id="1_u4j11"]
+
+[node name="Button" type="Button"]
+script = ExtResource("1_u4j11")

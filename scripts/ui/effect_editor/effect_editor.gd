@@ -1,4 +1,4 @@
-extends MarginContainer
+class_name EffectsEditor extends MarginContainer
 
 const EFFECT_EDITOR_ROW = preload("uid://cofluya4qt6qn")
 const EFFECT_GRAPH = preload("uid://dx8xcn5b2bmvn")
@@ -25,6 +25,7 @@ const EFFECT_GRAPH = preload("uid://dx8xcn5b2bmvn")
 @export var effect_label: Label
 @export var code_edit: CodeEdit
 @export var params_text: CodeEdit
+@export var error_logs: CodeEdit
 
 var effect_graph_effect: Effect
 
@@ -95,3 +96,12 @@ func _on_save_pressed() -> void:
     editing.shader.source = code_edit.text
     effects.s(editing.uid, editing)
     effects.emit_changed()
+
+
+func _on_renderer_compilation_failed(error: String) -> void:
+    error_logs.show()
+    error_logs.text = error
+
+
+func _on_renderer_compilation_successful() -> void:
+    error_logs.hide()

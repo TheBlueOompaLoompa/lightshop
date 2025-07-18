@@ -11,7 +11,8 @@ signal add(clip: Clip)
 @export var linear_box: HFlowContainer
 @export var spatial_box: HFlowContainer
 @export var binary_box: HFlowContainer
-@export var motion_box: HFlowContainer
+@export var position_box: HFlowContainer
+@export var rotation_box: HFlowContainer
 
 
 func update():
@@ -21,7 +22,9 @@ func update():
         child.queue_free()
     for child in binary_box.get_children():
         child.queue_free()
-    for child in motion_box.get_children():
+    for child in position_box.get_children():
+        child.queue_free()
+    for child in rotation_box.get_children():
         child.queue_free()
     var i = 0
     for clip in project.saved_clips:
@@ -39,11 +42,13 @@ func update():
         if clip.type == Target.Type.LINEAR:
             linear_box.add_child(button)
         elif clip.type == Target.Type.SPATIAL:
-            linear_box.add_child(button)
+            spatial_box.add_child(button)
         elif clip.type == Target.Type.BINARY:
-            linear_box.add_child(button)
-        elif clip.type == Target.Type.MOTION:
-            linear_box.add_child(button)
+            binary_box.add_child(button)
+        elif clip.type == Target.Type.POSITION:
+            position_box.add_child(button)
+        elif clip.type == Target.Type.ROTATION:
+            rotation_box.add_child(button)
         var context_menu = ContextMenu.new()
         context_menu.attach_to(button)
         context_menu.add_item("Delete Clip", Callable(button, "_delete_clip"), false, null)

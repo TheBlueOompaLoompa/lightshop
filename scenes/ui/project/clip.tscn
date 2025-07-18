@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cwvenjrjscc0a"]
 
 [ext_resource type="Script" uid="uid://c73or6amd53bg" path="res://scripts/ui/project/clip.gd" id="1_6gebj"]
-[ext_resource type="StyleBox" uid="uid://d0x2u5pjggxrk" path="res://clip_panel_style.tres" id="2_2d8sf"]
+[ext_resource type="StyleBox" uid="uid://d0x2u5pjggxrk" path="res://styles/clip_panel_style.tres" id="2_2d8sf"]
 
 [node name="Clip" type="PanelContainer"]
 z_index = 1

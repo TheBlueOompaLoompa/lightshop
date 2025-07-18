@@ -1,24 +1,37 @@
 extends Node
 class_name Renderer
 
+signal compilation_failed(error: String)
+signal compilation_successful
+
 @export var project: Project:
     set(v):
         project = v
         if project != null:
             _on_project_loaded()
+@export var settings: Settings:
+    set(v):
+        settings = v
+        if settings != null:
+            settings.device_changed.connect(_on_settings_device_changed)
 @export var effects: Effects:
     set(v):
         effects = v
         if effects != null:
             _on_effects_changed()
+            effects.changed.connect(_on_effects_changed)
+            for effect in effects.values():
+                effect.changed.connect(_on_effects_changed)
+@export var preview: Preview
 
 var rd: RenderingDevice
-var loaded_effects: Dictionary[String, RID]
 var connections: Dictionary[String, RenderConn]
 var renderer_template = ""
 
 var renderer_source = ""
 var noise_source = ""
+var renderer_compiled_successfully = false
+var renderer_loaded: Dictionary[String, bool] = {}
 
 func _init() -> void:
     rd = RenderingServer.create_local_rendering_device()
@@ -31,29 +44,104 @@ func _init() -> void:
 
 
 func _on_project_loaded():
-    renderer_source = generate_renderer()
+    project.tracks_changed.connect(on_tracks_changed)
+    on_tracks_changed()
+
+
+func _on_settings_device_changed(device: Device, _idx: int):
+    for target in device.targets.values():
+        update_render_conn(target.path)
+        restart_device(device, target.name)
+
+
+func on_tracks_changed():
     for track in project.tracks:
-        for target in track.targets:
-            if not connections.has(target.name):
-                var client = RenderConn.new(target)
-                client.renderer_source = renderer_source
-                client.load_renderer()
-                var split_addr = target.address.split(':')
-                var addrs = IP.resolve_hostname_addresses("".join(split_addr.slice(0, -1)), IP.TYPE_ANY)
-                if len(addrs) <= 0:
-                    continue
-                var addr = addrs[0]
-                print("Connecting to ", addr, split_addr[split_addr.size()-1])
-                client.connect_to_host(addr, int(split_addr[split_addr.size()-1]) if len(split_addr) > 0 else 8080)
-                
-                connections.set(target.name, client)
+        var t_changed = func():
+            on_track_changed(track)
+        if not track.renderer_reload.is_connected(t_changed):
+            track.renderer_reload.connect(t_changed)
+            on_track_changed(track)
+
+
+var polling_devices: Dictionary[String, Device]
+func _process(_delta: float) -> void:
+    for device in polling_devices.values():
+        device.poll()
+
+
+func on_track_changed(track: TrackClip):
+    for t in track.targets:
+        await update_render_conn(t.path, track)
+    _on_effects_changed()
+
+
+func update_render_conn(path: String, track: TrackClip = null) -> Error:
+    var target: Target
+    var device: Device
+    for d in settings.devices:
+        if d.name == path.split('/')[0]:
+            device = d
+            target = d.targets.get(path.split('/')[1])
+            break
+    if target == null: return ERR_DOES_NOT_EXIST
+    
+    var err = OK
+    if not connections.has(path):
+        if track == null: return ERR_INVALID_PARAMETER
+        err = await restart_device(device, target.name)
+        connections.set(target.path, RenderConn.new(target, track, preview))
+    else:
+        err = await restart_device(device, target.name)
+        (connections.get(path) as RenderConn).reset_output_params(target)
+    
+    return err
+
+
+func restart_device(device: Device, output_name: String):
+    var err = OK
+    device.connect_control()
+    polling_devices.set(device.name, device)
+    var conn_status = StreamPeerTCP.STATUS_CONNECTING
+    while conn_status != StreamPeerTCP.STATUS_CONNECTED and conn_status != StreamPeerTCP.STATUS_ERROR:
+        conn_status = await device.status_update
+    if conn_status == StreamPeerTCP.STATUS_CONNECTED:
+        device.restart_output(output_name)
+    else:
+        err = ERR_CANT_CONNECT
+    polling_devices.erase(device.name)
+    if err != OK:
+        Log.error('Failed to restart output', device.name + '/' + output_name, error_string(err))
+    return err
 
 
 func _on_effects_changed():
     renderer_source = generate_renderer()
-    for client in connections.values():
-        client.renderer_source = renderer_source
-        client.load_renderer()
+    var shader_source = RDShaderSource.new()
+    shader_source.language = RenderingDevice.SHADER_LANGUAGE_GLSL
+    shader_source.set_stage_source(RenderingDevice.SHADER_STAGE_COMPUTE, renderer_source)
+    var shader_spirv := rd.shader_compile_spirv_from_source(shader_source)
+    if shader_spirv.compile_error_compute:
+        renderer_compiled_successfully = false
+        var lines = renderer_source.split("\n")
+        var error_lines = shader_spirv.compile_error_compute.split("\n")
+        var err_line_num = 0
+        for line in error_lines:
+            if line.begins_with("ERROR: "):
+                err_line_num = int(line.split(":")[2])
+                break
+        var error_output: String = shader_spirv.compile_error_compute
+        var i = err_line_num - 5
+        for line in lines.slice(err_line_num - 5, err_line_num + 5):
+            error_output += str(i) + " " + line + "\n"
+            i += 1
+        Log.error("Renderer compilation error", error_output)
+        compilation_failed.emit(error_output)
+    else:
+        compilation_successful.emit()
+        renderer_compiled_successfully = true
+        for client in connections.values():
+            client.renderer_source = renderer_source
+            client.load_renderer()
 
 
 func generate_renderer() -> String:
@@ -74,22 +162,21 @@ func generate_renderer() -> String:
     
     temp = temp.replace("// EFFECT REPLACE", effect_source).replace("// RUN REPLACE", rns).replace("// NOISE REPLACE", noise_source)
     return temp
-    
-func has_effect(effect: Effect) -> bool:
-    return loaded_effects.has(effect)
-    
-    
+
+
 func deinit():
     for conn in connections.values():
         conn.deinit()
 
 
 func param_edit(track: TrackClip):
+    if not renderer_compiled_successfully: return
     for target in track.targets:
-        connections.get(target.name).param_edit()
+        connections.get(target.path).param_edit()
 
 
 func render(beats: float, delta: float):
+    if not renderer_compiled_successfully: return
     for track in project.tracks:
         var has_clip = false
         if track.render_enable:
@@ -99,20 +186,16 @@ func render(beats: float, delta: float):
                     has_clip = true
         if not has_clip:
             for target in track.targets:
-                connections.get(target.name).no_clip()
-#            for target in track.targets:
-#                var empty = PackedByteArray()
-#                empty.resize(target.leds*4)
-#                connections.get(target.name).put_packet(gzip_encode(empty))
-
-
-func color_to_u8vec4bytes(color: Color):
-    return PackedByteArray([color.r8, color.g8, color.b8, color.a8])
+                var conn = connections.get(target.path)
+                if conn == null or not conn.renderer_loaded: continue
+                conn.no_clip()
 
 
 func render_clip(track: TrackClip, clip: EffectClip, time: float, delta: float):
+    if not renderer_compiled_successfully: return
     for target in track.targets:
-        var conn: RenderConn = connections.get(target.name)
+        var conn: RenderConn = connections.get(target.path)
+        if conn == null or not conn.renderer_loaded: continue
         conn.render_delta += delta
         if conn.render_delta >= 1.0/target.framerate:
             conn.render_clip(track, clip, time)

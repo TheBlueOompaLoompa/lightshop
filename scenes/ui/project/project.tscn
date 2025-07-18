@@ -1,11 +1,8 @@
-[gd_scene load_steps=54 format=4 uid="uid://m4lmnfaqp3j3"]
+[gd_scene load_steps=59 format=4 uid="uid://m4lmnfaqp3j3"]
 
 [ext_resource type="Script" uid="uid://bjbamksfpsjt5" path="res://scripts/ui/project/project.gd" id="1_iay77"]
-[ext_resource type="Theme" uid="uid://bvlme0tisedbu" path="res://theme.tres" id="2_er4s0"]
-[ext_resource type="Script" uid="uid://cs7fhwl3mfjdc" path="res://scripts/ui/project/project_menu_bar.gd" id="2_ygaxq"]
+[ext_resource type="Theme" uid="uid://bvlme0tisedbu" path="res://styles/theme.tres" id="2_er4s0"]
 [ext_resource type="Texture2D" uid="uid://ble1fqyp3tyei" path="res://textures/icons/Save.svg" id="3_2ykfl"]
-[ext_resource type="Texture2D" uid="uid://bmfldtqde3yl7" path="res://textures/icons/GuiClose.svg" id="4_3l6yk"]
-[ext_resource type="Texture2D" uid="uid://dflr7ludrnrq0" path="res://textures/icons/GraphEdit.svg" id="4_s0f2y"]
 [ext_resource type="Script" uid="uid://gwomvdehmyuo" path="res://scripts/ui/clickout.gd" id="4_tf14p"]
 [ext_resource type="Texture2D" uid="uid://dgpmm71bwutto" path="res://textures/icons/Play.svg" id="4_ygaxq"]
 [ext_resource type="Texture2D" uid="uid://ddddn54r34j12" path="res://textures/icons/Stop.svg" id="5_vb854"]
@@ -15,18 +12,22 @@
 [ext_resource type="Script" uid="uid://bg1qjirq2guck" path="res://scripts/ui/project/clips.gd" id="7_esf1f"]
 [ext_resource type="FoldableGroup" uid="uid://ce3yp45kk1rdo" path="res://clip_fold_group.tres" id="7_ivxm6"]
 [ext_resource type="Script" uid="uid://dxvin7r57uh4q" path="res://scripts/ui/project/track_window.gd" id="8_3sejc"]
-[ext_resource type="Script" uid="uid://cqqmsxb3qbno4" path="res://scripts/ui/project/preview.gd" id="8_oguic"]
+[ext_resource type="Script" uid="uid://cqqmsxb3qbno4" path="res://scripts/ui/project/preview/preview.gd" id="8_oguic"]
 [ext_resource type="Script" uid="uid://be2tpt3ibph7x" path="res://scripts/ui/expand_fold.gd" id="8_y65iq"]
 [ext_resource type="Texture2D" uid="uid://dtafq0812pibj" path="res://textures/icons/Add.svg" id="9_3l6yk"]
 [ext_resource type="Material" uid="uid://c3m38xfuwa40j" path="res://preview.material" id="9_5w4mr"]
+[ext_resource type="Texture2D" uid="uid://b34e3op1ynot6" path="res://textures/icons/MeshItem.svg" id="9_wrtem"]
 [ext_resource type="Texture2D" uid="uid://5dkstx816des" path="res://textures/icons/SnapTimeline.svg" id="9_yeef4"]
 [ext_resource type="Texture2D" uid="uid://b2yhqhexmmgvy" path="res://textures/icons/ActionCopy.svg" id="12_0d5tb"]
+[ext_resource type="Script" uid="uid://bymwkrumdejhb" path="res://scripts/ui/project/preview/preview_light.gd" id="12_wo38v"]
 [ext_resource type="Texture2D" uid="uid://5ru3v8v315dy" path="res://textures/icons/ActionCut.svg" id="13_j3gt4"]
+[ext_resource type="Script" uid="uid://cr785jecp30lv" path="res://scripts/resources/target.gd" id="13_u4bye"]
 [ext_resource type="Texture2D" uid="uid://bgnh6q6g6vynx" path="res://textures/icons/ActionPaste.svg" id="14_oguic"]
-[ext_resource type="Script" uid="uid://bl8i7pscnoa61" path="res://scripts/renderer.gd" id="15_lbwwm"]
-[ext_resource type="Script" uid="uid://6sva3tsqvt8y" path="res://scripts/ui/effect_editor/effect_editor_window.gd" id="16_ivu5r"]
-[ext_resource type="PackedScene" uid="uid://bb0uwhbs3w5na" path="res://scenes/ui/effects_editor/effect_editor.tscn" id="17_s0f2y"]
+[ext_resource type="Script" uid="uid://db2nm58j0n0oa" path="res://scripts/ui/project/preview/preview_add_output_window.gd" id="15_y65iq"]
+[ext_resource type="Texture2D" uid="uid://bof0fn1g7i2or" path="res://textures/icons/Search.svg" id="16_esf1f"]
+[ext_resource type="Script" uid="uid://c313c7sruet37" path="res://scripts/ui/base_searchable_list.gd" id="17_vy0wc"]
 [ext_resource type="Texture2D" uid="uid://bpv8ru7cj8del" path="res://textures/icons/GuiVisibilityVisible.svg" id="18_aj4rv"]
+[ext_resource type="PackedScene" uid="uid://b7yi32fu0e4br" path="res://scenes/ui/project/add_output_row.tscn" id="18_wrtem"]
 [ext_resource type="Script" uid="uid://bufv7r3wmwmc1" path="res://scripts/ui/project/track_visibility.gd" id="22_wo38v"]
 [ext_resource type="Texture2D" uid="uid://xmth4wbc7alb" path="res://textures/icons/GuiVisibilityHidden.svg" id="23_u4bye"]
 [ext_resource type="Texture2D" uid="uid://bgtynrnykokw0" path="res://house_texgen_0.jpg" id="24_uk5wa"]
@@ -43,72 +44,7 @@ events = [SubResource("InputEventKey_u4bye")]
 bg_color = Color(0.235294, 0.235294, 0.235294, 1)
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_j3gt4"]
-viewport_path = NodePath("Preview")
-
-[sub_resource type="InputEventKey" id="InputEventKey_sginn"]
-device = -1
-keycode = 32
-unicode = 32
-
-[sub_resource type="Shortcut" id="Shortcut_er57u"]
-events = [SubResource("InputEventKey_sginn")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_qji3o"]
-device = -1
-shift_pressed = true
-keycode = 32
-unicode = 32
-
-[sub_resource type="Shortcut" id="Shortcut_a1tp5"]
-events = [SubResource("InputEventKey_qji3o")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_j3gt4"]
-device = -1
-ctrl_pressed = true
-keycode = 67
-
-[sub_resource type="Shortcut" id="Shortcut_oguic"]
-events = [SubResource("InputEventKey_j3gt4")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_5w4mr"]
-device = -1
-ctrl_pressed = true
-keycode = 88
-
-[sub_resource type="Shortcut" id="Shortcut_uk5wa"]
-events = [SubResource("InputEventKey_5w4mr")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_7xr11"]
-device = -1
-ctrl_pressed = true
-keycode = 86
-
-[sub_resource type="Shortcut" id="Shortcut_qrw54"]
-events = [SubResource("InputEventKey_7xr11")]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3sejc"]
-bg_color = Color(0.12549, 0.12549, 0.12549, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_blend = true
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygaxq"]
-bg_color = Color(1, 0, 0, 0.7647059)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb854"]
-bg_color = Color(1, 0, 0, 1)
-anti_aliasing = false
+viewport_path = NodePath("VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_60271"]
 resource_name = "main"
@@ -192,7 +128,91 @@ glow_enabled = true
 glow_intensity = 5.77
 glow_bloom = 0.08
 
-[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "effects_pane", "preview", "effect_editor_win", "track_visibility", "tracks_container", "clips_pool", "ticks", "division_label", "division_slider", "cursor_bucket", "renderer")]
+[sub_resource type="PlaneMesh" id="PlaneMesh_rlemx"]
+size = Vector2(0.8, 0.06)
+
+[sub_resource type="Curve3D" id="Curve3D_u4bye"]
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0, 0, 0, 5, 0.5, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 1, 1, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[sub_resource type="Resource" id="Resource_ivxm6"]
+script = ExtResource("13_u4bye")
+metadata/_custom_type_script = "uid://cr785jecp30lv"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4bye"]
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_sginn"]
+device = -1
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_er57u"]
+events = [SubResource("InputEventKey_sginn")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_qji3o"]
+device = -1
+shift_pressed = true
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_a1tp5"]
+events = [SubResource("InputEventKey_qji3o")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_j3gt4"]
+device = -1
+ctrl_pressed = true
+keycode = 67
+
+[sub_resource type="Shortcut" id="Shortcut_oguic"]
+events = [SubResource("InputEventKey_j3gt4")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_5w4mr"]
+device = -1
+ctrl_pressed = true
+keycode = 88
+
+[sub_resource type="Shortcut" id="Shortcut_uk5wa"]
+events = [SubResource("InputEventKey_5w4mr")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_7xr11"]
+device = -1
+ctrl_pressed = true
+keycode = 86
+
+[sub_resource type="Shortcut" id="Shortcut_qrw54"]
+events = [SubResource("InputEventKey_7xr11")]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3sejc"]
+bg_color = Color(0.12549, 0.12549, 0.12549, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_blend = true
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygaxq"]
+bg_color = Color(1, 0, 0, 0.7647059)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb854"]
+bg_color = Color(1, 0, 0, 1)
+anti_aliasing = false
+
+[node name="Project" type="MarginContainer" node_paths=PackedStringArray("audio_player", "minutes_node", "seconds_node", "effects_pane", "preview", "track_visibility", "tracks_container", "clips_pool", "ticks", "division_label", "division_slider", "cursor_bucket")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -204,7 +224,6 @@ minutes_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Co
 seconds_node = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Seconds")
 effects_pane = NodePath("VBoxContainer/VSplitContainer/BigSplit/LittleSplit/EffectsPane")
 preview = NodePath("VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview")
-effect_editor_win = NodePath("EffectEditorWindow")
 track_visibility = NodePath("TrackVisibility")
 tracks_container = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vbox/Scroll/Tracks")
 clips_pool = NodePath("VBoxContainer/VSplitContainer/BigSplit/Clips")
@@ -212,7 +231,6 @@ ticks = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/Margin/Vb
 division_label = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division Label")
 division_slider = NodePath("VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Division")
 cursor_bucket = NodePath("CursorBucket")
-renderer = NodePath("Renderer")
 metadata/_tab_index = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
@@ -220,25 +238,6 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-
-[node name="MenuBar" type="MenuBar" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-flat = true
-script = ExtResource("2_ygaxq")
-
-[node name="Project" type="PopupMenu" parent="VBoxContainer/HBoxContainer/MenuBar"]
-system_menu_id = 2
-prefer_native_menu = true
-item_count = 3
-item_0/text = "Save"
-item_0/icon = ExtResource("3_2ykfl")
-item_0/id = 0
-item_1/text = "Open Effects Editor"
-item_1/icon = ExtResource("4_s0f2y")
-item_1/id = 2
-item_2/text = "Quit"
-item_2/icon = ExtResource("4_3l6yk")
-item_2/id = 2
 
 [node name="Save" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -258,26 +257,30 @@ layout_mode = 2
 theme = ExtResource("2_er4s0")
 split_offset = 506
 
-[node name="Clips" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit" node_paths=PackedStringArray("linear_box", "spatial_box", "binary_box", "motion_box")]
+[node name="Clips" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit" node_paths=PackedStringArray("linear_box", "spatial_box", "binary_box", "position_box", "rotation_box")]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
 script = ExtResource("7_esf1f")
 linear_box = NodePath("VBoxContainer/Linear/ScrollContainer/HFlowContainer")
 spatial_box = NodePath("VBoxContainer/Spatial/ScrollContainer/HFlowContainer")
 binary_box = NodePath("VBoxContainer/Binary/ScrollContainer/HFlowContainer")
-motion_box = NodePath("VBoxContainer/Motion/ScrollContainer/HFlowContainer")
+position_box = NodePath("VBoxContainer/Position/ScrollContainer/HFlowContainer")
+rotation_box = NodePath("VBoxContainer/Rotation/ScrollContainer/HFlowContainer")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips"]
 layout_mode = 2
 
 [node name="NewEmptyClip" type="Button" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 focus_mode = 0
 text = "New Empty Clip"
 
 [node name="Linear" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 3
 title = "Linear"
 foldable_group = ExtResource("7_ivxm6")
 script = ExtResource("8_y65iq")
@@ -292,6 +295,7 @@ size_flags_horizontal = 3
 
 [node name="Spatial" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
 layout_mode = 2
+focus_mode = 3
 folded = true
 title = "Spatial"
 foldable_group = ExtResource("7_ivxm6")
@@ -308,6 +312,7 @@ size_flags_horizontal = 3
 
 [node name="Binary" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
 layout_mode = 2
+focus_mode = 3
 folded = true
 title = "Binary"
 foldable_group = ExtResource("7_ivxm6")
@@ -322,19 +327,37 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Motion" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
+[node name="Position" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
 layout_mode = 2
+focus_mode = 3
 folded = true
-title = "Motion"
+title = "Position"
 foldable_group = ExtResource("7_ivxm6")
 script = ExtResource("8_y65iq")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Motion"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Position"]
 visible = false
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="HFlowContainer" type="HFlowContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Motion/ScrollContainer"]
+[node name="HFlowContainer" type="HFlowContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Position/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Rotation" type="FoldableContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer"]
+layout_mode = 2
+focus_mode = 3
+folded = true
+title = "Rotation"
+foldable_group = ExtResource("7_ivxm6")
+script = ExtResource("8_y65iq")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Rotation"]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="HFlowContainer" type="HFlowContainer" parent="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/Rotation/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -346,20 +369,150 @@ split_offset = 516
 [node name="EffectsPane" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit" instance=ExtResource("6_u3oqd")]
 layout_mode = 2
 
-[node name="Preview" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit" node_paths=PackedStringArray("preview_rect", "viewport", "camera", "camera_y_axis")]
+[node name="Preview" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit" node_paths=PackedStringArray("preview_rect", "viewport", "viewport_models_node", "outputs_node", "scene_node", "camera", "camera_y_axis", "model_file_dialog", "add_output_window", "output_meshes")]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jvdmd")
 script = ExtResource("8_oguic")
-preview_rect = NodePath("PreviewRect")
-viewport = NodePath("../../../../../Preview")
-camera = NodePath("../../../../../Preview/CameraYAxis/Camera3D")
-camera_y_axis = NodePath("../../../../../Preview/CameraYAxis")
-out_mat = ExtResource("9_5w4mr")
+preview_rect = NodePath("HBoxContainer/Preview Rect")
+viewport = NodePath("Preview Viewport")
+viewport_models_node = NodePath("Preview Viewport/Scene/Models")
+outputs_node = NodePath("Preview Viewport/Scene/Outputs")
+scene_node = NodePath("Preview Viewport/Scene")
+camera = NodePath("Preview Viewport/CameraYAxis/Camera3D")
+camera_y_axis = NodePath("Preview Viewport/CameraYAxis")
+model_file_dialog = NodePath("FileDialog")
+add_output_window = NodePath("AddOutputWindow")
+output_meshes = {
+"Garage/Bar": NodePath("Preview Viewport/house/Led Strip"),
+"Inside/Door": NodePath("Preview Viewport/Door Strip")
+}
 
-[node name="PreviewRect" type="TextureRect" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview"]
 layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Left Sidebar" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LoadModel" type="Button" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer/MarginContainer/Left Sidebar"]
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Load 3D Model"
+focus_mode = 3
+icon = ExtResource("9_wrtem")
+
+[node name="AddOutput" type="Button" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer/MarginContainer/Left Sidebar"]
+layout_mode = 2
+tooltip_text = "Add output to preview"
+focus_mode = 3
+icon = ExtResource("9_3l6yk")
+
+[node name="Preview Rect" type="TextureRect" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 texture = SubResource("ViewportTexture_j3gt4")
 expand_mode = 1
+
+[node name="Preview Viewport" type="SubViewport" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview"]
+size = Vector2i(669, 512)
+
+[node name="CameraYAxis" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.859, 2.5404997)
+
+[node name="Camera3D" type="Camera3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/CameraYAxis"]
+
+[node name="house" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5479672, 0, -5.0327816)
+
+[node name="Scaniverse_2025_06_29_185738" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/house"]
+transform = Transform3D(0.92497087, 0.38003802, 5.9604645e-08, 2.9802322e-08, 5.9604645e-08, -1, -0.38003802, 0.9249709, 5.9604645e-08, 0, 0, 0)
+
+[node name="Geom" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/house/Scaniverse_2025_06_29_185738"]
+
+[node name="mesh" type="MeshInstance3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/house/Scaniverse_2025_06_29_185738/Geom"]
+mesh = SubResource("ArrayMesh_haxd4")
+skeleton = NodePath("")
+
+[node name="Materials" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/house/Scaniverse_2025_06_29_185738"]
+
+[node name="Led Strip" type="MeshInstance3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/house"]
+transform = Transform3D(0, 0.8818104, 0, -0.02933424, 0, 0, 0, 0, 0.8818104, 5.634979, 2.2057812, -1.1812327)
+mesh = SubResource("ArrayMesh_uk5wa")
+skeleton = NodePath("")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+environment = SubResource("Environment_uk5wa")
+
+[node name="Door Strip" type="MeshInstance3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.334666, 0.20496488, -6.998781)
+mesh = SubResource("PlaneMesh_rlemx")
+
+[node name="Scene" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+
+[node name="Models" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/Scene"]
+
+[node name="Outputs" type="Node3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport/Scene"]
+
+[node name="PreviewLight" type="MeshInstance3D" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/Preview Viewport"]
+script = ExtResource("12_wo38v")
+curves = Array[Curve3D]([SubResource("Curve3D_u4bye")])
+target = SubResource("Resource_ivxm6")
+width = 0.02000000000407453
+mat = SubResource("StandardMaterial3D_u4bye")
+metadata/_custom_type_script = "uid://bymwkrumdejhb"
+
+[node name="FileDialog" type="FileDialog" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview"]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.gltf", "*.glb")
+use_native_dialog = true
+
+[node name="AddOutputWindow" type="Window" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" node_paths=PackedStringArray("list")]
+oversampling_override = 1.0
+title = "Add Output"
+position = Vector2i(0, 36)
+size = Vector2i(550, 275)
+visible = false
+script = ExtResource("15_y65iq")
+list = NodePath("MarginContainer/VBoxContainer/ScrollContainer/BaseSearchableList")
+metadata/_custom_type_script = "uid://db2nm58j0n0oa"
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow/MarginContainer"]
+layout_mode = 2
+
+[node name="Searchbox" type="LineEdit" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Search..."
+right_icon = ExtResource("16_esf1f")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BaseSearchableList" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow/MarginContainer/VBoxContainer/ScrollContainer" node_paths=PackedStringArray("search_box")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("17_vy0wc")
+search_box = NodePath("../../Searchbox")
+row_scene = ExtResource("18_wrtem")
 
 [node name="Bottom" type="PanelContainer" parent="VBoxContainer/VSplitContainer"]
 layout_mode = 2
@@ -729,57 +882,17 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="TrackVisibility/MarginContainer/VBoxContainer/Groups/ScrollContainer"]
 layout_mode = 2
 
-[node name="Renderer" type="Node" parent="."]
-script = ExtResource("15_lbwwm")
-
-[node name="EffectEditorWindow" type="Window" parent="."]
-auto_translate_mode = 1
-oversampling_override = 1.0
-title = "Effect Editor"
-position = Vector2i(0, 36)
-size = Vector2i(1280, 720)
-visible = false
-script = ExtResource("16_ivu5r")
-
-[node name="Effect Editor" parent="EffectEditorWindow" instance=ExtResource("17_s0f2y")]
-
-[node name="Preview" type="SubViewport" parent="."]
-size = Vector2i(669, 512)
-
-[node name="CameraYAxis" type="Node3D" parent="Preview"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.859, 2.5404997)
-
-[node name="Camera3D" type="Camera3D" parent="Preview/CameraYAxis"]
-
-[node name="house" type="Node3D" parent="Preview"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5479672, 0, -5.0327816)
-
-[node name="Scaniverse_2025_06_29_185738" type="Node3D" parent="Preview/house"]
-transform = Transform3D(0.92497087, 0.38003802, 5.9604645e-08, 2.9802322e-08, 5.9604645e-08, -1, -0.38003802, 0.9249709, 5.9604645e-08, 0, 0, 0)
-
-[node name="Geom" type="Node3D" parent="Preview/house/Scaniverse_2025_06_29_185738"]
-
-[node name="mesh" type="MeshInstance3D" parent="Preview/house/Scaniverse_2025_06_29_185738/Geom"]
-mesh = SubResource("ArrayMesh_haxd4")
-skeleton = NodePath("")
-
-[node name="Materials" type="Node3D" parent="Preview/house/Scaniverse_2025_06_29_185738"]
-
-[node name="Plane" type="MeshInstance3D" parent="Preview/house"]
-transform = Transform3D(0, 0.8818104, 0, -0.02933424, 0, 0, 0, 0, 0.8818104, 5.634979, 2.2057812, -1.1812327)
-mesh = SubResource("ArrayMesh_uk5wa")
-skeleton = NodePath("")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Preview"]
-environment = SubResource("Environment_uk5wa")
-
-[connection signal="file_pressed" from="VBoxContainer/HBoxContainer/MenuBar" to="." method="_on_menu_bar_file_pressed"]
-[connection signal="index_pressed" from="VBoxContainer/HBoxContainer/MenuBar/Project" to="VBoxContainer/HBoxContainer/MenuBar" method="_on_file_index_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Save" to="." method="save"]
 [connection signal="add" from="VBoxContainer/VSplitContainer/BigSplit/Clips" to="." method="_on_clips_add"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/BigSplit/Clips/VBoxContainer/NewEmptyClip" to="." method="_on_clip_button_pressed"]
 [connection signal="effect_param_changed" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/EffectsPane" to="." method="_on_effects_pane_effect_param_changed"]
-[connection signal="gui_input" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/PreviewRect" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_preview_rect_gui_input"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer/MarginContainer/Left Sidebar/LoadModel" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_load_model_pressed"]
+[connection signal="pressed" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/PanelContainer/MarginContainer/Left Sidebar/AddOutput" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_add_output_pressed"]
+[connection signal="gui_input" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/HBoxContainer/Preview Rect" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_preview_rect_gui_input"]
+[connection signal="file_selected" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/FileDialog" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_file_dialog_file_selected"]
+[connection signal="close_requested" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow" method="_on_close_requested"]
+[connection signal="selected" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview" method="_on_add_output_window_selected"]
+[connection signal="event" from="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow/MarginContainer/VBoxContainer/ScrollContainer/BaseSearchableList" to="VBoxContainer/VSplitContainer/BigSplit/LittleSplit/Preview/AddOutputWindow" method="_on_base_searchable_list_event"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/AspectRatioContainer2/Stop" to="." method="_on_stop_pressed"]
 [connection signal="value_changed" from="VBoxContainer/VSplitContainer/Bottom/BottomContainer/ControlsContainer/MarginContainer/HBoxContainer/Minutes" to="." method="_on_minutes_value_changed"]
@@ -806,4 +919,3 @@ environment = SubResource("Environment_uk5wa")
 [connection signal="close_requested" from="TrackVisibility" to="TrackVisibility" method="_on_close_requested"]
 [connection signal="folding_changed" from="TrackVisibility/MarginContainer/VBoxContainer/Tracks" to="TrackVisibility" method="_on_tracks_folding_changed"]
 [connection signal="folding_changed" from="TrackVisibility/MarginContainer/VBoxContainer/Groups" to="TrackVisibility" method="_on_groups_folding_changed"]
-[connection signal="close_requested" from="EffectEditorWindow" to="EffectEditorWindow" method="_on_close_requested"]

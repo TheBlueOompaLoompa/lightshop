@@ -4,7 +4,8 @@
 #define TARGET_LINEAR 0
 #define TARGET_SPATIAL 1
 #define TARGET_BINARY 2
-#define TARGET_MOTION 3
+#define TARGET_POSITION 3
+#define TARGET_ROTATION 3
 
 #define TYPE_INT 0
 #define TYPE_FLOAT 1
@@ -85,6 +86,7 @@ vec3 hsv2rgb(vec3 c) {
 // EFFECT REPLACE
 
 void run_effect(uint effect_idx) {
+    if(INDEX >= constant.count || INDEX < 0.0) return;
     switch(effect_idx) {
 // RUN REPLACE
         case -1:
@@ -118,6 +120,7 @@ void main() {
                 NEXT = clamp(vec4(CURRENT.rgb * CURRENT.a + NEXT.rgb * (1.0 - CURRENT.a), CURRENT.a + NEXT.a), vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
                 break;
             case 1: // add 
+                NEXT = clamp(CURRENT + NEXT, vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
                 break;
             case 2: // multiply 
                 NEXT = clamp(CURRENT.rgba * NEXT.rgba, vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));

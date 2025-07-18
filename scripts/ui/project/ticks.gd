@@ -1,6 +1,6 @@
 extends PanelContainer
 
-const BlankPanel = preload("res://blank_panel.tres")
+const BlankPanel = preload("uid://c1m2kcaweij66")
 
 signal retime(beats: float)
 signal playhead_scroll(beats: float)
